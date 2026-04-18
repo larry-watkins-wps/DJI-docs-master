@@ -30,3 +30,6 @@ desktop.ini
 # Logs / temp
 *.log
 *.tmp
+
+# Claude Code — user-specific local settings (team-shared settings.json stays tracked)
+.claude/settings.local.json
