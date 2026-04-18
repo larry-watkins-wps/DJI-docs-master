@@ -1,0 +1,32 @@
+# Build outputs (may appear inside DJI-Cloud-API-Demo/ or dji_cloud_dock3/ if anyone ever builds them)
+target/
+build/
+dist/
+out/
+node_modules/
+.gradle/
+.mvn/
+*.class
+*.jar
+*.war
+*.ear
+
+# Vendored build tools (fetch normally if needed)
+**/apache-maven*.tar.gz
+**/apache-maven*.zip
+
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs / temp
+*.log
+*.tmp

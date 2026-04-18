@@ -1,0 +1,6 @@
+- [Project: DJI Cloud docs corpus](project_dji_docs_corpus.md) — long-running, multi-session effort to build curated DJI Dock 3 / M4D / M4TD Cloud API docs in `master-docs/`
+- [Source directory inventory](reference_source_dirs.md) — where raw DJI Cloud material lives and which dir is authoritative vs. reference-only
+- [Documentation style preferences](feedback_documentation_style.md) — clean/clear/concise, LLM-digestible, ask questions rather than guess
+- [Working style: methodical phased work](feedback_working_style.md) — phased execution, persistent TODO file, avoid context/quota exhaustion
+- [User scope boundary](user_scope_boundary.md) — user's professional role is not to influence scope of this work
+- [Real payloads only, no fabrication](feedback_real_payloads_only.md) — all wire examples must be verbatim from DJI source; invented content silently breaks both audits and implementations

@@ -1,0 +1,1125 @@
+DJI Cloud API - Aircraft Properties (Pilot-to-Cloud MQTT)
+Source: https://developer.dji.com/doc/cloud-api-tutorial/en/api-reference/pilot-to-cloud/mqtt/others/aircraft/properties.html
+Extracted from MHTML archive.
+
+This document lists the thing model properties for aircraft devices in the
+DJI Cloud API pilot-to-cloud MQTT integration. Properties are reported via
+thing/product/{sn}/osd (pushMode 0) or thing/product/{sn}/state (pushMode 1),
+and writable properties can be set via thing/product/{sn}/property/set.
+
+================================================================================
+
+### Device Property List
+
+-
+pushMode:
+
+ - 0: Stable frequency data. Device will report in the frequency of 0.5HZ. (Topic:thing/product/{sn}/osd)
+ - 1: State data. It is reported when the state changes. (Topic:thing/product/{sn}/state)
+
+-
+accessMode:
+
+ - r: Property can only be read
+ - rw: Property can be read and written (Topic:thing/product/{sn}/property/set)
+
+country
+ Name: Country area code
+ Type: text
+ Access: r
+ pushMode: 0
+
+mode_code
+ Name: Aircraft state
+ Type: enum_int
+ Constraint: {"0":"Standby","1":"Takeoff preparation","2":"Takeoff preparation completed","3":"Manual flight","4":"Automatic takeoff","5":"Wayline flight","6":"Panoramic photography","7":"Intelligent tracking","8":"ADS-B avoidance","9":"Auto returning to home","10":"Automatic landing","11":"Forced landing","12":"Three-blade landing","13":"Upgrading","14":"Not connected","15":"APAS","16":"Virtual stick state","17":"Live flight Controls","18":"Airborne RTK fixing mode"}
+ Access: r
+ pushMode: 0
+
+mode_code_reason
+ Name: The reason the aircraft entered the current state
+ Type: enum_int
+ Constraint: {"0":"No meaning","1":"Insufficient battery power (return, landing)","2":"Insufficient battery voltage (return, landing)","3":"Severely low voltage (return, landing)","4":"Requested by remote controller buttons (takeoff, return, landing)","5":"Requested by App (takeoff, return, landing)","6":"Loss of remote controller signal (return, landing, hover)","7":"Triggered by external devices such as navigation, SDK, etc. (takeoff, return, landing)","8":"Entered the dock GEO Zone (landing)","9":"Although a return was triggered, it was too close to the Home point (landing)","10":"Although a return was triggered, it was too far from the Home point (landing)","11":"Requested when executing waypoint missions (takeoff)","12":"Requested after reaching above the Home point in the return phase (landing)","13":"Continued descent after the aircraft's height dropped to 0.7m from the ground (second-stage descent limit) leading to (landing)","14":"Forced breakthrough of low altitude protection by devices like App, SDK (landing)","15":"Requested due to passing flights in the vicinity (returning, landing)","16":"Requested due to height control failure (return, landing)","17":"Entered after intelligent low battery return (landing)","18":"AP controls the flight mode (manual flight)","19":"Hardware abnormally (return, landing)","20":"End of anti-collision protection (landing)","21":"Return canceled (hover)","22":"Encountered obstacles during the return (landing)"}
+ Access: r
+ pushMode: 1
+
+cameras
+ Name: Aircraft camera information
+ Type: array
+ Constraint: {"size": -, "item_type": struct}
+ Access: r
+ pushMode: 0
+
+ remain_photo_num
+ Name: Remaining number of photos to take
+ Type: int
+ Description: Remaining number of photos to take
+ pushMode: 0
+
+ remain_record_duration
+ Name: Remaining recording time
+ Type: int
+ Constraint: {"max":"","min":"","step":"","unit_name":"Seconds / s"}
+ Description: Remaining recording time
+ pushMode: 0
+
+ record_time
+ Name: Video recording duration
+ Type: int
+ Constraint: {"max":"","min":"","step":"","unit_name":"Seconds / s"}
+ Description: Video recording duration
+ pushMode: 0
+
+ payload_index
+ Name: Payload index
+ Type: text
+ Description: Payload index. Camera enumeration values. Non-standard device_mode_key, formatted as {type-subtype-gimbalindex}. Please refer to Product Supportedopen in new window
+ pushMode: 0
+
+ camera_mode
+ Name: Camera mode
+ Type: enum_int
+ Constraint: {"0":"Capturing","1":"Recording","2":"Smart Low-Light","3":"Panoramic photography"}
+ Description: Camera mode
+ pushMode: 0
+
+ photo_state
+ Name: Photo capturing status
+ Type: enum_int
+ Constraint: {"0":"Idle","1":"Capturing photo"}
+ pushMode: 0
+
+ screen_split_enable
+ Name: Is split screen enabled
+ Type: bool
+ Constraint: {"0":"Disable split screen","1":"Enable split screen"}
+ pushMode: 0
+
+ recording_state
+ Name: Recording state
+ Type: enum_int
+ Constraint: {"0":"Idle","1":"Recording"}
+ Description: Recording state
+ pushMode: 0
+
+ zoom_factor
+ Name: Zoom factor
+ Type: int
+ Constraint: {"max":200,"min":2,"step":"","unit_name":null}
+ pushMode: 0
+
+ ir_zoom_factor
+ Name: Infrared zoom factor
+ Type: float
+ Constraint: {"max":20,"min":2,"step":"","unit_name":null}
+ Description: Infrared zoom factor
+ pushMode: 0
+
+ liveview_world_region
+ Name: Field of view (FOV) region in liveview
+ Type: struct
+ Description: The field of view angle of the zoom camera relative to the wide-angle camera or infrared camera may differ in liveview. The coordinate origin is the upper-left corner of the lens.
+ pushMode: 0
+
+ left
+ Name: X-axis starting point in the top-left corner
+ Type: float
+ Description: X-axis starting point in the top-left corner
+ Access: r
+ pushMode: 0
+
+ top
+ Name: Top-left corner's starting point on the y-axis
+ Type: float
+ Description: Top-left corner's starting point on the y-axis
+ Access: r
+ pushMode: 0
+
+ right
+ Name: Starting point of the x-axis in the bottom right corner
+ Type: float
+ Description: Starting point of the x-axis in the bottom right corner
+ Access: r
+ pushMode: 0
+
+ bottom
+ Name: Y-axis starting point in the lower right corner
+ Type: float
+ Description: Y-axis starting point in the lower right corner
+ Access: r
+ pushMode: 0
+
+ photo_storage_settings
+ Name: Photo storage settings collection
+ Type: array
+ Constraint: {"size": -, "item_type": enum_string}
+ Description: Value range {current, wide, zoom, ir}
+ pushMode: 0
+
+ video_storage_settings
+ Name: Collection of video storage settings
+ Type: array
+ Constraint: {"size": -, "item_type": enum_string}
+ Description: Value range {current, wide, zoom, ir}
+ pushMode: 0
+
+ wide_exposure_mode
+ Name: Wide-angle lens exposure mode
+ Type: enum_int
+ Constraint: {"1":"Auto","2":"Shutter Priority","3":"Aperture Priority","4":"Manual"}
+ Description: Current configuration of wide-angle lens exposure mode
+ pushMode: 0
+
+ wide_iso
+ Name: Wide-angle lens ISO
+ Type: enum_int
+ Constraint: {"0":"Auto","1":"Auto(High Sense)","2":"50","3":"100","4":"200","5":"400","6":"800","7":"1600","8":"3200","9":"6400","10":"12800","11":"25600","255":"FIXED"}
+ Description: Current configuration of wide-angle lens ISO
+ pushMode: 0
+
+ wide_shutter_speed
+ Name: Wide-angle lens shutter speed
+ Type: enum_int
+ Constraint: {"0":"1/8000 s","1":"1/6400 s","2":"1/6000 s","3":"1/5000 s","4":"1/4000 s","5":"1/3200 s","6":"1/3000 s","7":"1/2500 s","8":"1/2000 s","9":"1/1600 s","10":"1/1500 s","11":"1/1250 s","12":"1/1000 s","13":"1/800 s","14":"1/725 s","15":"1/640 s","16":"1/500 s","17":"1/400 s","18":"1/350 s","19":"1/320 s","20":"1/250 s","21":"1/240 s","22":"1/200 s","23":"1/180 s","24":"1/160 s","25":"1/125 s","26":"1/120 s","27":"1/100 s","28":"1/90 s","29":"1/80 s","30":"1/60 s","31":"1/50 s","32":"1/40 s","33":"1/30 s","34":"1/25 s","35":"1/20 s","36":"1/15 s","37":"1/12.5 s","38":"1/10 s","39":"1/8 s","40":"1/6.25 s","41":"1/5 s","42":"1/4 s","43":"1/3 s","44":"1/2.5 s","45":"1/2 s","46":"1/1.67 s","47":"1/1.25 s","48":"1.0 s","49":"1.3 s","50":"1.6 s","51":"2.0 s","52":"2.5 s","53":"3.0 s","54":"3.2 s","55":"4.0 s","56":"5.0 s","57":"6.0 s","58":"7.0 s","59":"8.0 s","65534":"Auto"}
+ Description: Current configuration of wide-angle lens shutter speed
+ pushMode: 0
+
+ wide_exposure_value
+ Name: Wide-angle lens exposure value
+ Type: enum_int
+ Constraint: {"1":"-5.0EV","2":"-4.7EV","3":"-4.3EV","4":"-4.0EV","5":"-3.7EV","6":"-3.3EV","7":"-3.0EV","8":"-2.7EV","9":"-2.3EV","10":"-2.0EV","11":"-1.7EV","12":"-1.3EV","13":"-1.0EV","14":"-0.7EV","15":"-0.3EV","16":"0EV","17":"0.3EV","18":"0.7EV","19":"1.0EV","20":"1.3EV","21":"1.7EV","22":"2.0EV","23":"2.3EV","24":"2.7EV","25":"3.0EV","26":"3.3EV","27":"3.7EV","28":"4.0EV","29":"4.3EV","30":"4.7EV","31":"5.0EV","255":"FIXED"}
+ Description: Current configuration of wide-angle lens exposure value
+ pushMode: 0
+
+ zoom_exposure_mode
+ Name: Zoom lens exposure mode
+ Type: enum_int
+ Constraint: {"1":"Auto","2":"Shutter Priority","3":"Aperture Priority","4":"Manual"}
+ Description: Current configuration of zoom lens exposure mode
+ pushMode: 0
+
+ zoom_iso
+ Name: Zoom lens ISO
+ Type: enum_int
+ Constraint: {"0":"Auto","1":"Auto(High Sense)","2":"50","3":"100","4":"200","5":"400","6":"800","7":"1600","8":"3200","9":"6400","10":"12800","11":"25600","255":"FIXED"}
+ Description: Current configuration of zoom lens ISO
+ pushMode: 0
+
+ zoom_shutter_speed
+ Name: Zoom lens shutter speed
+ Type: enum_int
+ Constraint: {"0":"1/8000 s","1":"1/6400 s","2":"1/6000 s","3":"1/5000 s","4":"1/4000 s","5":"1/3200 s","6":"1/3000 s","7":"1/2500 s","8":"1/2000 s","9":"1/1600 s","10":"1/1500 s","11":"1/1250 s","12":"1/1000 s","13":"1/800 s","14":"1/725 s","15":"1/640 s","16":"1/500 s","17":"1/400 s","18":"1/350 s","19":"1/320 s","20":"1/250 s","21":"1/240 s","22":"1/200 s","23":"1/180 s","24":"1/160 s","25":"1/125 s","26":"1/120 s","27":"1/100 s","28":"1/90 s","29":"1/80 s","30":"1/60 s","31":"1/50 s","32":"1/40 s","33":"1/30 s","34":"1/25 s","35":"1/20 s","36":"1/15 s","37":"1/12.5 s","38":"1/10 s","39":"1/8 s","40":"1/6.25 s","41":"1/5 s","42":"1/4 s","43":"1/3 s","44":"1/2.5 s","45":"1/2 s","46":"1/1.67 s","47":"1/1.25 s","48":"1.0 s","49":"1.3 s","50":"1.6 s","51":"2.0 s","52":"2.5 s","53":"3.0 s","54":"3.2 s","55":"4.0 s","56":"5.0 s","57":"6.0 s","58":"7.0 s","59":"8.0 s","65534":"Auto"}
+ Description: Current configuration of zoom lens shutter speed
+ pushMode: 0
+
+ zoom_exposure_value
+ Name: Zoom lens exposure value
+ Type: enum_int
+ Constraint: {"1":"-5.0EV","2":"-4.7EV","3":"-4.3EV","4":"-4.0EV","5":"-3.7EV","6":"-3.3EV","7":"-3.0EV","8":"-2.7EV","9":"-2.3EV","10":"-2.0EV","11":"-1.7EV","12":"-1.3EV","13":"-1.0EV","14":"-0.7EV","15":"-0.3EV","16":"0EV","17":"0.3EV","18":"0.7EV","19":"1.0EV","20":"1.3EV","21":"1.7EV","22":"2.0EV","23":"2.3EV","24":"2.7EV","25":"3.0EV","26":"3.3EV","27":"3.7EV","28":"4.0EV","29":"4.3EV","30":"4.7EV","31":"5.0EV","255":"FIXED"}
+ Description: Current configuration of zoom lens exposure value
+ pushMode: 0
+
+ zoom_focus_mode
+ Name: Zoom lens focus mode
+ Type: enum_int
+ Constraint: {"0":"MF","1":"AFS","2":"AFC"}
+ pushMode: 0
+
+ zoom_focus_value
+ Name: Zoom lens focus value
+ Type: int
+ pushMode: 0
+
+ zoom_max_focus_value
+ Name: Zoom lens maximum focus value
+ Type: int
+ pushMode: 0
+
+ zoom_min_focus_value
+ Name: Zoom lens minimum focus value
+ Type: int
+ pushMode: 0
+
+ zoom_calibrate_farthest_focus_value
+ Name: Zoom lens calibrated farthest focus value
+ Type: int
+ Description: Farthest position with the clearest focus
+ pushMode: 0
+
+ zoom_calibrate_nearest_focus_value
+ Name: Zoom lens calibrated nearest focus value
+ Type: int
+ Description: Nearest position with the clearest focus
+ pushMode: 0
+
+ zoom_focus_state
+ Name: Zoom lens focus state
+ Type: enum_int
+ Constraint: {"0":"Idle","1":"Focusing","2":"Focus successful","3":"Focus failed"}
+ pushMode: 0
+
+ ir_metering_mode
+ Name: Infrared metering mode
+ Type: enum_int
+ Constraint: {"0":"Temperature measurement off","1":"Spot temperature measurement","2":"Area temperature measurement"}
+ pushMode: 0
+
+ ir_metering_point
+ Name: Infrared metering point
+ Type: struct
+ Description: Information related to the infrared metering point
+ pushMode: 0
+
+ x
+ Name: Metering point coordinate x
+ Type: double
+ Constraint: {"max":1,"min":0}
+ Description: The horizontal coordinate x with the top left corner of the lens as the origin
+ Access: r
+ pushMode: 0
+
+ y
+ Name: Metering point coordinate y
+ Type: double
+ Constraint: {"max":1,"min":0}
+ Description: The vertical coordinate y with the top left corner of the lens as the origin
+ Access: r
+ pushMode: 0
+
+ temperature
+ Name: Temperature of the metering point
+ Type: double
+ Access: r
+ pushMode: 0
+
+ ir_metering_area
+ Name: Infrared metering area
+ Type: struct
+ Description: Information related to the infrared metering area
+ pushMode: 0
+
+ x
+ Name: Top-left corner coordinate x of the metering area
+ Type: double
+ Constraint: {"max":1,"min":0}
+ Description: The horizontal coordinate x with the top left corner of the lens as the origin
+ Access: r
+ pushMode: 0
+
+ y
+ Name: Top-left corner coordinate y of the metering area
+ Type: double
+ Constraint: {"max":1,"min":0}
+ Description: The vertical coordinate y with the top left corner of the lens as the origin
+ Access: r
+ pushMode: 0
+
+ width
+ Name: Width of the metering area
+ Type: double
+ Constraint: {"max":1,"min":0}
+ Description: Width of the metering area
+ Access: r
+ pushMode: 0
+
+ height
+ Name: Height of the metering area
+ Type: double
+ Constraint: {"max":1,"min":0}
+ Description: Height of the metering area
+ Access: r
+ pushMode: 0
+
+ aver_temperature
+ Name: Average temperature of the metering area
+ Type: double
+ Description: Average temperature of the metering area
+ Access: r
+ pushMode: 0
+
+ min_temperature_point
+ Name: Lowest temperature point in the metering area
+ Type: struct
+ Description: Information related to the lowest temperature point in the metering area
+ Access: r
+ pushMode: 0
+
+ x
+ Name: Coordinate x of the lowest temperature point
+ Type: double
+ Constraint: {"max":1,"min":0}
+ Description: The horizontal coordinate x with the top left corner of the lens as the origin
+ Access: r
+ pushMode: 0
+
+ y
+ Name: Coordinate y of the lowest temperature point
+ Type: double
+ Constraint: {"max":1,"min":0}
+ Description: The vertical coordinate y with the top left corner of the lens as the origin
+ Access: r
+ pushMode: 0
+
+ temperature
+ Name: Temperature of the lowest temperature point
+ Type: double
+ Description: Temperature of the lowest temperature point
+ Access: r
+ pushMode: 0
+
+ max_temperature_point
+ Name: Highest temperature point in the metering area
+ Type: struct
+ Description: Information related to the highest temperature point in the metering area
+ Access: r
+ pushMode: 0
+
+ x
+ Name: Coordinate x of the highest temperature point
+ Type: double
+ Constraint: {"max":1,"min":0}
+ Description: The horizontal coordinate x with the top left corner of the lens as the origin
+ Access: r
+ pushMode: 0
+
+ y
+ Name: Coordinate y of the highest temperature point
+ Type: double
+ Constraint: {"max":1,"min":0}
+ Description: The vertical coordinate y with the top left corner of the lens as the origin
+ Access: r
+ pushMode: 0
+
+ temperature
+ Name: Temperature of the highest temperature point
+ Type: double
+ Description: Temperature of the highest temperature point
+ Access: r
+ pushMode: 0
+
+dongle_infos
+ Name: 4G Dongle information
+ Type: array
+ Constraint: {"size": -, "item_type": struct}
+ Access: r
+ pushMode: 1
+
+ imei
+ Name: dongle imei
+ Type: text
+ Description: Unique identifier for the Dongle
+ Access: r
+ pushMode: 0
+
+ dongle_type
+ Name: Dongle type
+ Type: enum_int
+ Constraint: {"6":"Old Dongle","10":"New Dongle with eSIM support"}
+ Description: Dongle type
+ Access: r
+ pushMode: 0
+
+ eid
+ Name: dongle eid
+ Type: text
+ Description: Unique identifier for eSIM, used for public account query of plans and service purchase
+ Access: r
+ pushMode: 0
+
+ esim_activate_state
+ Name: eSIM activation state
+ Type: enum_int
+ Constraint: {"0":"Not activated","1":"Activated"}
+ Description: Requires activation to use
+ Access: r
+ pushMode: 0
+
+ sim_card_state
+ Name: SIM card state
+ Type: enum_int
+ Constraint: {"0":"Not inserted","1":"Inserted"}
+ Description: Insertion state of the physical SIM card in the dongle
+ Access: r
+ pushMode: 0
+
+ sim_slot
+ Name: SIM card slot enable state
+ Type: enum_int
+ Constraint: {"0":"Unknown","1":"Physical SIM card","2":"eSIM"}
+ Description: Identifies the SIM card slot currently in use by the dongle
+ Access: r
+ pushMode: 0
+
+ esim_infos
+ Name: eSIM information
+ Type: array
+ Constraint: {"size": -, "item_type": struct}
+ Access: r
+ pushMode: 0
+
+ telecom_operator
+ Name: Supported operators
+ Type: enum_int
+ Constraint: {"0":"Unknown","1":"Mobile","2":"China Unicom","3":"Telecommunications"}
+ Description: Telecom operators supported by eSIM
+ Access: r
+ pushMode: 0
+
+ enabled
+ Name: eSIM enable state
+ Type: bool
+ Constraint: {"false":"Not in use","true":"In use"}
+ Description: Only one eSIM can be enabled at a time
+ Access: r
+ pushMode: 0
+
+ iccid
+ Name: sim iccid
+ Type: text
+ Description: Unique identifier for the SIM card, can be used for purchasing packages for physical SIM cards
+ Access: r
+ pushMode: 0
+
+ sim_info
+ Name: SIM card information
+ Type: struct
+ Description: Information about the physical SIM card that can be inserted into the dongle
+ Access: r
+ pushMode: 0
+
+ telecom_operator
+ Name: Supported operators
+ Type: enum_int
+ Constraint: {"0":"Unknown","1":"Mobile","2":"China Unicom","3":"Telecommunications"}
+ Description: Telecom operator supported by the SIM card
+ Access: r
+ pushMode: 0
+
+ sim_type
+ Name: SIM card type
+ Type: enum_int
+ Constraint: {"0":"Unknown","1":"Other regular SIM card","2":"Three-network card"}
+ Description: Type of physical SIM card
+ Access: r
+ pushMode: 0
+
+ iccid
+ Name: sim iccid
+ Type: text
+ Description: Unique identifier for the SIM card, can be used for purchasing packages for physical SIM cards
+ Access: r
+ pushMode: 0
+
+obstacle_avoidance
+ Name: Aircraft obstacle sensing state
+ Type: struct
+ Access: r
+ pushMode: 0
+
+ horizon
+ Name: Horizontal obstacle sensing state
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"Enable"}
+ pushMode: 0
+
+ upside
+ Name: Upward obstacle sensing state
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"Enable"}
+ pushMode: 0
+
+ downside
+ Name: Downward obstacle sensing state
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"Enable"}
+ pushMode: 0
+
+is_near_area_limit
+ Name: Whether approaching the GEO Zone
+ Type: enum_int
+ Constraint: {"0":"Not reaching the GEO Zone","1":"Approaching the GEO Zone"}
+ Access: r
+ pushMode: 0
+
+is_near_height_limit
+ Name: Whether approaching the set height limit
+ Type: enum_int
+ Constraint: {"0":"Not reaching the set height limit","1":"Approaching the set height limit"}
+ Access: r
+ pushMode: 0
+
+height_limit
+ Name: Aircraft height limit
+ Type: int
+ Constraint: {"max":"1500","min":"20","step":"1","unit_name":"Meters / m"}
+ Access: rw
+ pushMode: 0
+
+night_lights_state
+ Name: Aircraft night lights state
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"On"}
+ Access: rw
+ pushMode: 0
+
+activation_time
+ Name: Aircraft activation time (Unix timestamp)
+ Type: int
+ Constraint: {"unit_name":"Seconds / s"}
+ Access: r
+ pushMode: 0
+
+maintain_status
+ Name: Maintenance information
+ Type: struct
+ Access: r
+ pushMode: 0
+
+ maintain_status_array
+ Name: Maintenance information array
+ Type: array
+ Constraint: {"size": -, "item_type": struct}
+ pushMode: 0
+
+ state
+ Name: Maintenance state
+ Type: enum_int
+ Constraint: {"0":"No maintenance","1":"With maintenance"}
+ pushMode: 0
+
+ last_maintain_type
+ Name: Last maintenance type
+ Type: enum_int
+ Constraint: {"1":"Basic maintenance of the aircraft","2":"Regular maintenance of the aircraft","3":"Deep maintenance of the aircraft"}
+ pushMode: 0
+
+ last_maintain_time
+ Name: Last maintenance time
+ Type: date
+ Constraint: {"unit_name":"Seconds / s"}
+ pushMode: 0
+
+ last_maintain_flight_time
+ Name: Last maintenance flight hours
+ Type: int
+ Constraint: {"unit_name":"Hours / h"}
+ pushMode: 0
+
+ last_maintain_flight_sorties
+ Name: Last maintenance flight sorties
+ Type: int
+ Constraint: {"max":"2147483647","min":"0","step":"1"}
+ pushMode: 0
+
+total_flight_sorties
+ Name: Accumulated total sorties of the aircraft
+ Type: int
+ Constraint: {"max":"2147483647","min":"0","step":"1"}
+ Access: r
+ pushMode: 0
+
+track_id
+ Name: Track ID
+ Type: text
+ Constraint: {"length":"64"}
+ Access: r
+ pushMode: 0
+
+position_state
+ Name: Satellite search state
+ Type: struct
+ Access: r
+ pushMode: 0
+
+ is_fixed
+ Name: Whether is Fixed
+ Type: enum_int
+ Constraint: {"0":"Not started","1":"Fixing","2":"Fixing successful","3":"Fixing failed"}
+ pushMode: 0
+
+ quality
+ Name: Satellite acquisition mode
+ Type: enum_int
+ Constraint: {"1":"Gear 1","2":"Gear 2","3":"Gear 3","4":"Gear 4","5":"Gear 5"}
+ pushMode: 0
+
+ gps_number
+ Name: Number of GPS satellites
+ Type: int
+ pushMode: 0
+
+ rtk_number
+ Name: Number of RTK satellite acquisitions
+ Type: int
+ pushMode: 0
+
+storage
+ Name: Storage capacity
+ Type: struct
+ Description: kb
+ Access: r
+ pushMode: 0
+
+ total
+ Name: Total capacity
+ Type: int
+ Constraint: {"unit_name":"Kilobytes / KB"}
+ pushMode: 0
+
+ used
+ Name: Used capacity
+ Type: int
+ Constraint: {"unit_name":"Kilobytes / KB"}
+ pushMode: 0
+
+battery
+ Name: Aircraft battery information
+ Type: struct
+ Access: r
+ pushMode: 0
+
+ capacity_percent
+ Name: Total remaining battery capacity
+ Type: int
+ Constraint: {"max":100,"min":0}
+ pushMode: 0
+
+ remain_flight_time
+ Name: Remaining flight time
+ Type: int
+ Constraint: {"unit_name":"Seconds / s"}
+ pushMode: 0
+
+ return_home_power
+ Name: Percentage of power required for return home
+ Type: int
+ Constraint: {"max":100,"min":0}
+ pushMode: 0
+
+ landing_power
+ Name: Forced landing battery percentage
+ Type: int
+ Constraint: {"max":100,"min":0}
+ pushMode: 0
+
+ batteries
+ Name: Battery details
+ Type: array
+ Constraint: {"size": -, "item_type": struct}
+ pushMode: 0
+
+ capacity_percent
+ Name: Remaining battery capacity
+ Type: int
+ Constraint: {"max":100,"min":0}
+ pushMode: 0
+
+ index
+ Name: Battery serial number
+ Type: int
+ Constraint: {"min":"0"}
+ pushMode: 0
+
+ sn
+ Name: Battery serial number (SN)
+ Type: text
+ pushMode: 0
+
+ type
+ Name: Battery type
+ Type: enum_int
+ Constraint: {}
+ pushMode: 0
+
+ sub_type
+ Name: Battery subtype
+ Type: enum_int
+ Constraint: {}
+ pushMode: 0
+
+ firmware_version
+ Name: Firmware version
+ Type: text
+ pushMode: 0
+
+ loop_times
+ Name: Battery cycle count
+ Type: int
+ pushMode: 0
+
+ voltage
+ Name: Voltage
+ Type: int
+ Constraint: {"unit_name":"Millivolts / mV"}
+ pushMode: 0
+
+ temperature
+ Name: Temperature
+ Type: float
+ Constraint: {"unit_name":"Celsius / deg C"}
+ Description: Retain one decimal place
+ pushMode: 0
+
+ high_voltage_storage_days
+ Name: High voltage storage days
+ Type: int
+ Constraint: {"unit_name":"Days / day"}
+ pushMode: 0
+
+total_flight_distance
+ Name: Accumulated total mileage of the aircraft
+ Type: float
+ Constraint: {"unit_name":"Meters / m"}
+ Access: r
+ pushMode: 0
+
+total_flight_time
+ Name: Accumulated total flight time of the aircraft
+ Type: float
+ Constraint: {"unit_name":"Seconds / s"}
+ Access: r
+ pushMode: 0
+
+serious_low_battery_warning_threshold
+ Name: Critical low battery warning
+ Type: int
+ Description: User-set battery critically low warning percentage
+ Access: r
+ pushMode: 1
+
+low_battery_warning_threshold
+ Name: Low battery warning
+ Type: int
+ Description: User-set battery low battery warning percentage
+ Access: r
+ pushMode: 1
+
+control_source
+ Name: Current control source
+ Type: text
+ Description: Can be a device or a browser. Devices use A/B to represent A control and B control, while browsers use a self-generated UUID as an identifier.
+ Access: r
+ pushMode: 1
+
+wind_direction
+ Name: Current wind direction
+ Type: enum_int
+ Constraint: {"1":"True North","2":"Northeast","3":"East","4":"Southeast","5":"South","6":"Southwest","7":"West","8":"Northwest"}
+ Access: r
+ pushMode: 0
+
+wind_speed
+ Name: Wind speed
+ Type: float
+ Constraint: {"unit_name":"0.1 Meters per second / m/s"}
+ Description: Estimated wind speed, calculated based on the aircraft's attitude with some margin of error. It is for reference only and should not be used as meteorological data.
+ Access: r
+ pushMode: 0
+
+home_distance
+ Name: Distance from the Home point
+ Type: float
+ Access: r
+ pushMode: 0
+
+home_latitude
+ Name: Home point latitude
+ Type: float
+ Access: r
+ pushMode: 1
+
+home_longitude
+ Name: Home point longitude
+ Type: float
+ Access: r
+ pushMode: 1
+
+attitude_head
+ Name: Yaw axis angle
+ Type: int
+ Description: Yaw axis angle with true north angle (longitude). Positive values from 0 to 6 o'clock direction, negative values from 6 to 12 o'clock direction.
+ Access: r
+ pushMode: 0
+
+attitude_roll
+ Name: Roll axis angle
+ Type: float
+ Access: r
+ pushMode: 0
+
+attitude_pitch
+ Name: Pitch axis angle
+ Type: float
+ Access: r
+ pushMode: 0
+
+elevation
+ Name: Relative takeoff point altitude
+ Type: float
+ Access: r
+ pushMode: 0
+
+height
+ Name: Absolute height
+ Type: float
+ Description: Relative to the Earth ellipsoid height. Calculation is height relative to takeoff point + ellipsoid height of takeoff point
+ Access: r
+ pushMode: 0
+
+latitude
+ Name: Current latitude
+ Type: float
+ Constraint: {"max":"3.4028235E38","min":"-1.4E-45","step":"0.1"}
+ Access: r
+ pushMode: 0
+
+longitude
+ Name: Longitude of the current position
+ Type: float
+ Constraint: {"max":"3.4028235E38","min":"-1.4E-45","step":"0.1"}
+ Access: r
+ pushMode: 0
+
+vertical_speed
+ Name: Vertical speed
+ Type: float
+ Constraint: {"unit_name":"Meters per second / m/s"}
+ Access: r
+ pushMode: 0
+
+horizontal_speed
+ Name: Horizontal speed
+ Type: float
+ Access: r
+ pushMode: 0
+
+firmware_upgrade_status
+ Name: Firmware upgrade state
+ Type: enum_int
+ Constraint: {"0":"Not upgraded","1":"Upgrading"}
+ Access: r
+ pushMode: 1
+
+compatible_status
+ Name: Firmware consistency
+ Type: enum_int
+ Constraint: {"0":"No consistency upgrade required","1":"Consistency upgrade required"}
+ Description: Consistent firmware update means a consistent firmware update is required when the firmware versions of some modules of the aircraft are inconsistent with the compatible version of the system. For example, the aircraft and RC have been updated to newest version, but the used batteries is not updated. Then the Consistent firmware update will be prompted. Normal firmware update means developers update all modules of aircraft to selected firmware version.
+ Access: r
+ pushMode: 1
+
+firmware_version
+ Name: Firmware version
+ Type: text
+ Constraint: {"length":"64"}
+ Access: r
+ pushMode: 1
+
+gear
+ Name: Gear
+ Type: enum_int
+ Constraint: {"0":"A","1":"P","2":"NAV","3":"FPV","4":"FARM","5":"S","6":"F","7":"M","8":"G","9":"T"}
+ Access: r
+ pushMode: 0
+
+camera_watermark_settings
+ Name: Camera watermark settings
+ Type: struct
+ Description: User configuration for watermarks on photos and video files taken by the camera. Currently, live stream watermarks are not supported.
+ Access: rw
+ pushMode: 1
+
+ global_enable
+ Name: Watermark display global enable switch
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"Enable"}
+ Description: Watermark display requires global enable switch
+ Access: rw
+ pushMode: 1
+
+ drone_type_enable
+ Name: Aircraft model display switch
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"Enable"}
+ Access: rw
+ pushMode: 1
+
+ drone_sn_enable
+ Name: Aircraft serial number display switch
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"Enable"}
+ Access: rw
+ pushMode: 1
+
+ datetime_enable
+ Name: Date and time display switch
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"Enable"}
+ Description: Time zone defaults to local time zone
+ Access: rw
+ pushMode: 1
+
+ gps_enable
+ Name: Latitude, longitude and altitude display switch
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"Enable"}
+ Access: rw
+ pushMode: 1
+
+ user_custom_string_enable
+ Name: Custom text display switch
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"Enable"}
+ Access: rw
+ pushMode: 1
+
+ user_custom_string
+ Name: Custom text content
+ Type: text
+ Description: Up to 250 bytes can be displayed
+ Access: rw
+ pushMode: 1
+
+ layout
+ Name: Position of the watermark in the frame
+ Type: enum_int
+ Constraint: {"0":"Top-left","1":"Bottom-left","2":"Top-right","3":"Bottom-right"}
+ Access: rw
+ pushMode: 1
+
+{type-subtype-gimbalindex}
+ Name: Payload index
+ Type: struct
+ Description: Consistent with the numerical value of the 'payload_index' field.
+ Access: r
+ pushMode: 0
+
+ gimbal_pitch
+ Name: Gimbal pitch axis angle
+ Type: double
+ Constraint: {"max":"180","min":"-180","step":0.1,"unit_name":"Degrees / deg"}
+ Access: r
+ pushMode: 0
+
+ gimbal_roll
+ Name: Gimbal roll axis angle
+ Type: double
+ Constraint: {"max":"180","min":"-180","step":0.1,"unit_name":"Degrees / deg"}
+ Access: r
+ pushMode: 0
+
+ gimbal_yaw
+ Name: Gimbal yaw axis angle
+ Type: double
+ Constraint: {"max":"180","min":"-180","step":0.1,"unit_name":"Degrees / deg"}
+ Access: r
+ pushMode: 0
+
+ measure_target_longitude
+ Name: Laser ranging target longitude
+ Type: double
+ Constraint: {"max":"180","min":"-180","unit_name":"Degrees / deg"}
+ Access: r
+ pushMode: 0
+
+ measure_target_latitude
+ Name: Laser ranging target latitude
+ Type: double
+ Constraint: {"max":"90","min":"-90","unit_name":"Degrees / deg"}
+ Access: r
+ pushMode: 0
+
+ measure_target_altitude
+ Name: Laser ranging target altitude
+ Type: double
+ Constraint: {"unit_name":"Meters / m"}
+ Access: r
+ pushMode: 0
+
+ measure_target_distance
+ Name: Laser ranging distance
+ Type: double
+ Constraint: {"unit_name":"Meters / m"}
+ Access: r
+ pushMode: 0
+
+ measure_target_error_state
+ Name: Laser ranging state
+ Type: enum_int
+ Constraint: {"0":"NORMAL","1":"TOO_CLOSE","2":"TOO_FAR","3":"NO_SIGNAL"}
+ Access: r
+ pushMode: 0
+
+ payload_index
+ Name: Payload index. The format is {type-subtype-gimbalindex}
+ Type: text
+ Access: r
+ pushMode: 1
+
+ zoom_factor
+ Name: Zoom factor
+ Type: double
+ Access: r
+ pushMode: 0
+
+ thermal_current_palette_style
+ Name: Palette style
+ Type: enum_int
+ Constraint: {"0":"WHITE_HOT","1":"BLACK_HOT","2":"RED_HOT","3":"GREEN_HOT","5":"RAINBOW","6":"IRONBOW1","8":"ICE_FIRE","11":"COLOR1","12":"COLOR2","13":"RAIN"}
+ Description: The infrared camera offers various color styles, allowing users to choose different color palettes based on different scenes for clearer visibility of targets
+ Access: rw
+ pushMode: 0
+
+ thermal_supported_palette_styles
+ Name: Collection of supported palette styles by the device
+ Type: array
+ Constraint: {"size": -, "item_type": enum_int}
+ Description: The capability of supported styles varies for different devices
+ Access: r
+ pushMode: 1
+
+ thermal_gain_mode
+ Name: Gain Mode
+ Type: enum_int
+ Constraint: {"0":"Auto","1":"Low Gain. Temperature Range is from 0 deg C to 500 deg C","2":"High Gain. Temperature Range is from -20 deg C to 150 deg C"}
+ Description: Low gain provides a larger temperature measurement range, while high gain offers higher temperature measurement accuracy.
+ Access: rw
+ pushMode: 0
+
+ thermal_isotherm_state
+ Name: Whether isotherm is enabled
+ Type: enum_int
+ Constraint: {"0":"Disable","1":"Enable"}
+ Description: Isotherm allows users to observe the content of temperature ranges of interest, making objects in the temperature range more prominent.
+ Access: rw
+ pushMode: 0
+
+ thermal_isotherm_upper_limit
+ Name: Upper limit of the temperature range for isotherm
+ Type: int
+ Constraint: {"unit_name":"Celsius / deg C"}
+ Description: Effective only when Isotherm is enabled
+ Access: rw
+ pushMode: 0
+
+ thermal_isotherm_lower_limit
+ Name: Lower limit of the temperature range for isotherm
+ Type: int
+ Constraint: {"unit_name":"Celsius / deg C"}
+ Description: Effective only when Isotherm is enabled
+ Access: rw
+ pushMode: 0
+
+ thermal_global_temperature_min
+ Name: Minimum temperature measured in the overall view
+ Type: float
+ Constraint: {"unit_name":"Celsius / deg C"}
+ Access: r
+ pushMode: 0
+
+ thermal_global_temperature_max
+ Name: Maximum temperature measured in the overall view
+ Type: float
+ Constraint: {"unit_name":"Celsius / deg C"}
+ Access: r
+ pushMode: 0

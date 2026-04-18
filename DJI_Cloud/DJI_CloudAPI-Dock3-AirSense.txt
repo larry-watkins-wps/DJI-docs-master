@@ -1,0 +1,108 @@
+==============================================================================
+DJI Cloud API — Dock 3 AirSense Events (Dock-to-Cloud MQTT)
+==============================================================================
+
+Source: https://developer.dji.com/doc/cloud-api-tutorial/en/api-reference/dock-to-cloud/mqtt/dock/dock3/airsense.html
+Platform: DJI Dock 3 (Matrice 4 series)
+Protocol: MQTT (dock-to-cloud)
+Category: AirSense (ADS-B proximity warning events)
+
+------------------------------------------------------------------------------
+
+EVENT
+=====
+
+AirSense warning notification
+-----------------------------
+
+Topic: thing/product/{gateway_sn}/events
+Direction: up
+Method: airsense_warning
+Data:
+
+Data Fields:
+
+  icao
+    Name:        ICAO aircraft address
+    Type:        text
+    Constraint:  (none)
+    Description: ICAO aircraft address
+
+  warning_level
+    Name:        Warning level
+    Type:        enum_int
+    Constraint:  0 = No danger; 1 = Level One; 2 = Level Two; 3 = Level Three; 4 = Level Four
+    Description: As the warning level increases, the severity of the situation escalates. For levels 3 and above, it is recommended that the aircraft to avoid.
+
+  latitude
+    Name:        Latitude
+    Type:        float
+    Constraint:  max=90, min=-90
+    Description: Latitude of the aircraft location. Negative for south, and positive for north. Accurate to 6 decimal places
+
+  longitude
+    Name:        Longitude
+    Type:        float
+    Constraint:  max=180, min=-180
+    Description: Longitude of the aircraft location. Negative for west, and positive for east. Accurate to 6 decimal places
+
+  altitude
+    Name:        Absolute height
+    Type:        int
+    Constraint:  (none)
+    Description: Flight absolute altitude, measured in meters
+
+  altitude_type
+    Name:        Absolute altitude type
+    Type:        enum_int
+    Constraint:  0 = Ellipsoidal altitude; 1 = Altitude above sea level
+
+  heading
+    Name:        Heading
+    Type:        float
+    Constraint:  (none)
+    Description: Heading angle in degrees. 0 for true north, 90 for true east. Accurate to 1 decimal place
+
+  relative_altitude
+    Name:        Relative altitude of the crewed airplane to the aircraft
+    Type:        int
+    Constraint:  (none)
+    Description: Relative altitude of the crewed airplane to the aircraft, measured in meters
+
+  vert_trend
+    Name:        Trend of relative altitude change
+    Type:        enum_int
+    Constraint:  0 = Relative altitude unchanged; 1 = Relative altitude increasing; 2 = Relative altitude decreasing
+
+  distance
+    Name:        Horizontal distance between the crewed airplane and the aircraft
+    Type:        int
+    Constraint:  unit=Meters / m
+
+
+Example:
+
+  {
+  	"bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  	"data": [
+  		{
+  			"altitude": 100,
+  			"altitude_type": 1,
+  			"distance": 100,
+  			"heading": 89.1,
+  			"icao": "B-5931",
+  			"latitude": 12.23,
+  			"longitude": 12.23,
+  			"relative_altitude": 80,
+  			"vert_trend": 0,
+  			"warning_level": 3
+  		}
+  	],
+  	"need_reply": 1,
+  	"tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  	"timestamp": 16540709686556,
+  	"method": "airsense_warning"
+  }
+
+------------------------------------------------------------------------------
+End of document

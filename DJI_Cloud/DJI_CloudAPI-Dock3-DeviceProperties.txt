@@ -1,0 +1,956 @@
+Cloud API
+
+
+
+Cloud API v1.15
+Languages Languages English
+中文
+
+
+Search K
+
+
+v1.15
+Languages Languages English
+中文
+
+
+Release Notes
+Tutorial Reading Guide
+Flight Safety Notification
+Basic Introduction
+Product Introduction
+Product Architecture
+Product Supported
+Basic Concept
+Noun Explanation
+MQTT
+Thing Model
+HTTPS
+WebSocket
+JSBridge
+
+
+Quick Start
+Environment Preparation List
+Source Code Deployment Steps
+Docker Deployment Steps
+Function Display Video
+
+Function Set
+Pilot Function Set
+Access to the Cloud Server
+Situation Awareness
+Live Stream
+Map Elements
+Media Management
+Wayline Management
+Obtain Log via JSBridge
+Pilot Launch Third-party App
+Live Flight Controls/Remote Control
+
+Dock Function Set
+Access to the Cloud Server
+Device Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Live Flight Controls/Remote Control
+Custom Flight Area
+Multi-dock Task
+AI Target Recognition
+
+
+Debugging Methods
+Pilot Webview Debugging
+Log Export
+MQTTX
+
+API Reference
+DJI WPML
+Overview
+Template.kml
+Waylines.wpml
+Common Elements
+
+Pilot to Cloud
+MQTT
+Topic Definition
+Mavic 3 Enterprise Series
+Properties
+
+DJI RC Pro Enterprise
+Properties
+Device Management
+Live Stream
+Live Flight Controls
+Remote Control
+
+DJI Matrice 4 Series
+Properties
+
+DJI RC Plus 2 Enterprise
+Properties
+Device Management
+Live Stream
+Live Flight Controls
+Remote Control
+
+DJI Matrice 400
+Properties
+
+Other Models
+Aircraft
+Properties
+
+Remote Controller
+Properties
+Device Management
+Live Stream
+
+
+
+HTTPS
+Map Elements
+Create Map Elements
+Update Map Elements
+Obtain Map Elements
+Delete Map Elements
+
+Wayline Management
+Obtain Wayline List
+Obtain Temporary Credential
+Obtain Wayline File Download Address
+Obtain Duplicated Wayline Name
+Obtain File Upload Result Report
+Batch Favorites Wayline
+Batch Unfavorite Wayline
+
+Media Management
+Media Fast Upload
+Obtain Exist File Tiny Fingerprint
+Obtain Temporary Credential
+App Reports File Upload Result
+Callback after the File Group Upload Complete
+
+Situation Awareness
+Obtain Device Topology List
+
+
+WebSocket
+Map Elements
+Push Message
+
+Situation Awareness
+Push Message
+
+
+JSBridge
+
+Dock to Cloud
+MQTT
+Topic Definition
+Aircraft
+M30/M30T Properties
+M3D/M3TD Properties
+M4D/M4TD Properties
+
+Dock
+DJI Dock
+Properties
+Device Management
+Organization Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Configuration Update
+Live Flight Controls
+AirSense
+Custom Flight Area
+PSDK Function
+PSDK Interconnection
+ESDK Interconnection
+Remote Unlocking
+
+DJI Dock 2
+Properties
+Device Management
+Organization Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Configuration Update
+Live Flight Controls
+AirSense
+Custom Flight Area
+PSDK Function
+PSDK Interconnection
+ESDK Interconnection
+Remote Unlocking
+Remote Control
+
+DJI Dock 3
+Properties
+
+
+
+Device Management
+Organization Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Configuration Update
+Live Flight Controls
+Custom Flight Area
+PSDK Function
+PSDK Interconnection
+ESDK Interconnection
+Remote Unlocking
+AirSense
+Remote Control
+
+
+
+
+
+Error Code
+FAQ
+Properties
+2025-09-17
+No Rating Github Edit open in new window
+
+Device Property List
+Device Property Push
+Device Property Settings
+
+# Device Property List
+pushMode:
+0: Stable frequency data. Device will report in the frequency of 0.5HZ. (Topic:thing/product/ {device_sn} /osd)
+1: Status data. It is reported when the status changes. (Topic:thing/product/ {device_sn} /state)
+
+accessMode:
+r: Property can only be read
+rw: Property can be read and written (Topic:thing/product/ {gateway_sn} /property/set)
+
+Column Name Type Constraint Description accessMode pushMode
+home_position_is_valid Home Point validity enum_int {"0":"Both heading and latitude/longitude coordinates are invalid","1":"Both heading and latitude/longitude coordinates are valid","2":"Heading is valid, but latitude and longitude are invalid","3":"Latitude and longitude are valid, but heading is invalid"} This is used to indicate whether the latitude/longitude and heading attributes of a dock is valid. When a dock is not calibrated, the latitude/longitude coordinates are invalid. The values of the latitude and longitude attributes fluctuate significantly and are not recommended for use. The heading may still be valid even without calibration. r 0
+heading Dock heading angle double {"max":"180","min":"-180","step":"","unit_name":"Degrees / °"} r 0
+rtcm_info Dock RTK calibration source struct r 1
+»mount_point Network RTK mounted point information text {"length":""} 0
+»port Network port information text {"length":""} 0
+»host Network host information text {"length":""} 0
+»rtcm_device_type Device type enum_int {"1":"Dock"} 0
+»source_type Calibration type enum_int {"0":"Not calibrated","1":"Auto-convergence calibration","2":"Manual calibration","3":"Network RTK calibration"} 0
+wireless_link_topo Wireless link topology struct r 1
+»secret_code Encryption code array {"size": 28, "item_type": int} 0
+»center_node Aircraft frequency information struct 0
+»»sdr_id Scrambling code information int {"max":"","min":"","step":"","unit_name":null} 0
+»»sn Device SN text {"length":""} 0
+»leaf_nodes Dock or remote controller pairing information array {"size": -, "item_type": struct} 0
+»»sdr_id Scrambling code information int {"max":"","min":"","step":"","unit_name":null} 0
+»»sn Device SN text {"length":""} 0
+»»control_source_index Control source number int {"max":"2","min":"1","step":"1","unit_name":"None / "} 0
+air_conditioner Dock air conditioner working state information struct r 0
+»air_conditioner_state Dock air conditioner state enum_int {"0":"Idle mode (no cooling, heating, or dehumidification)","1":"Cooling mode","2":"Heating mode","3":"Dehumidification mode","4":"Cooling exit mode","5":"Heating exit mode","6":"Dehumidification exit mode","7":"Cooling ready mode","8":"Heating ready mode","9":"Dehumidification ready mode"10":"Preparing for air cooling"11":"Air cooling in progress"12":"Air cooling exiting"13":"Preparing for defogger"14":"Defogger in progress"15":"Defogger exiting"} Dock air conditioner working state information, and only one working mode exists for the air conditioner 0
+»switch_time Remaining waiting time for switching int {"max":"","min":"","step":"","unit_name":"Second / s"} The air conditioner state sequence is switching from preparation mode to working mode, then switching to exit mode after being operable, and switching to idle mode after exit is complete. Therefore, this thing model represents how long it takes to switch to the next state after performing a certain command operation. For example, if the current state is idle, and the cooling mode is turned on, it will enter the cooling preparation mode. This time field indicates how long it will take to enter the cooling working mode. 0
+air_transfer_enable Photo transfer bool {"false":"Disable","true":"Enable"} Allows rapid photo transferring to the cloud during FlyTo tasks（The latest Dock3 firmware supports rapid photo transferring to the cloud during Wayline tasks） rw 1
+silent_mode Dock silent mode enum_int {"0":"Non-silent mode","1":"Silent mode"} Enabling silent mode means: 1. The fan speed will decrease, the air conditioning cooling performance will decline, and the operation intervals will lengthen in hot weather. 2. The buzzer sound will be turned off, so be cautious of your surroundings when opening or closing the cover. 3. The white light indicating the idle status of the dock will be turned off. Other indicators are not affected. rw 1
+user_experience_improvement User experience improvement program enum_int {"0":"Initial state","1":"Refuse to join the user experience improvement program","2":"Agree to join the user experience improvement program"} rw 1
+dongle_infos 4G dongle information array {"size": -, "item_type": struct} r 1
+»imei dongle imei text Unique identifier for the dongle r 0
+»dongle_type Dongle type enum_int {"6":"Old dongle","10":"New dongle with eSIM support"} Dongle type r 0
+»eid dongle eid text Unique identifier for eSIM, used for querying plans and purchasing services in official accounts on WeChat r 0
+»esim_activate_state eSIM activation state enum_int {"0":"Unknown","1":"Not activated","2":"Activated"} Requires activation to use r 0
+»sim_card_state SIM card state enum_int {"0":"Not inserted","1":"Inserted"} Insertion state of the physical SIM card in the dongle r 0
+»sim_slot SIM card slot enable state enum_int {"0":"Unknown","1":"Physical SIM card","2":"eSIM"} Identifies the SIM card slot currently in use by the dongle r 0
+»esim_infos eSIM information array {"size": -, "item_type": struct} r 0
+»»telecom_operator Supported operators enum_int {"0":"Unknown","1":"China Mobile","2":"China Unicom","3":"China Telecom"} Telecom operators supported by eSIM r 0
+»»enabled eSIM enable state bool {"false":"Not in use","true":"In use"} Only one eSIM can be enabled at a time r 0
+»»iccid sim iccid text Unique identifier for the SIM card, can be used for purchasing packages for physical SIM cards r 0
+»sim_info SIM card information struct Information about the physical SIM card that can be inserted into the dongle r 0
+»»telecom_operator Supported operators enum_int {"0":"Unknown","1":"Mobile","2":"China Unicom","3":"Telecommunications"} Telecom operator supported by the SIM card r 0
+»»sim_type SIM card type enum_int {"0":"Unknown","1":"Other regular SIM card","2":"Three-network card"} Type of physical SIM card r 0
+»»iccid sim iccid text Unique identifier for the SIM card, used for purchasing packages for physical SIM cards r 0
+drone_battery_maintenance_info Aircraft battery maintenance information struct r 0
+»maintenance_state Maintenance state enum_int {"0":"No maintenance required","1":"Waiting for maintenance","2":"In maintenance"} 0
+»maintenance_time_left Remaining maintenance time for the battery int {"max":"","min":"","step":"","unit_name":"Hours / h"} Rounded down 0
+»heat_state Battery heating and preservation state enum_int {"0":"Battery heating or insulation not activated","1":"Heating battery","2":"Insulating battery"} When the aircraft is inside the dock and powered off, the model reports the battery heating and insulation information of the aircraft 0
+»batteries Battery details array {"size": -, "item_type": struct} When the aircraft is inside the dock and powered off, the property will report the aircraft battery information. The basic data is consistent with the battery information in the aircraft thing model. 0
+»»capacity_percent Remaining battery capacity int {"max":100,"min":"","step":"","unit_name":null} The range is between 0.0 and 100.0, with one decimal place. When data cannot be obtained from device, the value will be 32767 0
+»»index Battery index enum_int {"0":"Left battery","1":"Right battery"} 0
+»»voltage Voltage int {"unit_name":"Millivolts / mV"} The range is between 0 and 28000 mV. When data cannot be obtained from device, the value will be 32767 0
+»»temperature Temperature float {"unit_name":"Celsius / °C"} The range is between -40.0 and 150.0° C, with one decimal place. When data cannot be obtained from device, the value will be 32767 0
+maintain_status Maintenance information struct r 0
+»maintain_status_array Maintenance information array array {"size": -, "item_type": struct} 0
+»»state Maintenance state enum_int {"0":"No maintenance","1":"Maintained"} 0
+»»last_maintain_type Last maintenance type enum_int {"0":"No Maintenance","17":"Dock Standard Service","18":"Dock Premium Service"} 0
+»»last_maintain_time Last maintenance time date {"unit_name":"Seconds / s"} 0
+»»last_maintain_work_sorties Number of flights before last maintenance int {"max":"2147483647","min":"0","step":"1"} 0
+position_state Satellite search state struct r 0
+»is_calibration Whether calibrated enum_int {"0":"Not calibrated","1":"Calibrated"} 0
+»is_fixed Whether is Fixed enum_int {"0":"Not started","1":"Fixing","2":"Fixing successful","3":"Fixing failed"} 0
+»quality Signal quality level enum_int {"1":"Level 1","2":"Level 2","3":"Level 3","4":"Level 4","5":"Level 5","10":"RTK Fix"} 0
+»gps_number Number of GPS satellites int {"max":"","min":"","step":"","unit_name":null} 0
+»rtk_number Number of RTK satellite acquisitions int {"max":"","min":"","step":"","unit_name":null} 0
+emergency_stop_state Emergency stop button state enum_int {"0":"Released","1":"Pressed Down"} r 0
+drone_charge_state Aircraft charging state struct Aircraft charging state r 0
+»capacity_percent Battery percentage int {"max":"100","min":"0"} 0
+»state Charging state enum_int {"0":"Idle","1":"Charging"} 0
+backup_battery Dock backup battery information struct r 0
+»switch Backup battery switch enum_int {"0":"Disabled","1":"Enabled"} 0
+»voltage Voltage of the backup battery int {"desc":"The voltage is 0 when the backup battery is turned off","max":"30,000","min":"0","step":"1","unit_name":"Millivolts / mV"} 0
+»temperature Backup battery temperature float {"step":"0.1","unit_name":"Celsius / °C"} Retain one decimal place 0
+alarm_state Dock sound and light alarm state enum_int {"0":"Disabled","1":"Enabled"} r 0
+battery_store_mode Battery operating mode enum_int {"1":"Schedule mode","2":"Standby mode"} The Schedule mode is suitable for performing regular tasks. The battery will be charged to between 55% and 60% when no task is distributed. The Standby mode is suitable for performing urgent tasks. The battery will be charged to between 90% and 95% when no task is distributed but battery lifespan will be shorter. r 0
+activation_time Dock activation time (Unix timestamp) int {"unit_name":"Seconds / s"} r 0
+height Ellipsoid height double {"unit_name":"Meters / m"} r 0
+alternate_land_point Alternate landing site struct r 0
+»longitude Longitude float {} 0
+»latitude Latitude float {} 0
+»safe_land_height Safe altitude (alternate route altitude) float {} 0
+»is_configured Whether the alternate landing site is set enum_int {"0":"Not set","1":"Already set"} 0
+»height Ellipsoid height float 0
+compatible_status Firmware consistency enum_int {"0":"No consistency update required","1":"Consistency update required"} Update All: Refers to the need to update when the firmware version of certain modules of the aircraft does not match the aircraft's system version. A common scenario is when the aircraft and remote controller have been updated to the latest version, but upon replacing the battery, it is found that the battery has not been updated. In this case, a consistency upgrade will be prompted. Standard Update: The developer updates all modules of the aircraft to a specified firmware version. r 1
+acc_time Dock total running time int {"unit_name":"Seconds / s"} r 1
+first_power_on First power-on time int {"unit_name":"Milliseconds / ms"} r 0
+storage Storage capacity struct r 0
+»total Total capacity int {"unit_name":"Kilobytes / KB"} 0
+»used Used capacity int {"unit_name":"Kilobytes / KB"} 0
+working_current Working current float {"unit_name":"Milliamps / mA"} r 0
+working_voltage Working voltage int {"unit_name":"Millivolts / mV"} r 0
+humidity Humidity inside the dock float {"max":"100","min":"0","step":"0.1","unit_name":"Relative humidity / %RH"} r 0
+temperature Temperature inside dock float {"unit_name":"Celsius / °C"} r 0
+environment_temperature Ambient temperature float {"unit_name":"Celsius / °C"} r 0
+wind_speed Wind speed float {"unit_name":"Meters per second / m/s"} r 0
+rainfall Rainfall enum_int {"0":"No rain","1":"Light rain","2":"Moderate rain","3":"Heavy rain"} r 0
+live_capacity Gateway device live streaming capability struct r 1
+»available_video_number Selectable stream count int 0
+»coexist_video_number_max Number of simultaneous streams int 0
+»device_list Selectable video sources array {"size": -, "item_type": struct} Selectable video sources (device layer, such as aircraft) 0
+»»sn Device serial number (SN) of aircraft and other video source text 0
+»»available_video_number Selectable stream count for device with the specified serial number int 0
+»»coexist_video_number_max Number of simultaneous streams for device with the specified serial number int 0
+»»camera_list List of cameras on the device with the specified serial number array {"size": -, "item_type": struct} 0
+»»»camera_index Camera index text Formatted as {type-subtype-gimbalindex} 0
+»»»available_video_number Selectable stream count for specified video source int 0
+»»»coexist_video_number_max Number of simultaneous streams for specified video source int 0
+»»»video_list List of selectable streams for specified video source array {"size": -, "item_type": struct} 0
+»»»»video_index Indices of selectable streams for specified video source text 0
+»»»»video_type Types of selectable streams for specified video source text 0
+»»»»switchable_video_types Supported video camera types that the video stream can switch to array {"size": -, "item_type": text} 0
+live_status Gateway's current overall live streaming state push array {"size": -, "item_type": struct} r 1
+»video_id Live streaming identifier text Identifier for a certain video stream, formatted as {sn}/{camera_index}/{video_index} . Here, {sn} represents the serial number of the video source device. {camera_index} is the camera index, formatted as {type-subtype-gimbalindex} . {video_index} is the stream index that can be selected for the video source. 0
+»video_type Video type text {"length":"24"} Indicates the type of livestream lens, such as normal, wide, zoom, infrared, etc. 0
+»video_quality Quality of the live streaming enum_int {"0":"Adaptive","1":"Smooth","2":"Standard definition","3":"High definition","4":"Ultra-high definition"} 0
+»status Livestream state enum_int {"0":"Not livestreaming","1":"Livestreaming"} 0
+»error_status Error code int {"length":6} 0
+wireless_link Video transmission link struct r 0
+»dongle_number Number of dongles on the aircraft int 0
+»4g_link_state 4G link connection state enum_int {"0":"Disconnected","1":"Connected"} 0
+»sdr_link_state SDR link connection state enum_int {"0":"Disconnected","1":"Connected"} 0
+»link_workmode Dock's video transmission link mode enum_int {"0":"SDR Mode","1":"4G Fusion Mode"} 0
+»sdr_quality SDR signal quality int {"max":"5","min":"0","step":"1"} 0
+»4g_quality Overall 4G signal quality int {"max":"5","min":"0","step":"1"} 0
+»4g_uav_quality Sky-end 4G signal quality int {"max":"5","min":"0","step":"1"} Signal quality between aircraft and 4G server 0
+»4g_gnd_quality Ground-end 4G signal quality int {"max":"5","min":"0","step":"1"} Signal quality between the ground end (e.g., remote controller, DJI Dock, etc.) and the 4G server 0
+»sdr_freq_band SDR frequency band float 0
+»4g_freq_band 4G frequency band float 0
+media_file_detail Media file upload details struct r 0
+»remain_upload Number to be uploaded int 0
+job_number Cumulative number of dock operations int {"unit_name":"Times / count"} r 0
+drone_in_dock Is the aircraft inside the dock enum_int {"0":"Outside the dock","1":"Inside the dock"} r 0
+network_state Network state struct r 0
+»type Network type enum_int {"1":"4G","2":"Ethernet"} 0
+»quality Network quality enum_int {"0":"No signal","1":"Very Poor","2":"Poor","3":"Fair","4":"Good","5":"Excellent"} 0
+»rate Network rate float {"unit_name":"Kilobytes per second / KB/s"} 0
+supplement_light_state Auxiliary light state enum_int {"0":"Disabled","1":"Enabled"} r 0
+cover_state Cover state enum_int {"0":"Closed","1":"Open","2":"Half open","3":"Cover state abnormal"} r 0
+sub_device Sub-device state struct r 0
+»device_sn Sub-device serial number (SN) text {"length":""} 0
+»device_model_key Sub-device enumeration values text {"length":""} Formatted as {domain-type-subtype} 0
+»device_online_status Aircraft power-on state on the dock enum_int {"0":"Powered off","1":"Powered on"} 0
+»device_paired Aircraft pairing status on the dock enum_int {"0":"Not paired","1":"Paired"} 0
+flighttask_step_code Dock task state enum_int {"0":"Task Preparation","1":"Task in Progress","2":"Status Recovery After Task","3":"Updating Custom Flight Area","4":"Updating Obstacle Data","5":"Idle","255":"Aircraft Error","256":"Unknown Status"} r 0
+mode_code Dock state enum_int {"0":"Idle","1":"On-site debugging","2":"Remote debugging","3":"Firmware update in progress","4":"Task in progress","5":"To be calibrated"} r 0
+firmware_upgrade_status Firmware update state enum_int {"0":"Not updated","1":"Updating"} r 1
+firmware_version Firmware version text {"length":"64"} r 1
+latitude Latitude double {"max":"90","min":"-90","step":"0.01"} r 0
+longitude Longitude double {"max":"180","min":"-180","step":"0.01"} Longitude of the gateway device r 0
+drc_state DRC link state enum_int {"0":"Not connected","1":"Connecting","2":"Connected"} r 0
+self_converge_coordinate Self-convergent coordinate struct r 0
+»latitude Latitude double {"max":"90","min":"-90","step":"0.01"} r 0
+»longitude Longitude double {"max":"180","min":"-180","step":"0.01"} r 0
+»height Ellipsoid height double {"unit_name":"Meters / m"} r 0
+# Device Property Push
+Topic: thing/product/ {device_sn} /state State Data: Device reports when the state changes
+Topic: thing/product/ {device_sn} /osd Fixed Frequency Data: Device will report at a frequency of 0.5 Hz
+Direction: up
+Notes on API
+Payload property push refers to the push of properties of the payload mounted on the aircraft, such as the camera. A payload is uniquely identified by a payload index, formatted as {type-subtype-gimbalIndex} (product type-subtype-mount position). Refer to Product Supported open in new window for the values of type, subtype, and gimbalIndex.
+The protocols currently involving the push of payload properties include the device property push of gateway devices, and the livestream capability update of the livestream function. For device property push , the content of payload property pushing includes information about the camera itself, such as the angles of gimbal tilt, pan, and roll. For livestream capability update , the content of payload property pushing is more about the camera's capabilities during livestream, such as the maximum number of streams that can be pushed simultaneously. Refer to the example below for the specific structure of payload properties. It should be noted that the device properties of the remote controller are pushed in a single message, while the device property pushing of the dock is done in multiple pushes.
+Data:
+Column Name Type Constraint Description
+data Content text {} Refer to the device's property for content
+» camera_index type_subtype_gimbalindex text {} gimbalIndex refers to the camera position. Refer to Product Supported open in new window for the values of type, subtype, and gimbalIndex.
+Example:
+Topic: thing/product/ {dock_sn} /state
+Topic: thing/product/ {dock_sn} /osd
+{
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1667220873846 ,
+"data" : {
+"job_number" : 492 ,
+"acc_time" : 1859010 ,
+"activation_time" : 0 ,
+"maintain_status" : {
+"maintain_status_array" : [
+{
+"state" : 0 ,
+"last_maintain_type" : 17 ,
+"last_maintain_time" : 0 ,
+"last_maintain_work_sorties" : 0
+}
+]
+} ,
+"electric_supply_voltage" : 231 ,
+"working_voltage" : 25440 ,
+"working_current" : 1120 ,
+"backup_battery" : {
+"voltage" : 26631 ,
+"temperature" : 27.9 ,
+"switch" : 1
+} ,
+"drone_battery_maintenance_info" : {
+"maintenance_state" : 0 ,
+"maintenance_time_left" : 0
+}
+} ,
+"gateway" : "dock_sn"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"flighttask_prepare_capacity" : 1 ,
+"flighttask_step_code" : 255 ,
+"media_file_detail" : {
+"remain_upload" : 0
+} ,
+"wireless_link" : {
+"4g_freq_band" : 2.4 ,
+"4g_gnd_quality" : 0 ,
+"4g_link_state" : 0 ,
+"4g_quality" : 0 ,
+"4g_uav_quality" : 0 ,
+"dongle_number" : 0 ,
+"link_workmode" : 0 ,
+"sdr_freq_band" : 2.4 ,
+"sdr_link_state" : 0 ,
+"sdr_quality" : 0
+}
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1667220881576 ,
+"gateway" : "dock_sn"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1667220916697 ,
+"data" : {
+"network_state" : {
+"type" : 2 ,
+"quality" : 0 ,
+"rate" : 5.0970001220703125
+} ,
+"drone_charge_state" : {
+"state" : 0 ,
+"capacity_percent" : 100
+} ,
+"drone_in_dock" : 1 ,
+"rainfall" : 0 ,
+"wind_speed" : 0 ,
+"environment_temperature" : 24 ,
+"temperature" : 24.9 ,
+"humidity" : 62 ,
+"latitude" : 22.907809968 ,
+"longitude" : 113.703482143 ,
+"height" : 34.174125671386719 ,
+"alternate_land_point" : {
+"latitude" : 22.907898319908661 ,
+"longitude" : 113.70347329676635 ,
+"safe_land_height" : 0 ,
+"is_configured" : 1
+} ,
+"first_power_on" : 1631945855969 ,
+"position_state" : {
+"is_calibration" : 1 ,
+"is_fixed" : 2 ,
+"quality" : 5 ,
+"gps_number" : 6 ,
+"rtk_number" : 25
+} ,
+"storage" : {
+"total" : 82045336 ,
+"used" : 51772
+} ,
+"mode_code" : 1 ,
+"cover_state" : 0 ,
+"supplement_light_state" : 0 ,
+"emergency_stop_state" : 0 ,
+"air_conditioner_mode" : 0 ,
+"battery_store_mode" : 1 ,
+"alarm_state" : 0 ,
+"putter_state" : 0 ,
+"sub_device" : {
+"device_sn" : "1581F5BKD225D00BP891" ,
+"device_model_key" : "0-67-0" ,
+"device_online_status" : 0 ,
+"device_paired" : 1
+}
+} ,
+"gateway" : "dock_sn"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/ {aircraft_sn} /state
+Topic: thing/product/ {aircraft_sn} /osd
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"52-0-0" : {
+"measure_target_altitude" : 0 ,
+"measure_target_distance" : 591.70001220703125 ,
+"measure_target_error_state" : 1 ,
+"measure_target_latitude" : 0 ,
+"measure_target_longitude" : 0 ,
+"payload_index" : "52-0-0" ,
+"version" : 1
+} ,
+"activation_time" : 1667935211 ,
+"attitude_head" : 41.7 ,
+"attitude_pitch" : 2.7 ,
+"attitude_roll" : 0 ,
+"battery" : {
+"batteries" : [
+{
+"capacity_percent" : 95 ,
+"firmware_version" : "02.00.20.44" ,
+"high_voltage_storage_days" : 16 ,
+"index" : 0 ,
+"loop_times" : 137 ,
+"sn" : "4BUPJ99DAD009W" ,
+"sub_type" : 0 ,
+"temperature" : 33.3 ,
+"type" : 0 ,
+"voltage" : 24303
+} ,
+{
+"capacity_percent" : 85 ,
+"firmware_version" : "02.00.20.44" ,
+"high_voltage_storage_days" : 5 ,
+"index" : 1 ,
+"loop_times" : 82 ,
+"sn" : "4BUPJ9EDAD01CE" ,
+"sub_type" : 0 ,
+"temperature" : 32 ,
+"type" : 0 ,
+"voltage" : 24311
+}
+] ,
+"capacity_percent" : 90 ,
+"landing_power" : 0 ,
+"remain_flight_time" : 0 ,
+"return_home_power" : 0
+} ,
+"distance_limit_status" : {
+"distance_limit" : 5000 ,
+"state" : 0
+} ,
+"elevation" : 0 ,
+"firmware_version" : "05.01.0214" ,
+"gear" : 1 ,
+"height" : 38.417465209960938 ,
+"height_limit" : 120 ,
+"home_distance" : 0 ,
+"horizontal_speed" : 0 ,
+"latitude" : 0 ,
+"longitude" : 0 ,
+"maintain_status" : {
+"maintain_status_array" : [
+{
+"last_maintain_flight_time" : 0 ,
+"last_maintain_time" : 0 ,
+"last_maintain_type" : 1 ,
+"state" : 0
+} ,
+{
+"last_maintain_flight_time" : 0 ,
+"last_maintain_time" : 0 ,
+"last_maintain_type" : 2 ,
+"state" : 0
+} ,
+{
+"last_maintain_flight_time" : 0 ,
+"last_maintain_time" : 0 ,
+"last_maintain_type" : 3 ,
+"state" : 0
+}
+]
+} ,
+"mode_code" : 0 ,
+"night_lights_state" : 0 ,
+"obstacle_avoidance" : {
+"downside" : 1 ,
+"horizon" : 1 ,
+"upside" : 1
+} ,
+"position_state" : {
+"gps_number" : 0 ,
+"is_fixed" : 0 ,
+"quality" : 0 ,
+"rtk_number" : 0
+} ,
+"storage" : {
+"total" : 0 ,
+"used" : 0
+} ,
+"total_flight_distance" : 0 ,
+"total_flight_sorties" : 0 ,
+"total_flight_time" : 0 ,
+"track_id" : "" ,
+"vertical_speed" : 0 ,
+"wind_direction" : 0 ,
+"wind_speed" : 0
+} ,
+"tid" : "2d2040eb-23b0-43dc-b7ac-64838276c4ac" ,
+"timestamp" : 1670422793916 ,
+"gateway" : "dock_sn"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Device Property Settings
+Topic: thing/product/ {gateway_sn} /property/set
+Direction: down
+Data:
+Column Name Type Constraint Description
+data Content text {} Refer to the device's property for content
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"distance_limit_status" : { "state" : 1 }
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1643268212187
+}
+
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /property/set_reply
+Direction: up
+Data:
+Column Name Type Constraint Description
+data Content text {} Refer to the device's property for content
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"distance_limit_status" : {
+"state" : {
+"result" : 0 // 0: Success, 1: Failure, 2: Timeout (refer to error code for specific reasons)
+}
+}
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1643268212187
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+Github Edit open in new window
+Last Updated: 9/17/2025, 3:50:10 AM
+
+Device Management
+How was your reading experience of our documentation?
+
+Device Property List
+Device Property Push
+Device Property Settings
+
+
+Documentation Feedback
+
+
+
+
+
+
+
+
+
+
+
+
+
+If you have any comments or confusion about our documentation, you can click here to give feedback and we will get back to you as soon as possible. OK

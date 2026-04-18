@@ -1,0 +1,462 @@
+Cloud API
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+SearchK
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+Release Notes
+
+Tutorial Reading Guide
+
+Flight Safety Notification
+
+Basic Introduction
+
+Product Introduction
+
+Product Architecture
+
+Product Supported
+
+Basic Concept
+
+Noun Explanation
+
+MQTT
+
+Thing Model
+
+HTTPS
+
+WebSocket
+
+JSBridge
+
+Quick Start
+
+Environment Preparation List
+
+Source Code Deployment Steps
+
+Docker Deployment Steps
+
+Function Display Video
+
+Function Set
+
+Pilot Function Set
+
+Access to the Cloud Server
+
+Situation Awareness
+
+Live Stream
+
+Map Elements
+
+Media Management
+
+Wayline Management
+
+Obtain Log via JSBridge
+
+Pilot Launch Third-party App
+
+Live Flight Controls/Remote Control
+
+Dock Function Set
+
+Access to the Cloud Server
+
+Device Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Live Flight Controls/Remote Control
+
+Custom Flight Area
+
+Multi-dock Task
+
+AI Target Recognition
+
+Debugging Methods
+
+Pilot Webview Debugging
+
+Log Export
+
+MQTTX
+
+API Reference
+
+DJI WPML
+
+Overview
+
+Template.kml
+
+Waylines.wpml
+
+Common Elements
+
+Pilot to Cloud
+
+MQTT
+
+Topic Definition
+
+Mavic 3 Enterprise Series
+
+Properties
+
+DJI RC Pro Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 4 Series
+
+Properties
+
+DJI RC Plus 2 Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 400
+
+Properties
+
+Other Models
+
+Aircraft
+
+Properties
+
+Remote Controller
+
+Properties
+
+Device Management
+
+Live Stream
+
+HTTPS
+
+Map Elements
+
+Create Map Elements
+
+Update Map Elements
+
+Obtain Map Elements
+
+Delete Map Elements
+
+Wayline Management
+
+Obtain Wayline List
+
+Obtain Temporary Credential
+
+Obtain Wayline File Download Address
+
+Obtain Duplicated Wayline Name
+
+Obtain File Upload Result Report
+
+Batch Favorites Wayline
+
+Batch Unfavorite Wayline
+
+Media Management
+
+Media Fast Upload
+
+Obtain Exist File Tiny Fingerprint
+
+Obtain Temporary Credential
+
+App Reports File Upload Result
+
+Callback after the File Group Upload Complete
+
+Situation Awareness
+
+Obtain Device Topology List
+
+WebSocket
+
+Map Elements
+
+Push Message
+
+Situation Awareness
+
+Push Message
+
+JSBridge
+
+Dock to Cloud
+
+MQTT
+
+Topic Definition
+
+Aircraft
+
+M30/M30T Properties
+
+M3D/M3TD Properties
+
+M4D/M4TD Properties
+
+Dock
+
+DJI Dock
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+DJI Dock 2
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+Remote Control
+
+DJI Dock 3
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+AirSense
+
+Remote Control
+
+Error Code
+
+FAQ
+
+Overview
+
+2025-03-12
+4.1 Ratings
+6 customers rated
+Github Edit open in new window
+
+Introduction
+
+What's WPML
+
+How to Use WPML
+
+Existing route change
+
+# Introduction
+
+Waypoint flight function, as an important technology of drone automation operation scenarios, is one of the core functions that users and developers attach to the most attention. With the popularity of drone automation, route data has quickly become an important digital asset for users and developers. However, for a long time in the past, routes could only be edited and executed on a single device, and it was difficult to apply across devices and models; the route file format was not open or shared, making it difficult for users to independently complete secondary editing and business tuning work. In line with the vision of liberating repetitive productivity for the industry and users, leading the drone industry to a new era of automation, and promoting the assetization of route data, we officially released the route file format standard-WPML.
+
+# What's WPML
+
+WPML is the abbreviation of WayPoint Markup Language, which is the Route File Format Standard. The WPML route file format standard is extended based on the definition of KML (Keyhole Markup Language). WPML route files follow KMZ filing requirements and all route files end with a “.kmz” suffix. WPML route file format standard, as the carrier of route digital assets, has the following advantages:
+
+Open: WPML's definitions are shared publicly. Route files are archived using file packages, and paths are described in markup language, which is highly scalable. Users and developers can continue to add business data based on the open principle without restriction.
+
+Easy to read: WPML uses the most basic XML markup language format and media file format to describe routes. Users and developers can read and write resources such as path definition and route media without relying on any parsing software.
+
+Inheritance: WPML will continue to iterate as a route file format standard and maintain intergenerational compatibility according to protocol rules. Route files in the hands of users and developers can become digital assets, which can be directly applied and continuously inherited between different devices and models.
+
+Based on the open principle of WPML, users and developers are welcome to put forward suggestions and suggestions for improvement. Let's transcend the future of drone automation applications together!
+
+# How to Use WPML
+
+WPML route files all end with a ".kmz" suffix and are essentially archive files packed in ZIP format. After decompression of a standard WPML route file, its file structure is as follows:
+
+The template.kml file is referred to as the "template file". Predefined templates provide a convenient means for users to edit and plan routes. For example, when surveying and mapping users use the mapping aerial template, they do not need to carefully describe the path of each route, but only need to define the surveying and mapping area and overlap rate, which can be generated by DJI Pilot 2, DJI Flighthub 2 or other software and finally provided to the drone. The path and action to execute.
+
+And the waylines.wpml file is called the "execution file". The executive file defines clear drone flight and payload action instructions. These commands are generated by DJI Pilot 2, DJI Flighthub 2 or other software. These softwares read the template parameters in template.kml, combined with the calculation of the path generation algorithm, and finally generates the waylines.wpml file for execution.
+
+The res resource folder contains auxiliary resources required for the wayline. For example, the pre-prepared reference target photos for the AI Spot-Check.
+
+The template.kml, waylines.wpml and res resource folders are all part of the route file format standard. template.kml defines business attributes, which are convenient for users to quickly adjust and edit; waylines.wpml defines execution details; res folder stores auxiliary resource files.
+
+The fields of DJI WPML are introduced as follows:
+
+The fields used only in template.kml file are introduced in Template.kmlopen in new window.
+
+The fields used only in waylines.wpml file are introduced in Waylines.wpmlopen in new window.
+
+Common fields for template.kml file and waylines.wpml file are introduced in Common Elementsopen in new window.
+
+Note:
+
+Please follow this specification for the naming of each file or folder in the route file, otherwise the route file may fail to be read.
+
+The route name is the file name of the route file. For example, the route name of new_waypoints.kmz is new_waypoints.
+
+# Existing route change
+
+For the existing route files of the M300 RTK, you can upgrade to WPML route files by importing them into the new version of DJI Pilot 2 and saving them again.
+
+Note: The route format conversion library is not yet available. Developers who need it can convert it based on DJI Pilot 2, or generate it based on the WPML route file format standard.
+
+Github Edit open in new window
+
+Last Updated: 3/12/2025, 9:09:23 PM
+
+Template.kml
+
+How was your reading experience of our documentation?
+
+Introduction
+
+What's WPML
+
+How to Use WPML
+
+Existing route change
+
+Documentation Feedback
+
+
+
+
+If you have any comments or confusion about our documentation, you can click here to give feedback and we will get back to you as soon as possible.
+OK

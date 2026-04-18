@@ -1,0 +1,20 @@
+# Normalize text files to LF in the repo; tools handle native line endings on checkout.
+* text=auto eol=lf
+
+# Explicit binaries (prevent any text processing)
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.tar   binary
+*.tar.gz binary
+*.gz    binary
+*.jar   binary
+*.class binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary

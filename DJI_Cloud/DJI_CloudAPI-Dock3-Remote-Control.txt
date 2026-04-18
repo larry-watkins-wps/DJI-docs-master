@@ -1,0 +1,5180 @@
+Cloud API
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+SearchK
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+Release Notes
+
+Tutorial Reading Guide
+
+Flight Safety Notification
+
+Basic Introduction
+
+Product Introduction
+
+Product Architecture
+
+Product Supported
+
+Basic Concept
+
+Noun Explanation
+
+MQTT
+
+Thing Model
+
+HTTPS
+
+WebSocket
+
+JSBridge
+
+Quick Start
+
+Environment Preparation List
+
+Source Code Deployment Steps
+
+Docker Deployment Steps
+
+Function Display Video
+
+Function Set
+
+Pilot Function Set
+
+Access to the Cloud Server
+
+Situation Awareness
+
+Live Stream
+
+Map Elements
+
+Media Management
+
+Wayline Management
+
+Obtain Log via JSBridge
+
+Pilot Launch Third-party App
+
+Live Flight Controls/Remote Control
+
+Dock Function Set
+
+Access to the Cloud Server
+
+Device Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Live Flight Controls/Remote Control
+
+Custom Flight Area
+
+Multi-dock Task
+
+AI Target Recognition
+
+Debugging Methods
+
+Pilot Webview Debugging
+
+Log Export
+
+MQTTX
+
+API Reference
+
+DJI WPML
+
+Overview
+
+Template.kml
+
+Waylines.wpml
+
+Common Elements
+
+Pilot to Cloud
+
+MQTT
+
+Topic Definition
+
+Mavic 3 Enterprise Series
+
+Properties
+
+DJI RC Pro Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 4 Series
+
+Properties
+
+DJI RC Plus 2 Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 400
+
+Properties
+
+Other Models
+
+Aircraft
+
+Properties
+
+Remote Controller
+
+Properties
+
+Device Management
+
+Live Stream
+
+HTTPS
+
+Map Elements
+
+Create Map Elements
+
+Update Map Elements
+
+Obtain Map Elements
+
+Delete Map Elements
+
+Wayline Management
+
+Obtain Wayline List
+
+Obtain Temporary Credential
+
+Obtain Wayline File Download Address
+
+Obtain Duplicated Wayline Name
+
+Obtain File Upload Result Report
+
+Batch Favorites Wayline
+
+Batch Unfavorite Wayline
+
+Media Management
+
+Media Fast Upload
+
+Obtain Exist File Tiny Fingerprint
+
+Obtain Temporary Credential
+
+App Reports File Upload Result
+
+Callback after the File Group Upload Complete
+
+Situation Awareness
+
+Obtain Device Topology List
+
+WebSocket
+
+Map Elements
+
+Push Message
+
+Situation Awareness
+
+Push Message
+
+JSBridge
+
+Dock to Cloud
+
+MQTT
+
+Topic Definition
+
+Aircraft
+
+M30/M30T Properties
+
+M3D/M3TD Properties
+
+M4D/M4TD Properties
+
+Dock
+
+DJI Dock
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+DJI Dock 2
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+Remote Control
+
+DJI Dock 3
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+AirSense
+
+Remote Control
+
+Error Code
+
+FAQ
+
+Remote Control
+
+2026-01-27
+
+No Rating
+Github Edit open in new window
+
+PSDK - Floating window push
+
+Speaker - Audio playback progress
+
+PSDK - Status report
+
+PSDK - UI resource package upload
+
+Aircraft state information report
+
+Report Camera Status
+
+Camera OSD Push
+
+Report AI Status
+
+Night mode settings
+
+Noise Reduction Level Settings
+
+Night Vision enable
+
+Near infrared fill light enable
+
+Forced Landing
+
+Emergency Stop
+
+Emergency Landing
+
+Spotlight - Brightness settings
+
+Spotlight - Mode settings
+
+Spotlight - Settings
+
+Spotlight - Gimbal calibration
+
+Speaker - Mode settings
+
+Speaker - TTS settings
+
+Speaker - Set volume
+
+Speaker - Stop playback
+
+Speaker - Replay
+
+Speaker - Start playing TTS audio
+
+PSDK - Send text box content
+
+PSDK - Widget Value Settings
+
+Initial state subscription for DRC
+
+Beacon Settings
+
+Flight Control - Discreet Mode
+
+Payload Control - Camera Aperture
+
+Payload Control - Camera Shutter
+
+Payload Control - ISO Settings
+
+Payload Control - Mechanical Shutter
+
+Payload Control - Lens Dewarp
+
+Set Infrared Photo Format
+
+AI Model Selection
+
+AI Recognition Switch Setting
+
+AI Tracking Switch Setting
+
+AI Recognition Target Tracking
+
+AI Box-Select Target Tracking
+
+AI Box-Select Target Tracking Confirmation
+
+Stop Target Tracking
+
+Set AI Recognition Confidence Mode
+
+Set AI Recognition Confidence
+
+Reset AI Recognition Confidence
+
+Set AI Recognition Target Filter List
+
+# Event
+
+# PSDK - Floating window push
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: drc_psdk_floating_window_text
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+floating_window_text
+
+Floating window content
+
+text
+
+{"length":""}
+
+Example:
+
+{
+"data": {
+"floating_window_text": "",
+"psdk_index": 0
+},
+"method": "drc_psdk_floating_window_text",
+"seq": 1
+}
+
+# Speaker - Audio playback progress
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_speaker_play_progress
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+result
+
+Result
+
+enum_int
+
+{"0":"Success"}
+
+status
+
+Status
+
+enum_string
+
+{"failed":"Failed","in_progress":"In progress","success":"Success"}
+
+progress
+
+Progress
+
+struct
+
+»step_key
+
+Step
+
+enum_string
+
+{"change_work_mode":"Working","download":"Download","encoding":"Converting","play":"Playing","tts_processing":"TTS Play","upload":"Upload"}
+
+»percent
+
+Progress
+
+int
+
+{"max":"100","min":"1"}
+
+md5
+
+Verification
+
+int
+
+string
+
+# PSDK - Status report
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: drc_psdk_state_info
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+psdk_type
+
+PSDK type
+
+enum_int
+
+{"4":"Third party","5":"DJI developed"}
+
+psdk_name
+
+Name
+
+enum_string
+
+{"Searchlight":"Spotlight","Speaker":"Speaker"}
+
+psdk_sn
+
+SN
+
+text
+
+{"length":""}
+
+psdk_version
+
+Version
+
+text
+
+{"length":""}
+
+psdk_lib_version
+
+Lib version
+
+text
+
+{"length":""}
+
+speaker
+
+Speaker
+
+struct
+
+»work_mode
+
+Work mode
+
+int
+
+»play_mode
+
+Play mode
+
+enum_int
+
+{"0":"Single play","1":"Loop play (single track)"}
+
+»system_state
+
+Speaker state
+
+enum_int
+
+{"0":"Idle","1":"Transmitting (from dock to aircraft)","2":"Playing","3":"Abnormal","4":"TTS text conversion in progress","99":"Downloading (from dock to cloud)"}
+
+»play_volume
+
+Volume
+
+int
+
+{"max":"100","min":"1"}
+
+»play_file_name
+
+File name
+
+text
+
+{"length":""}
+
+»play_file_md5
+
+File verification
+
+text
+
+{"length":""}
+
+»tts_volume
+
+TTS playback volume
+
+int
+
+{"max":"100","min":"1"}
+
+»tts_type
+
+TTS playback type
+
+enum_int
+
+{"0":"Male voice","1":"Female voice"}
+
+»tts_language
+
+Language
+
+enum_int
+
+{"0":"Chinese","1":"English"}
+
+»tts_speed
+
+Speed
+
+int
+
+{"max":"100","min":"1"}
+
+light
+
+Spotlight
+
+struct
+
+»work_mode
+
+Work mode
+
+int
+
+»brightness
+
+Brightness
+
+int
+
+»calibration_status
+
+Calibration
+
+enum_int
+
+{"0":"Calibration Complete","1":"Calibrating","2":"Calibration Failed"}
+
+»calibration_progress
+
+Calibration progress
+
+int
+
+»left_value
+
+Left light value
+
+int
+
+{"max":"100","min":"1"}
+
+»right_value
+
+Right light value
+
+int
+
+{"max":"100","min":"1"}
+
+»wide_field_mode
+
+Whether the spotlight wide field mode is enabled
+
+bool
+
+{"false":"Disabled","true":"Enabled"}
+
+»light_gimbal_control
+
+Whether spotlight gimbal linkage is enabled
+
+bool
+
+{"false":"Disabled","true":"Enabled"}
+
+values
+
+Custom value
+
+struct
+
+»index
+
+index
+
+int
+
+»value
+
+value
+
+int
+
+# PSDK - UI resource package upload
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: drc_psdk_ui_resource
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+psdk_ready
+
+Whether UI resource is ready
+
+enum_int
+
+{"0":"Not ready","1":"Ready"}
+
+object_key
+
+OSS object
+
+text
+
+{"length":""}
+
+Example:
+
+{
+"data": {
+"object_key": "b4cfaae6-bd9d-4cd0-8472-63b608c3c581/SN/psdk_config/0/2023_6_7_1103_XXXXXX.tar.gz",
+"psdk_index": 0,
+"psdk_ready": 1
+},
+"method": "drc_psdk_ui_resource",
+"seq": 1
+}
+
+# Aircraft state information report
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: drc_drone_state_push
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+stealth_state
+
+Discreet mode state
+
+bool
+
+{"0":"Disabled","1":"Enabled"}
+
+night_lights_state
+
+Beacon state
+
+bool
+
+{"0":"Disabled","1":"Enabled"}
+
+mode_code
+
+Aircraft state
+
+enum_int
+
+{"0":"Standby","1":"Takeoff preparation","2":"Takeoff preparation completed","3":"Manual flight","4":"Automatic takeoff","5":"Wayline flight","6":"Panorama","7":"Intelligent tracking","8":"ADS-B avoidance","9":"Automatic returning to home","10":"Automatic landing","11":"Forced landing","12":"Three-blade landing","13":"Upgrading","14":"Not connected","15":"APAS","16":"Virtual stick state","17":"Live flight Controls"}
+
+Example:
+
+{
+"data": {
+"mode_code": 0,
+"night_lights_state": 0,
+"stealth_state": 0
+},
+"method": "drc_drone_state_push",
+"seq": 1
+}
+
+# Report Camera Status
+
+Report camera information when it changes. ("seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".)
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_camera_state_push
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+payload_index
+
+Camera enumeration value
+
+text
+
+Camera enumeration value.Non-standard device_mode_key. The format is {type-subtype-gimbalindex}. Refer to Supported Productsopen in new window.
+
+camera_state
+
+Camera status information
+
+struct
+
+»camera_mode
+
+Camera status
+
+enum_int
+
+{"0":"Capturing","1":"Recording","2":"Smart Low-Light","3":"Panorama","4":"Timed Shot"}
+
+»interval_photo_interval
+
+Time interval of Timed Shot
+
+int
+
+{"max":"","min":"","step":"","unit_name":"Second / s"}
+
+»video_resolution
+
+Video resolution
+
+enum_string
+
+{"0":"1920_1080 ","1":"3840_2160"}
+
+»linkage_zoom_state
+
+Link Zoom status
+
+bool
+
+{"0":"Closed","1":"Opened"}
+
+»photo_size
+
+Photo size
+
+enum_int
+
+{"0":"Default","1":"Extra small","2":"Small","3":"Medium","4":"Large","5":"Extra large"}
+
+»photo_format
+
+Photo Format
+
+enum_int
+
+{"7":"RJPEG","16":"DLT664"}
+
+»record_time
+
+Video recording duration
+
+int
+
+{"max":"","min":"","step":"","unit_name":"Second / s"}
+
+»recording_state
+
+Recording status
+
+enum_int
+
+{"0":"Idle","1":"Recording"}
+
+»photo_state
+
+Capturing status
+
+enum_int
+
+{"0":"Idle","1":"Capturing"}
+
+»remain_photo_num
+
+Remaining number of photos
+
+int
+
+»remain_record_duration
+
+Remaining time of recording
+
+int
+
+{"max":"","min":"","step":"","unit_name":"Second / s"}
+
+»night_mode_settings
+
+Night mode settings
+
+struct
+
+»»night_mode
+
+Night mode status
+
+enum_int
+
+{"0":"Disabled","1":"Enabled","2":"Auto"}
+
+Automatic mode automatically switches according to ambient light
+
+»»denoise_level
+
+Noise reduction level
+
+enum_int
+
+{"0":"Disabled","1":"Standard noise reduction","2":"Enhanced noise reduction","3":"Super noise reduction"}
+
+Enhanced noise reduction will affect frame rate
+
+»»night_vision_enable
+
+Night Vision enable
+
+bool
+
+{"false":"Disabled","true":"Enabled"}
+
+Only works when zoom is 7x or above
+
+»»infrared_fill_light_enable
+
+Near infrared fill light enable
+
+bool
+
+{"false":"Disabled","true":"Enabled"}
+
+Only works when zoom is 7x or above
+
+»»night_scene_mode_suggestion
+
+Night scene suggestions
+
+enum_int
+
+{"0":"No suggestions","1":"It is recommended to turn on night mode"}
+
+Recommendations based on ambient light
+
+»»is_working
+
+Is it in effect
+
+enum_int
+
+{"0":"Not effective","1":"Taking effect"}
+
+actual working status
+
+media_storage
+
+Media storage information
+
+struct
+
+»photo_storage_settings
+
+Set of photo storage settings
+
+array
+
+{"size": -, "item_type": text}
+
+Capturing storage types are {current, vision, ir}. Multiple selections are available based on the models.
+
+»video_storage_settings
+
+Set of video storage settings
+
+array
+
+{"size": -, "item_type": text}
+
+Video storage types are {current, vision, ir}. Multiple selections are available based on the models.
+
+Example:
+
+{
+"data": {
+"camera_state": {
+"camera_mode": 0,
+"interval_photo_interval": 2.5,
+"linkage_zoom_state": 0,
+"photo_size": 1,
+"photo_state": 0,
+"record_time": 0,
+"recording_state": 0,
+"remain_photo_num": 6727,
+"remain_record_duration": 0,
+"video_resolution": 0,
+"night_mode_settings": {
+"night_mode": 0,
+"denoise_level": 1,
+"night_vision_enable": true,
+"infrared_fill_light_enable": true,
+"night_scene_mode_suggestion": 1,
+"is_working": 1
+}
+},
+"media_storage": {
+"photo_storage_settings": [
+"current",
+"ir"
+],
+"video_storage_settings": [
+"current",
+"ir"
+]
+},
+"payload_index": "81-0-0"
+},
+"method": "drc_camera_state_push",
+"seq": 1
+}
+
+# Camera OSD Push
+
+Used for pushing camera related information. The "seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: drc_camera_osd_info_push
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+payload_index
+
+Camera enumeration
+
+text
+
+{"length":""}
+
+Camera enumeration value. Non-standard device_mode_key. The format is {type-subtype-gimbalindex}. Refer to Product Supportedopen in new window.
+
+wide_lense
+
+Wide-angle lens info
+
+struct
+
+»wide_exposure_mode
+
+Wide-angle lens exposure mode
+
+enum_int
+
+{"1":"Auto","2":"Shutter Priority","3":"Aperture Priority","4":"Manual"}
+
+Current configuration of the wide-angle lens exposure mode
+
+»wide_iso
+
+Wide-angle lens ISO
+
+enum_int
+
+{"0":"Auto","1":"Auto (High Sense)","2":"50","3":"100","4":"200","5":"400","6":"800","7":"1600","8":"3200","9":"6400","10":"12800","11":"25600","255":"FIXED"}
+
+Current configuration of the wide-angle lens ISO
+
+»wide_shutter_speed
+
+Wide-angle lens shutter speed
+
+enum_int
+
+{"0":"1/8000 s","1":"1/6400 s","2":"1/6000 s","3":"1/5000 s","4":"1/4000 s","5":"1/3200 s","6":"1/3000 s","7":"1/2500 s","8":"1/2000 s","9":"1/1600 s","10":"1/1500 s","11":"1/1250 s","12":"1/1000 s","13":"1/800 s","14":"1/725 s","15":"1/640 s","16":"1/500 s","17":"1/400 s","18":"1/350 s","19":"1/320 s","20":"1/250 s","21":"1/240 s","22":"1/200 s","23":"1/180 s","24":"1/160 s","25":"1/125 s","26":"1/120 s","27":"1/100 s","28":"1/90 s","29":"1/80 s","30":"1/60 s","31":"1/50 s","32":"1/40 s","33":"1/30 s","34":"1/25 s","35":"1/20 s","36":"1/15 s","37":"1/12.5 s","38":"1/10 s","39":"1/8 s","40":"1/6.25 s","41":"1/5 s","42":"1/4 s","43":"1/3 s","44":"1/2.5 s","45":"1/2 s","46":"1/1.67 s","47":"1/1.25 s","48":"1.0 s","49":"1.3 s","50":"1.6 s","51":"2.0 s","52":"2.5 s","53":"3.0 s","54":"3.2 s","55":"4.0 s","56":"5.0 s","57":"6.0 s","58":"7.0 s","59":"8.0 s","65534":"Auto"}
+
+Current configuration of the wide-angle lens shutter speed
+
+»wide_exposure_value
+
+Wide-angle lens exposure value
+
+enum_int
+
+{"1":"-5.0EV","2":"-4.7EV","3":"-4.3EV","4":"-4.0EV","5":"-3.7EV","6":"-3.3EV","7":"-3.0EV","8":"-2.7EV","9":"-2.3EV","10":"-2.0EV","11":"-1.7EV","12":"-1.3EV","13":"-1.0EV","14":"-0.7EV","15":"-0.3EV","16":"0EV","17":"0.3EV","18":"0.7EV","19":"1.0EV","20":"1.3EV","21":"1.7EV","22":"2.0EV","23":"2.3EV","24":"2.7EV","25":"3.0EV","26":"3.3EV","27":"3.7EV","28":"4.0EV","29":"4.3EV","30":"4.7EV","31":"5.0EV","255":"FIXED"}
+
+Current configuration of the wide-angle lens exposure value
+
+»wide_aperture_value
+
+Aperture value
+
+enum_int
+
+{"0": "F_AUTO", "50": "F0.5", "70": "F0.7", "80": "F0.8", "90": "F0.9", "95": "F0.95", "100": "F1.0", "110": "F1.1", "120": "F1.2", "140": "F1.4", "160": "F1.6", "170": "F1.7", "180": "F1.8", "200": "F2", "220": "F2.2", "240": "F2.4", "250": "F2.5", "280": "F2.8", "320": "F3.2", "330": "F3.3", "340": "F3.4", "350": "F3.5", "400": "F4", "440": "F4.4", "450": "F4.5", "480": "F4.8", "500": "F5", "560": "F5.6", "630": "F6.3", "670": "F6.7", "680": "F6.8", "710": "F7.1", "800": "F8", "900": "F9", "950": "F9.5", "960": "F9.6", "1000": "F10", "1100": "F11", "1300": "F13", "1400": "F14", "1600": "F16", "1800": "F18", "1900": "F19", "2000": "F20", "2200": "F22", "2500": "F25", "2700": "F27", "2900": "F29", "3200": "F32", "3600": "F36", "3800": "F38", "4000": "F40", "4500": "F45", "5100": "F51", "5400": "F54", "5700": "F57", "6400": "F64", "7200": "F72", "7600": "F76", "8000": "F80", "9000": "F90", "10700": "F107", "12800": "F128", "18000": "F180", "25600": "F256"}
+
+Depending on the aircraft model, the range may vary.
+
+zoom_lense
+
+Zoom lens info
+
+struct
+
+»zoom_exposure_mode
+
+Zoom lens exposure mode
+
+enum_int
+
+{"1":"Auto","2":"Shutter Priority","3":"Aperture Priority","4":"Manual"}
+
+Current configuration of the zoom lens exposure mode
+
+»zoom_iso
+
+Zoom lens ISO
+
+enum_int
+
+{"0":"Auto","1":"Auto (High Sense)","2":"50","3":"100","4":"200","5":"400","6":"800","7":"1600","8":"3200","9":"6400","10":"12800","11":"25600","255":"FIXED"}
+
+Current configuration of the zoom lens ISO
+
+»zoom_shutter_speed
+
+Zoom lens shutter speed
+
+enum_int
+
+{"0":"1/8000 s","1":"1/6400 s","2":"1/6000 s","3":"1/5000 s","4":"1/4000 s","5":"1/3200 s","6":"1/3000 s","7":"1/2500 s","8":"1/2000 s","9":"1/1600 s","10":"1/1500 s","11":"1/1250 s","12":"1/1000 s","13":"1/800 s","14":"1/725 s","15":"1/640 s","16":"1/500 s","17":"1/400 s","18":"1/350 s","19":"1/320 s","20":"1/250 s","21":"1/240 s","22":"1/200 s","23":"1/180 s","24":"1/160 s","25":"1/125 s","26":"1/120 s","27":"1/100 s","28":"1/90 s","29":"1/80 s","30":"1/60 s","31":"1/50 s","32":"1/40 s","33":"1/30 s","34":"1/25 s","35":"1/20 s","36":"1/15 s","37":"1/12.5 s","38":"1/10 s","39":"1/8 s","40":"1/6.25 s","41":"1/5 s","42":"1/4 s","43":"1/3 s","44":"1/2.5 s","45":"1/2 s","46":"1/1.67 s","47":"1/1.25 s","48":"1.0 s","49":"1.3 s","50":"1.6 s","51":"2.0 s","52":"2.5 s","53":"3.0 s","54":"3.2 s","55":"4.0 s","56":"5.0 s","57":"6.0 s","58":"7.0 s","59":"8.0 s","65534":"Auto"}
+
+Current configuration of the zoom lens shutter speed
+
+»zoom_exposure_value
+
+Zoom lens exposure value
+
+enum_int
+
+{"1":"-5.0EV","2":"-4.7EV","3":"-4.3EV","4":"-4.0EV","5":"-3.7EV","6":"-3.3EV","7":"-3.0EV","8":"-2.7EV","9":"-2.3EV","10":"-2.0EV","11":"-1.7EV","12":"-1.3EV","13":"-1.0EV","14":"-0.7EV","15":"-0.3EV","16":"0EV","17":"0.3EV","18":"0.7EV","19":"1.0EV","20":"1.3EV","21":"1.7EV","22":"2.0EV","23":"2.3EV","24":"2.7EV","25":"3.0EV","26":"3.3EV","27":"3.7EV","28":"4.0EV","29":"4.3EV","30":"4.7EV","31":"5.0EV","255":"FIXED"}
+
+Current configuration of the zoom lens exposure value
+
+»zoom_focus_mode
+
+Zoom lens focus mode
+
+enum_int
+
+{"0":"MF","1":"AFS","2":"AFC"}
+
+»zoom_focus_value
+
+Zoom lens focus value
+
+int
+
+»zoom_max_focus_value
+
+Zoom lens maximum focus value
+
+int
+
+»zoom_min_focus_value
+
+Zoom lens minimum focus value
+
+int
+
+»zoom_calibrate_farthest_focus_value
+
+Zoom lens calibrated farthest focus value
+
+int
+
+Focused value at the farthest clear position
+
+»zoom_calibrate_nearest_focus_value
+
+Zoom lens calibrated nearest focus value
+
+int
+
+Focused value at the nearest clear position
+
+»zoom_focus_state
+
+Zoom lens focus state
+
+int
+
+»zoom_factor
+
+Zoom ratio
+
+int
+
+»zoom_aperture_value
+
+Zoom lens aperture value
+
+enum_int
+
+{"440":"F4.4"}
+
+Depending on the aircraft model, the range may vary.
+
+measure_target
+
+Target ranging and height measurement
+
+struct
+
+»measure_target_longitude
+
+Laser ranging target longitude
+
+double
+
+{"max":"180","min":"-180","unit":"Degrees / °"}
+
+»measure_target_latitude
+
+Laser ranging target latitude
+
+double
+
+{"max":"90","min":"-90","unit":"Degrees / °"}
+
+»measure_target_altitude
+
+Laser ranging target altitude
+
+double
+
+{"unit":"Meters / m"}
+
+»measure_target_distance
+
+Laser ranging distance
+
+double
+
+{"unit":"Meters / m"}
+
+ir_lense
+
+Infrared information
+
+struct
+
+»screen_split_enable
+
+Whether split screen is enabled
+
+bool
+
+{"false":"Disable split screen","true":"Enable split screen"}
+
+»ir_zoom_factor
+
+Infrared zoom ratio
+
+float
+
+{"max":20,"min":2}
+
+Infrared zoom ratio
+
+»thermal_supported_palette_styles
+
+Collection of supported palette styles by the device
+
+array
+
+{"size": -,"item_type": enum_int}
+
+The capability of supported styles varies for different devices
+
+»thermal_gain_mode
+
+Gain Mode
+
+enum_int
+
+{"0":"Auto","1":"Low Gain. Temperature Range is from 0° C to 500° C","2":"High Gain. Temperature Range is from -20° C to 150° C"}
+
+Low gain provides a larger temperature measurement range, while high gain offers higher temperature measurement accuracy.
+
+»thermal_isotherm_state
+
+Whether isotherm is enabled
+
+enum_int
+
+{"0":"Disabled","1":"Enabled"}
+
+Isotherm allows users to observe the content of temperature ranges of interest, making objects in the temperature range more prominent.
+
+»thermal_isotherm_upper_limit
+
+Upper limit of the temperature range for isotherm
+
+int
+
+{"unit":"Celsius / °C"}
+
+Effective only when isotherm is enabled
+
+»thermal_isotherm_lower_limit
+
+Lower limit of the temperature range for isotherm
+
+int
+
+{"unit":"Celsius / °C"}
+
+Effective only when isotherm is enabled
+
+»thermal_global_temperature_min
+
+Minimum temperature measured in the overall view
+
+float
+
+{"unit":"Celsius / °C"}
+
+»thermal_global_temperature_max
+
+Maximum temperature measured in the overall view
+
+float
+
+{"unit":"Celsius / °C"}
+
+liveview
+
+Liveview area information
+
+struct
+
+»liveview_world_region
+
+Field of view (FOV) region in liveview
+
+struct
+
+The field of view angle of the zoom camera relative to the wide-angle camera or infrared camera may differ in liveview. The coordinate origin is the upper-left corner of the lens.
+
+»»left
+
+X-axis starting point in the upper-left corner
+
+float
+
+X-axis starting point in the upper-left corner
+
+»»top
+
+Y-axis starting point in the upper-left corner
+
+float
+
+Y-axis starting point in the upper-left corner
+
+»»right
+
+X-axis starting point in the lower-right corner
+
+float
+
+X-axis starting point in the lower-right corner
+
+»»bottom
+
+Y-axis starting point in the lower-right corner
+
+float
+
+Y-axis starting point in the lower-right corner
+
+Example:
+
+{
+"data": {
+"ir_lense": {
+"ir_zoom_factor": 2,
+"screen_split_enable": false,
+"thermal_current_palette_style": 11,
+"thermal_gain_mode": 2,
+"thermal_global_temperature_max": 40.0373764038086,
+"thermal_global_temperature_min": 31.65154457092285,
+"thermal_isotherm_lower_limit": -20,
+"thermal_isotherm_state": 0,
+"thermal_isotherm_upper_limit": 150
+},
+"liveview": {
+"liveview_world_region": {
+"bottom": 0.5609484910964966,
+"left": 0.43238765001297,
+"right": 0.5639060735702515,
+"top": 0.433199942111969
+}
+},
+"measure_target": {
+"measure_target_altitude": 34.60000228881836,
+"measure_target_distance": 0,
+"measure_target_error_state": 1,
+"measure_target_latitude": 22.907619920797877,
+"measure_target_longitude": 113.70345426744846
+},
+"payload_index": "81-0-0",
+"wide_lense": {
+"wide_aperture_value": 10,
+"wide_exposure_mode": 1,
+"wide_exposure_value": 16,
+"wide_iso": 8,
+"wide_shutter_speed": 45
+},
+"zoom_lense": {
+"zoom_aperture_value": 10,
+"zoom_calibrate_farthest_focus_value": 34,
+"zoom_calibrate_nearest_focus_value": 64,
+"zoom_exposure_mode": 1,
+"zoom_exposure_value": 16,
+"zoom_factor": 6.999994214380596,
+"zoom_focus_mode": 0,
+"zoom_focus_state": 0,
+"zoom_focus_value": 34,
+"zoom_iso": 8,
+"zoom_max_focus_value": 64,
+"zoom_min_focus_value": 33,
+"zoom_shutter_speed": 45
+}
+},
+"method": "drc_camera_osd_info_push",
+"seq": 1
+}
+
+# Report AI Status
+
+Used to push information related to AI object recognition features. (The "seq" is an incrementing sequence number that ensures commands are executed in order, and it is at the same level as "data".)
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_info_push
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+identify_on
+
+Identification Switch
+
+enum_int
+
+{"0":"Off","1":"On"}
+
+Whether the target recognition function is enabled.
+
+spotlight_zoom_on
+
+Tracking Switch
+
+enum_int
+
+{"0":"Off","1":"On"}
+
+Whether the AI tracking function is enabled.
+
+ai_spotlight_zoom
+
+AI Tracking Status
+
+struct
+
+AI tracking status and reason information.
+
+»state
+
+Tracking State
+
+enum_int
+
+{"0":"Idle","1":"Waiting for Selection","2":"Waiting for Confirmation","3":"Tracking"}
+
+Current AI tracking state.
+
+»state_reason
+
+State Reason
+
+enum_int
+
+{"0":"Normal","1":"Too Close to Target","2":"Too Far from Target","3":"Reached Lower Limit","4":"Reached Upper Limit","5":"Reached Far Limit","6":"Approaching No-Fly Zone","7":"Gimbal Reached Limit","8":"Aircraft Yaw Reached Orbit Mode Limit","9":"Obstacle Too Close","10":"Position Source Switch (GPS→RTK)","11":"Position Source Switch (RTK→GPS)","12":"Obstacle Avoidance Failure","13":"Reached Zoom Range Limit","14":"Tracking Target Lost","15":"Weak GPS Signal",
+Note: The following conditions will cause AI Follow to exit
+"160":"Normal Exit","161":"Unsupported Payload","162":"Unsupported Camera Mode","163":"Invalid Command","164":"Positioning Failed","165":"Aircraft Not Takeoff","166":"Flight Mode Error","167":"Mode Unavailable (Return-to-Home/Landing/Attitude)","168":"Lost RC or Video Link Signal"}
+
+Description of current state or reason for exit.
+
+ai_model_list
+
+Model List
+
+array
+
+{"item_type":"struct"}
+
+List of available AI models on the device.
+
+»index
+
+Model Index
+
+int
+
+{"min":0}
+
+»signed_name
+
+Model Name
+
+text
+
+{"length":""}
+
+Signed name of the model.
+
+selected_ai_model
+
+Selected Model
+
+struct
+
+Information of the currently selected AI model.
+
+»index
+
+Model Index
+
+int
+
+{"min":0}
+
+Index of the currently selected model.
+
+»score
+
+Confidence
+
+int
+
+{"range":"0-100"}
+
+Confidence level of the current recognition result.
+
+»score_mode
+
+Confidence Mode
+
+enum_int
+
+{"0":"Invalid","1":"Counting Mode","2":"Search & Rescue Mode","3":"User-Defined Mode"}
+
+»image_source
+
+Image Source
+
+enum_list
+
+{"1":"Wide","2":"Zoom","3":"Infrared","7":"visible light"}
+
+Code stream supported by the model.
+
+»digital_effect
+
+Color Palette Mode
+
+enum_list
+
+{"0":"White Hot","1":"Black Hot","2":"Red Hot"}
+
+Supported infrared color palette types.
+
+»filters
+
+Filters
+
+array
+
+{"size": -, "item_type": int}
+
+Current target filter list.For third-party models, filters values must be generated by adding an offset of 128 to the corresponding label index. For example, if the label index is 1, the filter value is 129.
+
+»labels
+
+Recognition Labels
+
+array
+
+{"item_type":"struct"}
+
+Set of labels supported by the model for recognition.
+
+»»index
+
+Label ID
+
+int
+
+{"min":0}
+
+Unique identifier of the label.
+
+»»name
+
+Label Name
+
+text
+
+{"length":""}
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_info_push",
+"data": {
+"identify_on": 1,
+"spotlight_zoom_on": 1,
+"ai_spotlight_zoom": {
+"state": 0,
+"state_reason": 0
+},
+"ai_model_list": [
+{
+"index": 0,
+"signed_name": "DJI"
+},
+{
+"index": 128,
+"signed_name": "Highway scene recognition"
+}
+],
+"selected_ai_model": {
+"index": 0,
+"score": 100,
+"score_mode": 1,
+"image_source": [1, 2, 3],
+"digital_effect": [0, 1, 2],
+"filters": [1, 2, 3],
+"labels": [
+{
+"index": 0,
+"name": "Motorcycle"
+},
+{
+"index": 1,
+"name": "Bicycle"
+}
+]
+},
+"ai_wayline_state": {
+"sequence_shot": true,
+"wait_control": true,
+"record": true,
+"normal_shot": true,
+"count_down_time": 23,
+"alert_uuid": "xxxxxxxxxxxxxxx"
+}
+}
+}
+
+# Service
+
+# Night mode settings
+
+"seq" is an incrementing serial number that ensures instructions are executed in order and resides at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_camera_night_mode_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+payload_index
+
+Camera Enumeration
+
+text
+
+{"length":""}
+
+Camera Enumeration。non-standard device_mode_key，format is {type-subtype-gimbalindex}，Can refer to [product support](
+It is recommended to use M4D（98-0-0）and M4TD（99-0-0））
+
+mode
+
+Night mode status
+
+enum_int
+
+{"0":"Enabled","1":"Enabled","2":"Auto"}
+
+Automatic mode activates automatically based on ambient light levels.
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_camera_night_mode_set",
+"data": {
+"payload_index": "99-0-0",
+"mode": 0
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_camera_night_mode_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_camera_night_mode_set",
+"data": {
+"result": 0
+}
+}
+
+# Noise Reduction Level Settings
+
+"seq" is an incrementing serial number that ensures instructions are executed in order and resides at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_camera_denoise_level_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+payload_index
+
+Camera Enumeration
+
+text
+
+{"length":""}
+
+Camera Enumeration。non-standard device_mode_key，format is {type-subtype-gimbalindex}，Can refer to [product support](
+It is recommended to use M4D（98-0-0）and M4TD（99-0-0））
+
+level
+
+Noise Reduction Level
+
+enum_int
+
+{"2":"Enhanced Noise Reduction 15fps","3":"Ultra Noise Reduction 5fps"}
+
+Takes effect only when Night Scene Mode is manually enabled
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_camera_denoise_level_set",
+"data": {
+"payload_index": "99-0-0",
+"level": 2
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_camera_denoise_level_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_camera_denoise_level_set",
+"data": {
+"result": 0
+}
+}
+
+# Night Vision enable
+
+"seq" is an incrementing serial number that ensures instructions are executed in order and resides at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_camera_night_vision_enable
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+payload_index
+
+Camera Enumeration
+
+text
+
+{"length":""}
+
+Camera Enumeration。non-standard device_mode_key，format is {type-subtype-gimbalindex}，Can refer to [product support](
+It is recommended to use M4TD（99-0-0））
+
+enable
+
+Enabled State
+
+bool
+
+{"false":"disable","true":"enable"}
+
+Takes effect only when zoom level is above 7x
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_camera_night_vision_enable",
+"data": {
+"payload_index": "99-0-0",
+"enable": true
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_camera_night_vision_enable
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_camera_night_vision_enable",
+"data": {
+"result": 0
+}
+}
+
+# Near infrared fill light enable
+
+"seq" is an incrementing serial number that ensures instructions are executed in order and resides at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_infrared_fill_light_enable
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+payload_index
+
+Camera Enumeration
+
+text
+
+{"length":""}
+
+Camera Enumeration。non-standard device_mode_key，format is {type-subtype-gimbalindex}，Can refer to [product support](
+It is recommended to use M4TD（99-0-0）
+
+enable
+
+Enabled State
+
+bool
+
+{"false":"disable","true":"enable"}
+
+Takes effect only when zoom level is above 7x
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_infrared_fill_light_enable",
+"data": {
+"payload_index": "99-0-0",
+"enable": true
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_infrared_fill_light_enable
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_infrared_fill_light_enable",
+"data": {
+"result": 0
+}
+}
+
+# Forced Landing
+
+After being called, the aircraft will descend directly to the ground regardless of obstacles. The drone_emergency_stop command can be used to cancel. After landing, the aircraft can only be picked up manually. Use with caution! ("seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".)
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_force_landing
+
+Data: null
+
+Example:
+
+{
+"data": {},
+"method": "drc_force_landing",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_force_landing
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_force_landing",
+"seq": 1
+}
+
+# Emergency Stop
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data". Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drone_emergency_stop
+
+Data: null
+
+Example:
+
+{
+"data": {},
+"method": "drone_emergency_stop",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drone_emergency_stop
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drone_emergency_stop",
+"seq": 1
+}
+
+# Emergency Landing
+
+After being called, the aircraft will begin to land, and it may stop if obstacle sensing is triggered. Use the drone_emergency_stop command to cancel. After landing, the aircraft can only be picked up manually. Use with caution! （ "seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_emergency_landing
+
+Data: null
+
+Example:
+
+{
+"data": {},
+"method": "drc_emergency_landing",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_emergency_landing
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_emergency_landing",
+"seq": 1
+}
+
+# Spotlight - Brightness settings
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_light_brightness_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+group
+
+Type
+
+enum_int
+
+{"0":"Main light","1":"Auxiliary light"}
+
+Example:
+
+{
+"data": {
+"brightness": 1,
+"group": 0,
+"psdk_index": 1
+},
+"method": "drc_light_brightness_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_light_brightness_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_night_lights_state_set",
+"seq": 1
+}
+
+# Spotlight - Mode settings
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_light_mode_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+group
+
+Type
+
+enum_int
+
+{"0":"Main light","1":"Auxiliary light"}
+
+mode
+
+Camera mode
+
+enum_int
+
+{"1":"Constant"}
+
+Example:
+
+{
+"data": {
+"group": 0,
+"mode": 1,
+"psdk_index": 1
+},
+"method": "drc_light_mode_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_light_mode_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_light_mode_set",
+"seq": 1
+}
+
+# Spotlight - Settings
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_light_fine_tuning_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+position
+
+Light
+
+enum_int
+
+{"0":"Left light","1":"Right light"}
+
+value
+
+Value
+
+int
+
+{"max":"100","min":"1"}
+
+saved
+
+Save or not
+
+bool
+
+{"0":"No","1":"Yes"}
+
+Example:
+
+{
+"data": {
+"position": 0,
+"psdk_index": 1,
+"saved": false,
+"value": 1
+},
+"method": "drc_light_fine_tuning_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_light_fine_tuning_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_light_fine_tuning_set",
+"seq": 1
+}
+
+# Spotlight - Gimbal calibration
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_light_calibration
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Example:
+
+{
+"data": {
+"psdk_index": 1
+},
+"method": "drc_light_calibration",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_light_calibration
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Push based on device
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_light_calibration",
+"seq": 1
+}
+
+# Speaker - Mode settings
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_speaker_play_mode_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push based on device
+
+play_mode
+
+Speaker playback mode
+
+enum_int
+
+{"0":"Single play","1":"Loop play (single track)"}
+
+Example:
+
+{
+"data": {
+"play_mode": 1,
+"psdk_index": 1
+},
+"method": "drc_speaker_play_mode_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_speaker_play_mode_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_speaker_play_mode_set",
+"seq": 1
+}
+
+# Speaker - TTS settings
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_speaker_tts_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push based on device
+
+volume
+
+Volume
+
+int
+
+{"max":"100","min"0:"","step":"","unit_name":null}
+
+type
+
+Type
+
+enum_int
+
+{"0":"Male voice","1":"Female voice"}
+
+language
+
+Language
+
+enum_int
+
+{"0":"Chinese","1":"English"}
+
+speed
+
+Speed
+
+int
+
+{"max"100:"","min":"0","step":"","unit_name":null}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_speaker_tts_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_speaker_tts_set",
+"seq": 1
+}
+
+# Speaker - Set volume
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_speaker_play_volume_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+play_volume
+
+Speaker volume
+
+int
+
+{"max":"100","min":"1"}
+
+Example:
+
+{
+"data": {
+"play_volume": 60,
+"psdk_index": 1
+},
+"method": "drc_speaker_play_volume_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_speaker_play_volume_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_speaker_play_volume_set",
+"seq": 1
+}
+
+# Speaker - Stop playback
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_speaker_play_stop
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Example:
+
+{
+"data": {
+"psdk_index": 2
+},
+"method": "drc_speaker_play_stop",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_speaker_play_stop
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Push by device
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_speaker_play_stop",
+"seq": 1
+}
+
+# Speaker - Replay
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_speaker_replay
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+Example:
+
+{
+"data": {
+"psdk_index": 2
+},
+"method": "drc_speaker_replay",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_speaker_replay
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_speaker_replay",
+"seq": 1
+}
+
+# Speaker - Start playing TTS audio
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_speaker_tts_play_start
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+tts
+
+TTS text
+
+struct
+
+»name
+
+File name
+
+text
+
+{"length":""}
+
+»text
+
+Text content
+
+text
+
+{"length":""}
+
+»md5
+
+MD5 checksum of the file content, used as a unique identifier for the dock
+
+text
+
+{"length":""}
+
+Example:
+
+{
+"data": {
+"psdk_index": 2,
+"tts": {
+"md5": "ACDEFQD33D31C212",
+"name": "",
+"text": ""
+}
+},
+"method": "drc_speaker_tts_play_start",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_speaker_tts_play_start
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_speaker_tts_play_start",
+"seq": 1
+}
+
+# PSDK - Send text box content
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_psdk_input_box_text_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+value
+
+Text content
+
+text
+
+{"length":"128"}
+
+Example:
+
+{
+"data": {
+"psdk_index": 1,
+"value": ""
+},
+"method": "drc_psdk_input_box_text_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_psdk_input_box_text_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_psdk_input_box_text_set",
+"seq": 1
+}
+
+# PSDK - Widget Value Settings
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_psdk_widget_value_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+psdk_index
+
+PSDK payload device index
+
+int
+
+Push by device
+
+index
+
+Widget number
+
+int
+
+value
+
+Widget value
+
+int
+
+Switches, progress, and other widget values are defined by the developer
+
+Example:
+
+{
+"data": {
+"index": 1,
+"psdk_index": 1,
+"value": 60
+},
+"method": "drc_psdk_widget_value_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_psdk_widget_value_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_psdk_widget_value_set",
+"seq": 1
+}
+
+# Initial state subscription for DRC
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_initial_state_subscribe
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+null
+
+null
+
+double
+
+Example:
+
+{
+"data": {},
+"method": "drc_initial_state_subscribe",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_initial_state_subscribe
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_initial_state_subscribe",
+"seq": 1
+}
+
+# Beacon Settings
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_night_lights_state_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+night_lights_state
+
+Status
+
+enum_int
+
+{"0":"Disabled","1":"Enabled"}
+
+Example:
+
+{
+"data": {
+"night_lights_state": 0
+},
+"method": "drc_night_lights_state_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_night_lights_state_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_night_lights_state_set",
+"seq": 1
+}
+
+# Flight Control - Discreet Mode
+
+Set the aircraft's discreet mode to turn off all aircraft lights. (The "seq" is an incrementing sequence number that ensures commands are executed in order, and it is at the same level as "data".)
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_stealth_state_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+stealth_state
+
+Discreet mode
+
+enum_int
+
+{"0":"Disabled","1":"Enabled"}
+
+Discreet mode state
+
+Example:
+
+{
+"data": {
+"stealth_state": 0
+},
+"method": "drc_stealth_state_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_stealth_state_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_stealth_state_set",
+"seq": 1
+}
+
+# Payload Control - Camera Aperture
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_camera_aperture_value_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+payload_index
+
+Camera enumeration
+
+text
+
+{"length":""}
+
+Camera enumeration value. Non-standard device_mode_key. The format is {type-subtype-gimbalindex}. Refer to Product Supportedopen in new window.
+
+camera_type
+
+Camera type
+
+enum_string
+
+{"wide":"Wide-angle","zoom":"Zoom"}
+
+Camera type enumeration
+
+aperture_value
+
+Aperture value
+
+enum_int
+
+{ "0": "F_AUTO", "50": "F0_5", "70": "F0_7", "80": "F0_8", "90": "F0_9", "95": "F0_95", "100": "F1_0", "110": "F1_1", "120": "F1_2", "140": "F1_4", "160": "F1_6", "170": "F1_7", "180": "F1_8", "200": "F2", "220": "F2_2", "240": "F2_4", "250": "F2_5", "280": "F2_8", "320": "F3_2", "330": "F3_3", "340": "F3_4", "350": "F3_5", "400": "F4", "440": "F4_4", "450": "F4_5", "480": "F4_8", "500": "F5", "560": "F5_6", "630": "F6_3", "670": "F6_7", "680": "F6_8", "710": "F7_1", "800": "F8", "900": "F9", "950": "F9_5", "960": "F9_6", "1000": "F10", "1100": "F11", "1300": "F13", "1400": "F14", "1600": "F16", "1800": "F18", "1900": "F19", "2000": "F20", "2200": "F22", "2500": "F25", "2700": "F27", "2900": "F29", "3200": "F32", "3600": "F36", "3800": "F38", "4000": "F40", "4500": "F45", "5100": "F51", "5400": "F54", "5700": "F57", "6400": "F64", "7200": "F72", "7600": "F76", "8000": "F80", "9000": "F90", "10700": "F107", "12800": "F128", "18000": "F180", "25600": "F256" }
+
+Depending on the aircraft model, the range may vary.
+
+Example:
+
+{
+"data": {
+"aperture_value": 5,
+"camera_type": "zoom",
+"payload_index": "39-0-7"
+},
+"method": "drc_camera_aperture_value_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_camera_aperture_value_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_camera_aperture_value_set",
+"seq": 1
+}
+
+# Payload Control - Camera Shutter
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_camera_shutter_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+payload_index
+
+Camera enumeration
+
+text
+
+{"length":""}
+
+Camera enumeration value. Non-standard device_mode_key. The format is {type-subtype-gimbalindex}. Refer to Product Supportedopen in new window.
+
+camera_type
+
+Camera type
+
+enum_string
+
+{"wide":"Wide angle","zoom":"Zoom"}
+
+Camera type enumeration.
+
+shutter_value
+
+Shutter settings
+
+enum_int
+
+{ "0": "1/8000 s", "1": "1/6400 s", "2": "1/6000 s", "3": "1/5000 s", "4": "1/4000 s", "5": "1/3200 s", "6": "1/3000 s", "7": "1/2500 s", "8": "1/2000 s", "9": "1/1600 s", "10": "1/1500 s", "11": "1/1250 s", "12": "1/1000 s", "13": "1/800 s", "14": "1/725 s", "15": "1/640 s", "16": "1/500 s", "17": "1/400 s", "18": "1/350 s", "19": "1/320 s", "20": "1/250 s", "21": "1/240 s", "22": "1/200 s", "23": "1/180 s", "24": "1/160 s", "25": "1/125 s", "26": "1/120 s", "27": "1/100 s", "28": "1/90 s", "29": "1/80 s", "30": "1/60 s", "31": "1/50 s", "32": "1/40 s", "33": "1/30 s", "34": "1/25 s", "35": "1/20 s", "36": "1/15 s", "37": "1/12.5 s", "38": "1/10 s", "39": "1/8 s", "40": "1/6.25 s", "41": "1/5 s", "42": "1/4 s", "43": "1/3 s", "44": "1/2.5 s", "45": "1/2 s", "46": "1/1.67 s", "47": "1/1.25 s", "48": "1.0 s", "49": "1.3 s", "50": "1.6 s", "51": "2.0 s", "52": "2.5 s", "53": "3.0 s", "54": "3.2 s", "55": "4.0 s", "56": "5.0 s", "57": "6.0 s", "58": "7.0 s", "59": "8.0 s", "60": "Auto" }
+
+Depending on the aircraft model, the range may vary.
+
+Example:
+
+{
+"data": {
+"shutter_value": 5,
+"camera_type": "zoom",
+"payload_index": "39-0-7"
+},
+"method": "drc_camera_shutter_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_camera_shutter_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_camera_shutter_set",
+"seq": 1
+}
+
+# Payload Control - ISO Settings
+
+"seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_camera_iso_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+payload_index
+
+Camera enumeration
+
+text
+
+{"length":""}
+
+Camera enumeration value. Non-standard device_mode_key. The format is {type-subtype-gimbalindex}. Refer to Product Supportedopen in new window.
+
+camera_type
+
+Camera type
+
+enum_string
+
+{"wide":"Wide angle","zoom":"Zoom"}
+
+Camera type enumeration.
+
+iso_value
+
+ISO value
+
+enum_int
+
+{ "0": "ISO_AUTO", "2": "ISO_50", "3": "ISO_100", "4": "ISO_200", "5": "ISO_400", "6": "ISO_800", "7": "ISO_1600", "8": "ISO_3200", "9": "ISO_6400", "10": "ISO_12800", "11": "ISO_25600", "12": "ISO_51200", "13": "ISO_102400", "255": "ISO_FIXED" }
+
+Depending on the aircraft model, the range may vary.
+
+Example:
+
+{
+"data": {
+"camera_type": "zoom",
+"iso_value": 5,
+"payload_index": "39-0-7"
+},
+"method": "drc_camera_iso_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_camera_iso_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_camera_iso_set",
+"seq": 1
+}
+
+# Payload Control - Mechanical Shutter
+
+Support for users to manually close the mechanical shutter to prolong the lifespan of the equipment. Mechanical shutter switch for Matrice 3D wide-angle mode. ("seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".)
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_camera_mechanical_shutter_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+payload_index
+
+Camera enumeration
+
+text
+
+{"length":""}
+
+Camera enumeration value. Non-standard device_mode_key. The format is {type-subtype-gimbalindex}. Refer to Product Supportedopen in new window.
+
+camera_type
+
+Camera type
+
+enum_string
+
+{"wide":"Wide-angle"}
+
+Camera type enumeration.
+
+mechanical_shutter_state
+
+Whether mechanical shutter is enabled
+
+enum_int
+
+{"0":"Disabled","1":"Enabled"}
+
+Enable or disable mechanical shutter
+
+Example:
+
+{
+"data": {
+"camera_type": "wide",
+"mechanical_shutter_state": 1,
+"payload_index": "39-0-7"
+},
+"method": "drc_camera_mechanical_shutter_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_camera_mechanical_shutter_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_camera_mechanical_shutter_set",
+"seq": 1
+}
+
+# Payload Control - Lens Dewarp
+
+Enable users to eliminate vignetting in wide-angle view. Lens distortion correction for Matrice 3D wide-angle mode.("seq" is an incrementing sequence number ensuring that the instructions are executed in order. It is at the same level as "data".)
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_camera_dewarping_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+payload_index
+
+Camera enumeration
+
+text
+
+{"length":""}
+
+Camera enumeration value. Non-standard device_mode_key. The format is {type-subtype-gimbalindex}. Refer to Product Supportedopen in new window.
+
+camera_type
+
+Camera type
+
+enum_string
+
+{"wide":"Wide-angle"}
+
+Camera type enumeration.
+
+dewarping_state
+
+Whether dewarp is enabled
+
+enum_int
+
+{"0":"Disabled","1":"Enabled"}
+
+Enable or disable lens dewarp
+
+Example:
+
+{
+"data": {
+"camera_type": "wide",
+"dewarping_state": 1,
+"payload_index": "39-0-7"
+},
+"method": "drc_camera_dewarping_set",
+"seq": 1
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_camera_dewarping_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_camera_dewarping_set",
+"seq": 1
+}
+
+# Set Infrared Photo Format
+
+Used to set the infrared photo format. The live camera must be switched to infrared mode before this can be used effectively.
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_camera_photo_format_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+payload_index
+
+Camera enumeration
+
+text
+
+{"length":""}
+
+Camera enumeration value. Non-standard device_mode_key. The format is {type-subtype-gimbalindex}. Refer to Product Supportedopen in new window.
+
+photo_format
+
+Photo Format
+
+enum_int
+
+{"7":"RJPEG","16":"DLT664"}
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_camera_photo_format_set",
+"data": {
+"payload_index": "81-0-0",
+"photo_format": 16
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_camera_photo_format_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_camera_photo_format_set",
+"data": {
+"result": 0
+}
+}
+
+# AI Model Selection
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_model_select
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+index
+
+Model index
+
+int
+
+Push via drc_ai_info_push
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_model_select",
+"data": {
+"index": 0
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_model_select
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_ai_model_select",
+"seq": 1
+}
+
+# AI Recognition Switch Setting
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_identify_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+on
+
+AI Recognition Switch
+
+enum_int
+
+{"0":"off","1":"on"}
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_identify_set",
+"data": {
+"on": 1
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_identify_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_ai_identify_set",
+"seq": 1
+}
+
+# AI Tracking Switch Setting
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_spotlight_zoom_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+on
+
+AI Tracking Switch
+
+enum_int
+
+{"0":"off","1":"on"}
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_spotlight_zoom_set",
+"data": {
+"on": 1
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_spotlight_zoom_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_ai_spotlight_zoom_set",
+"seq": 1
+}
+
+# AI Recognition Target Tracking
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_spotlight_zoom_track
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+target_index
+
+Target index
+
+int
+
+Push via live stream
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_spotlight_zoom_track",
+"data": {
+"target_index": 0
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_spotlight_zoom_track
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_ai_spotlight_zoom_track",
+"seq": 1
+}
+
+# AI Box-Select Target Tracking
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_spotlight_zoom_select
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+center_x
+
+Coordinate x of the left and upper corner of the temperature measurement area
+
+double
+
+{"max":1,"min":0}*10000
+
+Center X coordinate of the bounding box, in units of 1/10000 of the screen width.
+
+center_y
+
+Coordinate y of the left and upper corner of the temperature measurement area
+
+double
+
+{"max":1,"min":0}*10000
+
+Center Y coordinate of the bounding box, in units of 1/10000 of the screen height.
+
+height
+
+Height of the temperature measurement area
+
+double
+
+{"max":1,"min":0}*10000
+
+Width of the bounding box, in units of 1/10000 of the screen width.
+
+width
+
+Width of the temperature measurement area
+
+double
+
+{"max":1,"min":0}*10000
+
+Height of the bounding box, in units of 1/10000 of the screen height.
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_spotlight_zoom_select",
+"data": {
+"center_x":0.0*10000,
+"center_y":0.0*10000,
+"height":1.0*10000,
+"width":1.0*10000
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_spotlight_zoom_select
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_ai_spotlight_zoom_select",
+"seq": 1
+}
+
+# AI Box-Select Target Tracking Confirmation
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_spotlight_zoom_confirm
+
+Data: null
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_spotlight_zoom_confirm",
+"data": {
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_spotlight_zoom_confirm
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_spotlight_zoom_confirm",
+"data": {
+"result": 0
+}
+}
+
+# Stop Target Tracking
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_spotlight_zoom_stop
+
+Data: null
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_spotlight_zoom_stop",
+"data": {
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_spotlight_zoom_stop
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_spotlight_zoom_stop",
+"data": {
+"result": 0
+}
+}
+
+# Set AI Recognition Confidence Mode
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_identify_score_mode_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+score_mode
+
+AI Recognition Confidence Mode
+
+enum_int
+
+{"0":"Invalid","1":"Counting Mode","2":"Search and Rescue Mode","3":"Custom Mode"}
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_identify_score_mode_set",
+"data": {
+"score_mode": 1
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_identify_score_mode_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_ai_identify_score_mode_set",
+"seq": 1
+}
+
+# Set AI Recognition Confidence
+
+When the confidence mode is set to Custom, the confidence score can be freely configured.
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_identify_score_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+score
+
+AI Recognition Confidence Score
+
+int
+
+{"max":"100","min":"0","step":"1"}
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_identify_score_set",
+"data": {
+"score": 100
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_identify_score_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_ai_identify_score_set",
+"seq": 1
+}
+
+# Reset AI Recognition Confidence
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_identify_score_reset
+
+Data: null
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_identify_score_reset",
+"data": {
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_identify_score_reset
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_identify_score_reset",
+"data": {
+"result": 0
+}
+}
+
+# Set AI Recognition Target Filter List
+
+Topic: thing/product/{gateway_sn}/drc/down
+
+Direction: down
+
+Method: drc_ai_identify_filter_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+filters
+
+AI Recognition Target Filter List
+
+array
+
+{"size": -, "item_type": int}
+
+For third-party models, filters values must be generated by adding an offset of 128 to the corresponding label index. For example, if the label index is 1, the filter value is 129.
+
+Example:
+
+{
+"seq": 1,
+"method": "drc_ai_identify_filter_set",
+"data": {
+"filters": [1, 2, 3]
+}
+}
+
+Topic: thing/product/{gateway_sn}/drc/up
+
+Direction: up
+
+Method: drc_ai_identify_filter_set
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"data": {
+"result": 0
+},
+"method": "drc_ai_identify_filter_set",
+"seq": 1
+}
+
+Github Edit open in new window
+
+Last Updated: 1/27/2026, 11:46:20 PM
+
+AirSense
+
+How was your reading experience of our documentation?
+
+PSDK - Floating window push
+
+Speaker - Audio playback progress
+
+PSDK - Status report
+
+PSDK - UI resource package upload
+
+Aircraft state information report
+
+Report Camera Status
+
+Camera OSD Push
+
+Report AI Status
+
+Night mode settings
+
+Noise Reduction Level Settings
+
+Night Vision enable
+
+Near infrared fill light enable
+
+Forced Landing
+
+Emergency Stop
+
+Emergency Landing
+
+Spotlight - Brightness settings
+
+Spotlight - Mode settings
+
+Spotlight - Settings
+
+Spotlight - Gimbal calibration
+
+Speaker - Mode settings
+
+Speaker - TTS settings
+
+Speaker - Set volume
+
+Speaker - Stop playback
+
+Speaker - Replay
+
+Speaker - Start playing TTS audio
+
+PSDK - Send text box content
+
+PSDK - Widget Value Settings
+
+Initial state subscription for DRC
+
+Beacon Settings
+
+Flight Control - Discreet Mode
+
+Payload Control - Camera Aperture
+
+Payload Control - Camera Shutter
+
+Payload Control - ISO Settings
+
+Payload Control - Mechanical Shutter
+
+Payload Control - Lens Dewarp
+
+Set Infrared Photo Format
+
+AI Model Selection
+
+AI Recognition Switch Setting
+
+AI Tracking Switch Setting
+
+AI Recognition Target Tracking
+
+AI Box-Select Target Tracking
+
+AI Box-Select Target Tracking Confirmation
+
+Stop Target Tracking
+
+Set AI Recognition Confidence Mode
+
+Set AI Recognition Confidence
+
+Reset AI Recognition Confidence
+
+Set AI Recognition Target Filter List
+
+Documentation Feedback
+
+
+
+
+If you have any comments or confusion about our documentation, you can click here to give feedback and we will get back to you as soon as possible.
+OK

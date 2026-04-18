@@ -1,0 +1,1766 @@
+Event | Cloud API
+
+
+
+Cloud API v1.15
+Languages Languages English
+中文
+
+
+Search K
+
+
+v1.15
+Languages Languages English
+中文
+
+
+Release Notes
+Tutorial Reading Guide
+Flight Safety Notification
+Basic Introduction
+Product Introduction
+Product Architecture
+Product Supported
+Basic Concept
+Noun Explanation
+MQTT
+Thing Model
+HTTPS
+WebSocket
+JSBridge
+
+
+Quick Start
+Environment Preparation List
+Source Code Deployment Steps
+Docker Deployment Steps
+Function Display Video
+
+Function Set
+Pilot Function Set
+Access to the Cloud Server
+Situation Awareness
+Live Stream
+Map Elements
+Media Management
+Wayline Management
+Obtain Log via JSBridge
+Pilot Launch Third-party App
+Live Flight Controls/Remote Control
+
+Dock Function Set
+Access to the Cloud Server
+Device Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Live Flight Controls/Remote Control
+Custom Flight Area
+Multi-dock Task
+AI Target Recognition
+
+
+Debugging Methods
+Pilot Webview Debugging
+Log Export
+MQTTX
+
+API Reference
+DJI WPML
+Overview
+Template.kml
+Waylines.wpml
+Common Elements
+
+Pilot to Cloud
+MQTT
+Topic Definition
+Mavic 3 Enterprise Series
+Properties
+
+DJI RC Pro Enterprise
+Properties
+Device Management
+Live Stream
+Live Flight Controls
+Remote Control
+
+DJI Matrice 4 Series
+Properties
+
+DJI RC Plus 2 Enterprise
+Properties
+Device Management
+Live Stream
+Live Flight Controls
+Remote Control
+
+DJI Matrice 400
+Properties
+
+Other Models
+Aircraft
+Properties
+
+Remote Controller
+Properties
+Device Management
+Live Stream
+
+
+
+HTTPS
+Map Elements
+Create Map Elements
+Update Map Elements
+Obtain Map Elements
+Delete Map Elements
+
+Wayline Management
+Obtain Wayline List
+Obtain Temporary Credential
+Obtain Wayline File Download Address
+Obtain Duplicated Wayline Name
+Obtain File Upload Result Report
+Batch Favorites Wayline
+Batch Unfavorite Wayline
+
+Media Management
+Media Fast Upload
+Obtain Exist File Tiny Fingerprint
+Obtain Temporary Credential
+App Reports File Upload Result
+Callback after the File Group Upload Complete
+
+Situation Awareness
+Obtain Device Topology List
+
+
+WebSocket
+Map Elements
+Push Message
+
+Situation Awareness
+Push Message
+
+
+JSBridge
+
+Dock to Cloud
+MQTT
+Topic Definition
+Aircraft
+M30/M30T Properties
+M3D/M3TD Properties
+M4D/M4TD Properties
+
+Dock
+DJI Dock
+Properties
+Device Management
+Organization Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Configuration Update
+Live Flight Controls
+AirSense
+Custom Flight Area
+PSDK Function
+PSDK Interconnection
+ESDK Interconnection
+Remote Unlocking
+
+DJI Dock 2
+Properties
+Device Management
+Organization Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Configuration Update
+Live Flight Controls
+AirSense
+Custom Flight Area
+PSDK Function
+PSDK Interconnection
+ESDK Interconnection
+Remote Unlocking
+Remote Control
+
+DJI Dock 3
+Properties
+Device Management
+Organization Management
+Live Stream
+Media Management
+Wayline Management
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Configuration Update
+Live Flight Controls
+Custom Flight Area
+PSDK Function
+PSDK Interconnection
+ESDK Interconnection
+Remote Unlocking
+AirSense
+Remote Control
+
+
+
+
+
+Error Code
+FAQ
+Wayline Management
+2026-01-27
+No Rating Github Edit open in new window
+
+Return home information
+Task readiness notification
+Report task progress
+Device notification of Return to Home Exit State
+Status Report of Distributing Flight Routes via Virtual Cockpit
+Execute a mission
+Designate home point for returning
+Task termination
+Cancel return
+One-key return
+Wayline recovery
+Wayline pause
+Cancel mission
+Issue a mission
+Create a mission (deprecated)
+Distribute Flight Routes via Virtual Cockpit
+Pause Flight Route
+Resume Flight Route
+Cancel Flight Route
+Obtain dock task execution state
+Obtain mission resources
+
+# Event
+# Return home information
+Topic: thing/product/ {gateway_sn} /events
+Direction: up
+Method: return_home_info
+Data:
+Column Name Type Constraint Description
+planned_path_points List of planned trajectory points array {"size": -, "item_type": struct}
+»latitude Latitude of the trajectory point (angle value) double {"max":90,"min":-90} Trajectory point latitude. Negative for south, and positive for north. Accurate to 6 decimal places
+»longitude Longitude of the trajectory point (angle value) double {"max":180,"min":-180} Trajectory point longitude. Positive for east, and negative for west. Accurate to 6 decimal places
+»height Trajectory point height float {"max":"","min":"","step":0.1,"unit_name":"Meters / m"} Ellipsoid height of trajectory point
+last_point_type The type of the last point in the return path. enum_int {"0":"The last point of the trajectory is above the return point.","1":"The last point of the trajectory is not above the return point."}
+flight_id Task ID text {"length":""}
+home_dock_sn SN of dock for landing text {"length":""} Dock SN of current selected home point in multi-dock task. Not applicable in single-dock task
+multi_dock_home_info Dock return information of the multi-dock task array {"size": 2, "item_type": struct} Not applicable in single-dock task
+»sn Dock SN text {"length":""}
+»plan_status Path planning state enum_int {"0":"Planning failed or in progress","1":"Path planning unreachable","2":"Path planning unreachable due to insufficient battery level","3":"Destination reachable"}
+»estimated_battery_consumption Estimated battery consumption int {"max":"100","min":"0","step":"1","unit_name":null}
+»home_distance Home point distance float {"max":"","min":"","step":"","unit_name":"Meters / m"}
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"flight_id" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"home_dock_sn" : "6QCDL870020164" ,
+"last_point_type" : 0 ,
+"multi_dock_home_info" : [
+{
+"estimated_battery_consumption" : 30 ,
+"home_distance" : 298.3277282714844 ,
+"plan_status" : 3 ,
+"sn" : "6QCDL870020164"
+} ,
+{
+"estimated_battery_consumption" : 30 ,
+"home_distance" : 298.289794921875 ,
+"plan_status" : 3 ,
+"sn" : "6QCDL820020041"
+}
+] ,
+"planned_path_points" : [
+{
+"height" : 60.285194396972656 ,
+"latitude" : 22.755022128112614 ,
+"longitude" : 114.89828051067889
+} ,
+{
+"height" : 88.22719192504883 ,
+"latitude" : 22.755022128112614 ,
+"longitude" : 114.89828051067889
+} ,
+{
+"height" : 88.22719192504883 ,
+"latitude" : 22.75721542071551 ,
+"longitude" : 114.89853624254465
+} ,
+{
+"height" : 88.22719192504883 ,
+"latitude" : 22.757445462048054 ,
+"longitude" : 114.89860304631293
+} ,
+{
+"height" : 78.30619430541992 ,
+"latitude" : 22.757531544193625 ,
+"longitude" : 114.89862810820341
+}
+]
+} ,
+"gateway" : "6QCDL820020041" ,
+"method" : "return_home_info" ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1720000266772
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Task readiness notification
+Topic: thing/product/ {gateway_sn} /events
+Direction: up
+Method: flighttask_ready
+Data:
+Column Name Type Constraint Description
+flight_ids Plan ID array {"size": -, "item_type": text} Collection of IDs for tasks that are ready to be performed
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"flight_ids" : [
+"aaaaaaa" ,
+"bbbbbbb"
+]
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1654070968655 ,
+"method" : "flighttask_ready"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Report task progress
+Topic: thing/product/ {gateway_sn} /events
+Direction: up
+Method: flighttask_progress
+Data:
+Column Name Type Constraint Description
+ext Extended content struct
+»current_waypoint_index Number of waypoints currently executed int
+»wayline_mission_state Wayline task state enum_int {"0":"Disconnected","1":"This waypoint is not supported","2":"Wayline preparation state. It can upload files and execute existing files","3":"Wayline file uploading","4":"Trigger start command. The aircraft triggers logic such as reading the wayline. The task has not started yet and it's in a preparation state","5":"Entering the wayline, heading to the first waypoint","6":"Wayline execution","7":"Wayline interrupted. Triggered conditions are 1 for User actively pauses and 2 for Flight control abnormality","8":"Wayline recovery","9":"Wayline stopped"}
+»media_count Number of media files generated during the current flight task int
+»track_id Trajectory ID text
+»flight_id Task ID text
+»break_point Wayline breakpoint information struct Optional field to inform the cloud of the breakpoint information for this wayline task.
+»»index Breakpoint number int {"max":"","min":"","step":"","unit_name":null}
+»»state Breakpoint state enum_int {"0":"On segment","1":"On waypoint"}
+»»progress Current segment progress float {"max":"1.0","min":"0","step":"","unit_name":null}
+»»wayline_id Wayline ID int {"max":"","min":"","step":"","unit_name":null}
+»»break_reason Break reason enum_int {"0":"No abnormalities","1":"Task ID does not exist. The wayline task has not been executed.","2":"Uncommon error. Contact technical support","4":"Error loading wayline file when requesting to start/resume the wayline task. Try uploading the file again or contact technical support","5":"Failed to query breakpoint file when requesting breakpoint information. Failed to parse breakpoint type when requesting to resume the wayline task","6":"Incorrect cmd parameter when requesting to start/end the wayline task, incorrect protocol command in the request. Failed to parse breakpoint type when requesting to resume the wayline task","7":"Timeout parsing the WPMZ file when requesting to start/resume the wayline task, please retry","257":"Wayline has already started, cannot start again","258":"Unable to interrupt the wayline in this state, only allowed to pause the wayline in the executing state","259":"Wayline has not started, cannot end the wayline","261":"Flight mission conflict, unable to obtain control of the aircraft, not allowed to start the wayline during landing and return","262":"Unable to resume wayline in this state, only allowed when the wayline is paused","513":"Aircraft exceeded the maximum altitude limit","514":"Aircraft exceeded the maximum distance limit","515":"Wayline crosses Restricted Zone. Dock cannot execute the flight mission","516":"Aircraft triggered altitude limit","517":"Aircraft triggered obstacle sensing","518":"Poor RTK signal","519":"Approaching the boundary of Restricted Zone","521":"Exceeded the dock's GEO zone altitude limit","522":"Failed to request takeoff for the wayline","523":"Takeoff task execution failed","524":"Failed to request wayline mission","526":"Failed to request wayline RTK fixing task","527":"Wayline RTK fixing task failed to run","769":"Weak GPS signal","770":"The remote controller gear is not in N position.","771":"Home point not refreshed","772":"Unable to start the task due to low current battery level","773":"Wayline interrupted due to low battery causing return to home","775":"Disconnection between the remote controller and the aircraft","778":"Aircraft is on the ground with propellers spinning, not allowed to start the wayline","779":"During the real-time terrain follow, the camera state is abnormal (such as too bright, too dark and inconsistent brightness on both sides)","780":"Real-time terrain-following altitude set by the user is invalid (greater than 200m or less than 30m)","781":"Global map calculation error during real-time terrain follow","784":"Wayline interrupted due to strong winds causing return to home","1281":"User exit","1282":"User interruption","1283":"User triggered return to home","1539":"Incorrect start information (waypoint index or progress)","1540":"Using an unsupported coordinate system","1541":"Using an unsupported altitude mode","1542":"Using an unsupported transitional wayline mode","1543":"Using an unsupported yaw mode","1544":"Using an unsupported yaw direction reversal mode","1545":"Using an unsupported waypoint type","1546":"Coordinated turning type cannot be used for the start and end points","1547":"Wayline global speed exceeds a reasonable range","1548":"Waypoint number abnormal","1549":"Abnormal latitude and longitude data","1550":"Abnormal turning intercept","1551":"Maximum speed of wayline segment exceeds a reasonable range","1552":"Wayline segment target speed exceeds a reasonable range","1553":"Waypoint yaw angle exceeds a reasonable range","1555":"Input mission_id of resuming from breakpoint is wrong","1556":"Progress information of resuming from breakpoint input error","1557":"Mission state of resuming from breakpoint is abnormal","1558":"Waypoint index information of resuming from breakpoint input error","1559":"Incorrect latitude and longitude information for resuming from breakpoint","1560":"Yaw input error for waypoints during resuming from breakpoint","1561":"Incorrect flag setting for resuming from breakpoint","1563":"Wayline generation failed","1564":"Wayline execution failed","1565":"Emergency stop due to wayline obstacle sensing","1588":"Unrecognized action type","1595":"Action ID must be unique.","1598":"Action ID value cannot be 65535","1602":"Number of action groups exceeds a reasonable range","1603":"Error in action group effective range","1606":"Action index exceeds a reasonable range during resuming from breakpoint","1608":"Trigger running result of breakpoint information is abnormal","1609":"Action group ID information can not be duplicated during resume from breakpoint","1610":"Action group positions cannot be repeated during resuming from breakpoint","1611":"Action group positions exceed a reasonable range during resuming from breakpoint","1612":"Action ID is not in the breakpoint information during resuming","1613":"The action state can not be set to interrupt during the resuming flight from breakpoint","1614":"Resume failure due to incorrect breakpoint information","1634":"Unrecognized action type","1649":"Unrecognized trigger type","65534":"Unknown issue","65535":"Unknown issue"}
+»»latitude Latitude of the breakpoint float {"max":"90","min":"-90","step":"","unit_name":"Degrees / °"}
+»»longitude Longitude of the breakpoint float {"max":"180","min":"-180","step":"","unit_name":"Degrees / °"}
+»»height Breakpoint height relative to the Earth's ellipsoid surface float {"max":"","min":"","step":"","unit_name":"Meters / m"}
+»»attitude_head Breakpoint yaw axis angle float {"max":"","min":"","step":"","unit_name":null}
+»wayline_id Current working Wayline ID int Including the transition phase of entering the wayline, for example, 0 means the aircraft is entering or has executed the first wayline
+status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","partially_done":"Partially completed","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+progress Progress struct
+»current_step Executing result enum_int {"0":"Initial state","1":"Pre-flight check, whether the aircraft is executing a wayline","2":"Pre-flight check, whether the dock has exited working mode","3":"Pre-flight check, wayline execution in progress","4":"Pre-return-to-home check, in the process of returning to home","5":"Wayline execution enters the preparation state, waiting for the task to be issued","6":"Dock enters working state","7":"Enter the startup check and cover preparation work","8":"Remote image transmission frequency Pairing","9":"Waiting for the flight system to be ready, push connection established","10":"Waiting for RTK source to listen for reported values","11":"Check if the RTK source is from the dock, if not, reset it","12":"Waiting for flight control notification","13":"The dock has no control and seizes the control of the aircraft","14":"Consistency check of custom flight area","15":"Consistency check of offline maps","16":"Get the latest KMZ URL","17":"Download KMZ","18":"KMZ uploading","19":"Coloring configuration","20":"Aircraft takeoff parameter setting, alternate landing point setting, takeoff altitude setting, coloring setting","21":"Aircraft FlyTo takeoff parameter setting","22":"Takeoff dock checks the landing dock preparation status","23":"Home point setting","24":"Trigger wayline execution","26":"Enter pre-return-to-home check","27":"Aircraft landing at the dock","28":"Close the cover after landing","29":"Dock exits working mode","30":"Dock abnormal recovery","31":"Dock uploads flight system logs","32":"Check camera recording state","33":"Get the number of media files","34":"Abnormal recovery after dock takeoff cover","35":"Notify mission result","36":"Log list retrieval - Aircraft list","37":"Log list retrieval - Retrieve the list of docks","38":"Log list retrieval - Upload log list result","39":"Log retrieval - Retrieve aircraft logs","40":"Log retrieval - Retrieve dock logs","41":"Log retrieval - Compress aircraft logs","42":"Log retrieval - Compress dock logs","43":"Log retrieval - Upload aircraft logs","44":"Log retrieval - Upload dock logs","45":"Log retrieval - Notify the result","46":"Custom flight area file update preparation","47":"Custom flight area updating","48":"Offline map update preparation","49":"Offline map updating","65533":"Wait for service response after completion","65534":"No specific state","65535":"UNKNOWN"}
+»percent Progress value int {"max":"100","min":"0","step":"1"}
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"output" : {
+"ext" : {
+"break_point" : {
+"attitude_head" : 30 ,
+"break_reason" : 1 ,
+"height" : 100.23 ,
+"index" : 1 ,
+"latitude" : 23.4 ,
+"longitude" : 113.99 ,
+"progress" : 0.34 ,
+"state" : 0 ,
+"wayline_id" : 0
+} ,
+"current_waypoint_index" : 3 ,
+"flight_id" : "flight_id" ,
+"media_count" : 6 ,
+"track_id" : "track_id" ,
+"wayline_id" : 0 ,
+"wayline_mission_state" : 9
+} ,
+"progress" : {
+"current_step" : 19 ,
+"percent" : 100
+} ,
+"status" : "ok"
+} ,
+"result" : 0
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1654070968655 ,
+"method" : "flighttask_progress"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Device notification of Return to Home Exit State
+Topic: thing/product/ {gateway_sn} /events
+Direction: up
+Method: device_exit_homing_notify
+Data:
+Column Name Type Constraint Description
+sn Dock SN text {}
+action Exit return notification message type enum_int {"0":"Exit Return to Home Exit State","1":"Enter Return to Home Exit State"} Enter Return to Home Exit State indicating that the dock exits the return to home process due to the reason displayed in the reason field. Similarly, exiting the Return to Home Exit State refers to the dock stopping the exit from the return to home process.
+reason Exit return reason enum_int {"0":"Throttle added to the joystick","1":"Joystick interval added","2":"Behavior tree initialization failed","3":"Surrounded by obstacles","4":"Triggered flight restriction","5":"Obstacle too close","6":"No GPS signal","7":"GPS and VIO position output flags are false","8":"Large position error between GPS and VIO fusion","9":"Short-distance backtracking","10":"Return triggered at close range"}
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"action" : 1 ,
+"reason" : "0" ,
+"sn" : "Dock SN"
+} ,
+"need_reply" : 1 ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp:" : 1654070968655 ,
+"method" : "device_exit_homing_notify"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Status Report of Distributing Flight Routes via Virtual Cockpit
+Method: in_flight_wayline_progress
+Topic: thing/product/{gateway_sn}/events
+Direction: up
+Data:
+Column Name Type Constraint Description
+in_flight_wayline_id flight route task ID string Unique identifier for the flight route task
+progress task progress object Task progress information
+progress.percent completion percentage int {min: 0, max: 100} Task completion percentage
+status task status code int Status code description: status : 1 : Uploading file ( wayline_uploading ) 2 : File upload successful ( wayline_uploaded ) 3 : In progress ( wayline_progress ) 4 : Paused ( wayline_paused ) 5 : Canceled ( wayline_cancel ) 6 : Successful ( wayline_ok ) 7 : Failed ( wayline_failed ) Error code when failed 8 : Timeout
+result error reason code int
+way_point_index Current waypoint index int Current executing waypoint index
+Example:
+{
+"in_flight_wayline_id" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"progress" : {
+"percent" : 100
+} ,
+"status" : 0 ,
+"result" : 0 ,
+"way_point_index" : 0
+}
+
+
+
+
+
+
+
+
+
+
+# Service
+# Execute a mission
+Topic: thing/product/ {gateway_sn} /services
+Direction: down
+Method: flighttask_execute
+Data:
+Column Name Type Constraint Description
+flight_id Plan ID text {"length":""}
+multi_dock_task Multi-dock task parameters struct For Multi-dock task, this parameter must be provided. For standard wayline missions, only the flight_id needs to be sent.
+»wireless_link_topo Wireless link topology struct
+»»secret_code Encryption code array {"size": 28, "item_type": int} Obtained from aircraft device properties
+»»center_node Aircraft frequency information struct Obtained from aircraft device properties
+»»»sdr_id Scrambling code information int {"max":"","min":"","step":"","unit_name":null}
+»»»sn Device SN text {"length":""}
+»»leaf_nodes Dock or remote controller frequency information array {"size": -, "item_type": struct}
+»»»sdr_id Scrambling code information int {"max":"","min":"","step":"","unit_name":null}
+»»»sn Device SN text {"length":""}
+»»»control_source_index Control source number int {"max":"2","min":"1","step":"1,","unit_name":"None / "}
+»dock_infos Dock information array {"size": 2, "item_type": struct} Dock information for this multi-dock task, except for dock_type, other fields can be directly obtained from device properties
+»»dock_type Dock role in multi-dock task enum_string {"landing":"Dock for landing","takeoff":"Dock for takeoff"}
+»»latitude Latitude double {"max":"90","min":"-90","step":"0.01"} Dock latitude, obtainable from dock device properties
+»»longitude Longitude double {"max":"180","min":"-180","step":"0.01"} Dock longitude, obtainable from dock device properties
+»»height Ellipsoid height double {"unit_name":"Meters / m"} Dock height, obtainable from dock device properties
+»»heading Dock heading angle double {"max":"180","min":"-180","step":"","unit_name":"Degrees / °"} Dock heading angle, obtainable from dock device properties
+»»home_position_is_valid Dock home point validity enum_int {"0":"Invalid","1":"Valid"} Obtainable from dock device properties
+»»index Dock task unique identifier int {"max":"31","min":"1"} Number assigned to the dock, which should remain unique within a single task and preferably be used consistently over the long term
+»»sn Dock SN text {"length":""}
+»»rtcm_info Dock RTK calibration source struct
+»»»mount_point Network RTK mounted point information text {"length":""}
+»»»port Network port information text {"length":""}
+»»»host Network host information text {"length":""}
+»»»rtcm_device_type Device type enum_int {"1":"Dock"}
+»»»source_type Calibration type enum_int {"0":"Not calibrated","1":"Auto-convergence calibration","2":"Manual calibration","3":"Network RTK calibration"}
+»»alternate_land_point Alternate landing point struct
+»»»longitude Longitude float {}
+»»»latitude Latitude float {}
+»»»safe_land_height Safe altitude (alternate route altitude) float {}
+»»»is_configured Whether the alternate landing point is set enum_int {"0":"Not set","1":"Already set"}
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"flight_id" : "aee739dc-f1cc-47d5-beaa-64d327f2d797" ,
+"multi_dock_task" : {
+"dock_infos" : [
+{
+"alternate_land_point" : {
+"height" : 0 ,
+"is_configured" : 1 ,
+"latitude" : 37.348792490321514 ,
+"longitude" : 116.52867090782102 ,
+"safe_land_height" : 30
+} ,
+"dock_type" : "takeoff" ,
+"heading" : -78.7066650390625 ,
+"height" : 30.81130027770996 ,
+"home_position_is_valid" : 1 ,
+"index" : 1 ,
+"latitude" : 37.3487657248638 ,
+"longitude" : 116.52893686422743 ,
+"rtcm_info" : {
+"host" : "120.253.226.97" ,
+"mount_point" : "RTCM33_GRCEJ" ,
+"port" : "8002" ,
+"rtcm_device_type" : 1 ,
+"source_type" : 3
+} ,
+"sn" : "7CTDM5900B3X1B"
+} ,
+{
+"alternate_land_point" : {
+"height" : 0 ,
+"is_configured" : 1 ,
+"latitude" : 37.336024417709915 ,
+"longitude" : 116.554075635852 ,
+"safe_land_height" : 30
+} ,
+"dock_type" : "landing" ,
+"heading" : -69.79183197021484 ,
+"height" : 32.31420135498047 ,
+"home_position_is_valid" : 1 ,
+"index" : 2 ,
+"latitude" : 37.33605462094235 ,
+"longitude" : 116.55416413516038 ,
+"rtcm_info" : {
+"host" : "120.253.226.97" ,
+"mount_point" : "RTCM33_GRCEJ" ,
+"port" : "8002" ,
+"rtcm_device_type" : 1 ,
+"source_type" : 3
+} ,
+"sn" : "7CTDM5900BK07M"
+}
+] ,
+"wireless_link_topo" : {
+"center_node" : {
+"sdr_id" : 933765657 ,
+"sn" : "1581F6Q8D245P00EKS87"
+} ,
+"leaf_nodes" : [
+{
+"control_source_index" : 1 ,
+"sdr_id" : 920128532 ,
+"sn" : "7CTDM5900B3X1B"
+} ,
+{
+"control_source_index" : 2 ,
+"sdr_id" : 911741468 ,
+"sn" : "7CTDM5900BK07M"
+}
+] ,
+"secret_code" : [
+0 ,
+0 ,
+0 ,
+0 ,
+1 ,
+0 ,
+0 ,
+0 ,
+123 ,
+114 ,
+19 ,
+203 ,
+192 ,
+100 ,
+244 ,
+160 ,
+146 ,
+228 ,
+196 ,
+213 ,
+105 ,
+220 ,
+176 ,
+147 ,
+87 ,
+182 ,
+90 ,
+210
+]
+}
+}
+} ,
+"method" : "flighttask_execute" ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1720095314016
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /services_reply
+Direction: up
+Method: flighttask_execute
+Data:
+Column Name Type Constraint Description
+result Return code int {"max":"","min":"","step":"","unit_name":null} Non-zero represents an error
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"result" : 0
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1234567890123 ,
+"method" : "flighttask_execute"
+}
+
+
+
+
+
+
+
+
+
+
+# Designate home point for returning
+In multi-dock task, a specific dock should be designated as the return destination.
+Topic: thing/product/ {gateway_sn} /services
+Direction: down
+Method: return_specific_home
+Data:
+Column Name Type Constraint Description
+home_dock_sn SN of dock for landing text {"length":""}
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"home_dock_sn" : "xxxxxxxx"
+} ,
+"method" : "return_specific_home" ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1234567890123
+}
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /services_reply
+Direction: up
+Method: return_specific_home
+Data:
+Column Name Type Constraint Description
+result Return code int {"max":"","min":"","step":"","unit_name":null} Non-zero represents an error
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"result" : 0
+} ,
+"method" : "return_specific_home" ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1695634358385
+}
+
+
+
+
+
+
+
+
+
+
+# Task termination
+When a dock reports the task termination, this method should be issued to the other dock during the multi-dock task.
+Topic: thing/product/ {gateway_sn} /services
+Direction: down
+Method: flighttask_stop
+Data:
+Column Name Type Constraint Description
+flight_id Task ID text {"length":""}
+reason Termination reason enum_int {"0":"Normal termination","1":"The state machine of the other dock is abnormal"}
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"flight_id" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"reason" : 0
+} ,
+"method" : "flighttask_stop" ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1234567890123
+}
+
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /services_reply
+Direction: up
+Method: flighttask_stop
+Data:
+Column Name Type Constraint Description
+result Return code int {"max":"","min":"","step":"","unit_name":null} Non-zero represents an error
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"result" : 0
+} ,
+"method" : "flighttask_stop" ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1695634358385
+}
+
+
+
+
+
+
+
+
+
+
+# Cancel return
+After returning home, the aircraft will exit the wayline mode. If return is canceled at this point, the aircraft will hover.
+Topic: thing/product/ {gateway_sn} /services
+Direction: down
+Method: return_home_cancel
+Data: null
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : { } ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1654070968655 ,
+"method" : "return_home_cancel"
+}
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /services_reply
+Direction: up
+Method: return_home_cancel
+Data:
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"result" : 0
+} ,
+"need_reply" : 1 ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1654070968655 ,
+"method" : "return_home_cancel"
+}
+
+
+
+
+
+
+
+
+
+
+
+# One-key return
+Topic: thing/product/ {gateway_sn} /services
+Direction: down
+Method: return_home
+Data: null
+Topic: thing/product/ {gateway_sn} /services_reply
+Direction: up
+Method: return_home
+Data:
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+# Wayline recovery
+Topic: thing/product/ {gateway_sn} /services
+Direction: down
+Method: flighttask_recovery
+Data: null
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : { } ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1654070968655 ,
+"method" : "flighttask_recovery"
+}
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /services_reply
+Direction: up
+Method: flighttask_recovery
+Data:
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"result" : 0
+} ,
+"need_reply" : 1 ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1654070968655 ,
+"method" : "flighttask_recovery"
+}
+
+
+
+
+
+
+
+
+
+
+
+# Wayline pause
+Topic: thing/product/ {gateway_sn} /services
+Direction: down
+Method: flighttask_pause
+Data: null
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : { } ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1654070968655 ,
+"method" : "flighttask_pause"
+}
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /services_reply
+Direction: up
+Method: flighttask_pause
+Data:
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"result" : 0
+} ,
+"need_reply" : 1 ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1654070968655 ,
+"method" : "flighttask_pause"
+}
+
+
+
+
+
+
+
+
+
+
+
+# Cancel mission
+Topic: thing/product/ {gateway_sn} /services
+Direction: down
+Method: flighttask_undo
+Data:
+Column Name Type Constraint Description
+flight_ids Plan ID array {"size": -, "item_type": text}
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"flight_ids" : [
+"aaaaaaa" ,
+"bbbbbbb"
+]
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1234567890123 ,
+"method" : "flighttask_undo"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /services_reply
+Direction: up
+Method: flighttask_undo
+Data:
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"result" : 0
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1234567890123 ,
+"method" : "flighttask_undo"
+}
+
+
+
+
+
+
+
+
+
+
+# Issue a mission
+If user's cloud service can not connect to the Internet (that is, the WAN), it is necessary to implement the update configuration function to send the URL of the NTP service which can be accessed by the cloud service to synchronize the clock. Otherwise, the wayline mission can not work properly.
+Topic: thing/product/ {gateway_sn} /services
+Direction: down
+Method: flighttask_prepare
+Data:
+Column Name Type Constraint Description
+flight_id Plan ID text {"length":""}
+execute_time Start execution time int {"max":"","min":"","step":"","unit_name":null} The task start time in milliseconds timestamp. This is an optional field. It is required when task_type is 0 or 1, and not required when it is 2.
+task_type Mission type enum_int {"0":"Immediate mission","1":"Timed mission","2":" Conditional mission"} Immediate and timed tasks are both specified with the execute_time for execution. Conditional tasks support the ready_conditions field to specify conditions for task readiness. The device can execute the task as soon as it meets the readiness conditions within the specified time period. Media upload for immediate tasks has the highest priority, while timed and conditional tasks have equal priority for media uploads.
+file Wayline file object struct
+»url File URL text
+»fingerprint File signature text File MD5 signature
+ready_conditions Mission readiness conditions struct This is an optional field. For conditional tasks (i.e., when task_type is 2), this field is required. For other types of tasks, this field will be ignored. After distributing a conditional task, the device will periodically check if all ready_conditions are met. If they are all satisfied, a flighttask_ready event notification will be triggered. Additionally, when the device receives the flighttask_execute command, it will also check if all the task's ready_conditions have been met.
+»battery_capacity Battery capacity int The percentage threshold of aircraft battery power for executable missions. The aircraft battery power must be greater than battery_capacity when the mission starts.
+»begin_time Start time of the mission's executable period int {"length":13} Start time of the mission's executable period in milliseconds; the mission must start execution after the time specified in begin_time .
+»end_time End time of the mission execution period int {"length":13} Deadline in milliseconds for the mission execution period, the execution time must be less than end_time .
+executable_conditions Mission execution conditions struct Optional field for adding pre-execution check conditions on the device side. The mission will fail if any of the conditions are not met.
+»storage_capacity Storage capacity int The minimum storage capacity of the dock or aircraft that can execute tasks. If the storage capacity of the dock or aircraft does not meet storage_capacity , the task execution fails.
+break_point Wayline breakpoint information struct Optional field for resuming from breakpoint. If specified, the wayline mission will resume from the specified breakpoint.
+»index Breakpoint number int
+»state Breakpoint state enum_int {"0":"On segment","1":"On waypoint"}
+»progress Current segment progress float {"max":"1.0","min":"0"}
+»wayline_id Wayline ID int
+rth_altitude Return home altitude int {"max":1500,"min":20,"step":"","unit_name":"Meters / m"}
+rth_mode Return home altitude mode enum_int {"0":"Optimal","1":"Preset"} The aircraft will automatically plan the optimal RTH altitude in Optimal mode. Currently, DJI dock does not support setting the RTH altitude mode. Only the Preset mode can be selected. When the environmental lighting does not meet the requirements of the vision system (such as direct sunlight in the evening or low/no light at night), the aircraft will fly to Home Point in a straight line at the preset altitude.
+out_of_control_action Remote controller lost control action enum_int {"0":"Return to home","1":"Hover","2":"Land"} Out-of-control action, the current fixed value is 0, which means return to home. Note that the enumeration definition is inconsistent between the flight control and the dock, and the dock side will perform conversion.
+exit_wayline_when_rc_lost Wayline lost control action enum_int {"0":"Continue executing the wayline mission","1":"Exit wayline mission and execute remote controller lost control action"} Keep consistent with the KMZ file
+wayline_precision_type Wayline Precision Type enum_int {"0":"GPS Mission","1":"High-precision RTK mission"} High-precision RTK mission: The aircraft will take off and converge the RTK data before performing task. Unable to pause the task during convergence. Choose RTK when high positioning accuracy is required. GNSS Mission: The aircraft will perform the task directly without converging the RTK data. Choose GNSS when basic positioning accuracy is acceptable.
+simulate_mission Whether to execute the mission in the simulator struct Optional field for simulating mission debugging indoors.
+Note: Before performing simulated flights, be sure to remove the propellers to prevent them from being damaged by the closing hatch.
+»is_enable Whether to enable the simulator mission enum_int {"0":"Do not enable","1":"Enable"} Open or close the simulator for this mission
+»latitude Latitude double {"max":"90.0","min":"-90.0"}
+»longitude Longitude double {"max":"180.0","min":"-180.0"}
+»altitude Altitude double {"max":"9999.9","min":"-9999.9","unit_name":"m"}
+flight_safety_advance_check Pre-check for flight safety bool {"0":"Disabled","1":"Enabled"} Set to pre-check the flight safety for Take Off and flight route task. This field is optional. The default value is 0, which represents disabled. 1 represents enabled. Checking if the local operating area file is consistent with the cloud side before the task starts. If the files are different, pull file from the cloud side to update.
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"break_point" : {
+"index" : 1 ,
+"progress" : 0.34 ,
+"state" : 0 ,
+"wayline_id" : 0
+} ,
+"executable_conditions" : {
+"storage_capacity" : 1000
+} ,
+"execute_time" : 1234567890123 ,
+"exit_wayline_when_rc_lost" : 0 ,
+"file" : {
+"fingerprint" : "xxxx" ,
+"url" : "https://xxx.com/xxxx"
+} ,
+"flight_id" : "xxxxxxx" ,
+"flight_safety_advance_check" : 1 ,
+"out_of_control_action" : 0 ,
+"ready_conditions" : {
+"battery_capacity" : 90 ,
+"begin_time" : 1234567890123 ,
+"end_time" : 1234567890123
+} ,
+"rth_altitude" : 100 ,
+"simulate_mission" : {
+"is_enable" : 1 ,
+"latitude" : 22.1223 ,
+"longitude" : 113.2222 ,
+"altitude" : 66.6
+} ,
+"task_type" : 2 ,
+"wayline_precision_type" : 0
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1234567890123 ,
+"method" : "flighttask_prepare"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /services_reply
+Direction: up
+Method: flighttask_prepare
+Data:
+Column Name Type Constraint Description
+result Return code int {"max":"","min":"","step":"","unit_name":null} Non-zero represents an error
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"result" : 0
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1234567890123 ,
+"method" : "flighttask_prepare"
+}
+
+
+
+
+
+
+
+
+
+
+# Create a mission (deprecated)
+Topic: thing/product/ {gateway_sn} /services
+Direction: down
+Method: flighttask_create
+Data:
+Column Name Type Constraint Description
+flight_id Plan ID text
+Type Mission type text
+file Wayline file object struct
+»url File URL text
+»sign MD5 signature text
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"file" : {
+"sign" : "xxxx" ,
+"url" : "https://xxx.com/xxxx"
+} ,
+"flight_id" : "xxxxxxx" ,
+"type" : "wayline"
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp:" : 1654070968655 ,
+"method" : "flighttask_create"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /services_reply
+Direction: up
+Method: flighttask_create
+Data:
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"result" : 0
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp:" : 1654070968655 ,
+"method" : "flighttask_create"
+}
+
+
+
+
+
+
+
+
+
+
+# Distribute Flight Routes via Virtual Cockpit
+When the aircraft is in flight, you can distribute some flight routes with smaller file sizes.
+Method: in_flight_wayline_deliver
+Topic: thing/product/{gateway_sn}/services
+Direction: down
+Data:
+Column Name Type Constraint Description
+bid Request ID string Unique identifier for the request
+tid Task ID string Unique identifier for the task
+timestamp Timestamp int64 Timestamp of the request
+method Method Name string Fixed as in_flight_wayline_deliver
+data Data object Specific data of distributed flight route
+data.file File Info object Flight route file information
+data.file.fingerprint File Fingerprint string Used to verify file integrity
+data.file.url File Download URL string Download URL for flight route files
+data.in_flight_wayline_id Flight Route Task ID string Unique identifier for the flight route task
+data.out_of_control_action Signal lost action int {0: "Return to Home (RTH)", 1: "Hover", 2: "Land"} Action when the remote control is out of control
+data.exit_wayline_when_rc_lost Signal lost action int {0: "Continue", 1: "Perform signal lost action"} Action when the flight route loses signal
+data.rth_altitude RTH altitude int {min: 20, max: 1500} RTH altitude, unit: meters
+data.rth_mode RTH Mode int {0: "Optimal RTH", 1: "Preset RTH"} RTH altitude mode
+data.wayline_precision_type Flight positioning accuracy type int {0: "GPS task", 1: "High precision RTK task"} Flight positioning accuracy type
+Example:
+{
+"bid" : "d26db6b4-3bb0-432c-bdb2-a8e53c827b72" ,
+"tid" : "a5d95abe-e99c-4931-95cc-e2f3fdbc488f" ,
+"timestamp" : 1731135221528 ,
+"method" : "in_flight_wayline_deliver" ,
+"data" : {
+"file" : {
+"fingerprint" : "7a7cea5060c55920b7619a2a981f2223" ,
+"url" : "XXXX"
+} ,
+"in_flight_wayline_id" : "f2b31c13-3fce-4a7e-b188-87a78ff2f8a6" ,
+"out_of_control_action" : 1 ,
+"exit_wayline_when_rc_lost" : 0 ,
+"rth_altitude" : 120 ,
+"rth_mode" : 1 ,
+"wayline_precision_type" : 1
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/{gateway_sn}/services_reply
+Direction: up
+Data:
+Column Name Type Constraint Description
+result return code int Non-zero represents an error
+Example:
+{
+"result" : 0
+}
+
+
+
+
+# Pause Flight Route
+Method: in_flight_wayline_stop
+Topic: thing/product/{gateway_sn}/services
+Direction: down
+Data:
+Column Name Type Constraint Description
+bid Request ID string Unique identifier for the request
+tid Task ID string Unique identifier for the task
+timestamp Timestamp int64 Timestamp of the request
+method Method Name string Fixed as in_flight_wayline_stop
+data Data object Specific data for pausing the flight route
+data.in_flight_wayline_id Flight Route Task ID string Unique identifier for the flight route task
+Example:
+{
+"bid" : "bf1d9985-5077-4ea5-9f2b-44edbcde9a11" ,
+"tid" : "9da675b5-0a87-4b89-9813-4fb2e3aac4ec" ,
+"timestamp" : 1731136137237 ,
+"method" : "in_flight_wayline_stop" ,
+"data" : {
+"in_flight_wayline_id" : "36747381-4886-4ed0-9b2b-2919d6d4863c"
+}
+}
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/{gateway_sn}/services_reply
+Direction: up
+Data:
+Column Name Type Constraint Description
+result return code int Non-zero represents an error
+Example:
+{
+"result" : 0
+}
+
+
+
+
+# Resume Flight Route
+Method: in_flight_wayline_recover
+Topic: thing/product/{gateway_sn}/services
+Direction: down
+Data:
+Column Name Type Constraint Description
+bid Request ID string Unique identifier for the request
+tid Task ID string Unique identifier for the task
+timestamp Timestamp int64 Timestamp of the request
+method Method Name string Fixed as in_flight_wayline_recover
+data Data object Specific data for resuming the flight route
+data.in_flight_wayline_id Flight route task ID string Unique identifier for the flight route task
+Example:
+{
+"bid" : "8fd307b9-6a70-465c-aeb7-5edac860017b" ,
+"tid" : "b3a76306-2576-4bc5-9a55-77e4f8f3b17c" ,
+"timestamp" : 1731136244583 ,
+"method" : "in_flight_wayline_recover" ,
+"data" : {
+"in_flight_wayline_id" : "36747381-4886-4ed0-9b2b-2919d6d4863c"
+}
+}
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/{gateway_sn}/services_reply
+Direction: up
+Data:
+Column Name Type Constraint Description
+result return code int Non-zero represents an error
+Example:
+{
+"result" : 0
+}
+
+
+
+
+# Cancel Flight Route
+Method: in_flight_wayline_cancel
+Topic: thing/product/{gateway_sn}/services
+Direction: down
+Data:
+Column Name Type Constraint Description
+bid Request ID string Unique identifier for the request
+tid Task ID string Unique identifier for the task
+timestamp Timestamp int64 Timestamp of the request
+method Method Name string Fixed as in_flight_wayline_cancel
+data Data object Specific data for canceling the flight route
+Example:
+{
+"bid" : "8fd307b9-6a70-465c-aeb7-5edac860017b" ,
+"tid" : "b3a76306-2576-4bc5-9a55-77e4f8f3b17c" ,
+"timestamp" : 1731136244583 ,
+"method" : "in_flight_wayline_cancel" ,
+"data" : { }
+}
+
+
+
+
+
+
+
+
+Topic: thing/product/{gateway_sn}/services_reply
+Direction: up
+Data:
+Column Name Type Constraint Description
+result return code int Non-zero represents an error
+Example:
+{
+"result" : 0
+}
+
+
+
+
+# Requests
+# Obtain dock task execution state
+Dock requests for the task execution state of the other dock during the multi-dock task.
+Topic: thing/product/ {gateway_sn} /requests
+Direction: up
+Method: flighttask_progress_get
+Data:
+Column Name Type Constraint Description
+sn Target device SN text {"length":""}
+Topic: thing/product/ {gateway_sn} /requests_reply
+Direction: down
+Method: flighttask_progress_get
+Data:
+Column Name Type Constraint Description
+result Return code int {"max":"","min":"","step":"","unit_name":null} Non-zero represents an error
+output Output struct
+»flight_id Device's latest current task ID text {"length":""}
+»progress Task progress struct Field enumeration values are the same as those in the reported flighttask_progress progress field
+»»current_step Executing result int {"max":"","min":"","step":"","unit_name":null}
+»»percent Execution progress int {"max":"100","min":"0","step":"","unit_name":null}
+»status Task state text {"length":""} Field enumeration values are the same as those in the reported flighttask_progress status field
+# Obtain mission resources
+Topic: thing/product/ {gateway_sn} /requests
+Direction: up
+Method: flighttask_resource_get
+Data:
+Column Name Type Constraint Description
+flight_id Plan ID text
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"flight_id" : "xxxxxxx"
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1234567890123 ,
+"method" : "flighttask_resource_get"
+}
+
+
+
+
+
+
+
+
+
+
+Topic: thing/product/ {gateway_sn} /requests_reply
+Direction: down
+Method: flighttask_resource_get
+Data:
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»file Wayline file object struct
+»»url File URL text
+»»fingerprint File signature text File MD5 signature
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"output" : {
+"file" : {
+"fingerprint" : "signxxxx" ,
+"url" : "https://xx.oss-cn-hangzhou.aliyuncs.com/xx.kmz?Expires=xx&OSSAccessKeyId=xxx&Signature=xxx"
+}
+} ,
+"result" : 0
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp" : 1234567890123 ,
+"method" : "flighttask_resource_get"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Github Edit open in new window
+Last Updated: 1/27/2026, 11:46:20 PM
+
+Media Management HMS Function
+How was your reading experience of our documentation?
+
+Return home information
+Task readiness notification
+Report task progress
+Device notification of Return to Home Exit State
+Status Report of Distributing Flight Routes via Virtual Cockpit
+Execute a mission
+Designate home point for returning
+Task termination
+Cancel return
+One-key return
+Wayline recovery
+Wayline pause
+Cancel mission
+Issue a mission
+Create a mission (deprecated)
+Distribute Flight Routes via Virtual Cockpit
+Pause Flight Route
+Resume Flight Route
+Cancel Flight Route
+Obtain dock task execution state
+Obtain mission resources
+
+
+Documentation Feedback
+
+
+
+
+
+
+
+
+
+
+
+
+If you have any comments or confusion about our documentation, you can click here to give feedback and we will get back to you as soon as possible. OK

@@ -1,0 +1,1026 @@
+Cloud API
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+SearchK
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+Release Notes
+
+Tutorial Reading Guide
+
+Flight Safety Notification
+
+Basic Introduction
+
+Product Introduction
+
+Product Architecture
+
+Product Supported
+
+Basic Concept
+
+Noun Explanation
+
+MQTT
+
+Thing Model
+
+HTTPS
+
+WebSocket
+
+JSBridge
+
+Quick Start
+
+Environment Preparation List
+
+Source Code Deployment Steps
+
+Docker Deployment Steps
+
+Function Display Video
+
+Function Set
+
+Pilot Function Set
+
+Access to the Cloud Server
+
+Situation Awareness
+
+Live Stream
+
+Map Elements
+
+Media Management
+
+Wayline Management
+
+Obtain Log via JSBridge
+
+Pilot Launch Third-party App
+
+Live Flight Controls/Remote Control
+
+Dock Function Set
+
+Access to the Cloud Server
+
+Device Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Live Flight Controls/Remote Control
+
+Custom Flight Area
+
+Multi-dock Task
+
+AI Target Recognition
+
+Debugging Methods
+
+Pilot Webview Debugging
+
+Log Export
+
+MQTTX
+
+API Reference
+
+DJI WPML
+
+Overview
+
+Template.kml
+
+Waylines.wpml
+
+Common Elements
+
+Pilot to Cloud
+
+MQTT
+
+Topic Definition
+
+Mavic 3 Enterprise Series
+
+Properties
+
+DJI RC Pro Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 4 Series
+
+Properties
+
+DJI RC Plus 2 Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 400
+
+Properties
+
+Other Models
+
+Aircraft
+
+Properties
+
+Remote Controller
+
+Properties
+
+Device Management
+
+Live Stream
+
+HTTPS
+
+Map Elements
+
+Create Map Elements
+
+Update Map Elements
+
+Obtain Map Elements
+
+Delete Map Elements
+
+Wayline Management
+
+Obtain Wayline List
+
+Obtain Temporary Credential
+
+Obtain Wayline File Download Address
+
+Obtain Duplicated Wayline Name
+
+Obtain File Upload Result Report
+
+Batch Favorites Wayline
+
+Batch Unfavorite Wayline
+
+Media Management
+
+Media Fast Upload
+
+Obtain Exist File Tiny Fingerprint
+
+Obtain Temporary Credential
+
+App Reports File Upload Result
+
+Callback after the File Group Upload Complete
+
+Situation Awareness
+
+Obtain Device Topology List
+
+WebSocket
+
+Map Elements
+
+Push Message
+
+Situation Awareness
+
+Push Message
+
+JSBridge
+
+Dock to Cloud
+
+MQTT
+
+Topic Definition
+
+Aircraft
+
+M30/M30T Properties
+
+M3D/M3TD Properties
+
+M4D/M4TD Properties
+
+Dock
+
+DJI Dock
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+DJI Dock 2
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+Remote Control
+
+DJI Dock 3
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+AirSense
+
+Remote Control
+
+Error Code
+
+FAQ
+
+Properties
+
+2025-09-03
+
+No Rating
+Github Edit open in new window
+
+Device Property List
+
+# Device Property List
+
+pushMode:
+
+0: Stable frequency data. Device will report in the frequency of 0.5HZ. (Topic:thing/product/{device_sn}/osd)
+
+1: State data. It is reported when the state changes. (Topic:thing/product/{device_sn}/state)
+
+accessMode:
+
+r: Property can only be read
+
+rw: Property can be read and written (Topic:thing/product/{gateway_sn}/property/set)
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+accessMode
+
+pushMode
+
+live_capacity
+
+Gateway device live streaming capability
+
+struct
+
+r
+
+1
+
+»available_video_number
+
+Number of selectable streaming bitrates
+
+int
+
+{"max":"","min":"","step":"","unit_name":null}
+
+0
+
+»coexist_video_number_max
+
+Maximum number of streams that can be simultaneously streamed
+
+int
+
+{"max":"","min":"","step":"","unit_name":null}
+
+0
+
+»device_list
+
+Selectable video device sources
+
+array
+
+{"size": -, "item_type": struct}
+
+Selectable video device sources (device layer, such as aircraft)
+
+0
+
+»»sn
+
+Aircraft and other video source device serial number (SN)
+
+text
+
+0
+
+»»available_video_number
+
+Number of streaming bitrates that can be selected for the serial number device
+
+int
+
+0
+
+»»coexist_video_number_max
+
+The maximum number of streams that can be simultaneously streamed by the device with this serial number
+
+int
+
+0
+
+»»camera_list
+
+List of cameras on the device with the specified serial number
+
+array
+
+{"size": -, "item_type": struct}
+
+0
+
+»»»camera_index
+
+Camera index
+
+text
+
+Using the format {type-subtype-gimbalindex}
+
+0
+
+»»»available_video_number
+
+Number of streaming bitrates that can be selected for the camera level video source
+
+int
+
+0
+
+»»»coexist_video_number_max
+
+The maximum number of streams that can be simultaneously streamed for this camera level
+
+int
+
+0
+
+»»»video_list
+
+List of streams that can be selected for this camera-level video source
+
+array
+
+{"size": -, "item_type": struct}
+
+0
+
+»»»»video_index
+
+Index of the stream that can be selected for this camera-level video source
+
+text
+
+0
+
+»»»»video_type
+
+Types of streams that can be selected for this camera-level video source
+
+text
+
+0
+
+»»»»switchable_video_types
+
+Supported video camera types that the video stream can switch to
+
+array
+
+{"size": -, "item_type": text}
+
+0
+
+capacity_percent
+
+Remaining capacity
+
+int
+
+{"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+
+Remaining battery level of the remote control
+
+r
+
+0
+
+height
+
+Ellipsoid height
+
+double
+
+{"max":"","min":"","step":"","unit_name":"Meters / m"}
+
+r
+
+0
+
+dongle_infos
+
+4G Dongle information
+
+array
+
+{"size": -, "item_type": struct}
+
+r
+
+1
+
+»imei
+
+dongle imei
+
+text
+
+Unique identifier for the Dongle
+
+r
+
+0
+
+»dongle_type
+
+Dongle type
+
+enum_int
+
+{"6":"Old Dongle","10":"New Dongle with eSIM support"}
+
+Dongle type
+
+r
+
+0
+
+»eid
+
+dongle eid
+
+text
+
+Unique identifier for eSIM, used for public account query of plans and service purchase
+
+r
+
+0
+
+»esim_activate_state
+
+eSIM activation state
+
+enum_int
+
+{"0":"Not activated","1":"Activated"}
+
+Requires activation to use
+
+r
+
+0
+
+»sim_card_state
+
+SIM card state
+
+enum_int
+
+{"0":"Not inserted","1":"Inserted"}
+
+Insertion state of the physical SIM card in the dongle
+
+r
+
+0
+
+»sim_slot
+
+SIM card slot enable state
+
+enum_int
+
+{"0":"Unknown","1":"Physical SIM card","2":"eSIM"}
+
+Identifies the SIM card slot currently in use by the dongle
+
+r
+
+0
+
+»esim_infos
+
+eSIM information
+
+array
+
+{"size": -, "item_type": struct}
+
+r
+
+0
+
+»»telecom_operator
+
+Supported operators
+
+enum_int
+
+{"0":"Unknown","1":"Mobile","2":"China Unicom","3":"Telecommunications"}
+
+Telecom operators supported by eSIM
+
+r
+
+0
+
+»»enabled
+
+eSIM enable state
+
+bool
+
+{"false":"Not in use","true":"In use"}
+
+Only one eSIM can be enabled at a time
+
+r
+
+0
+
+»»iccid
+
+sim iccid
+
+text
+
+Unique identifier for the SIM card, can be used for purchasing packages for physical SIM cards
+
+r
+
+0
+
+»sim_info
+
+SIM card information
+
+struct
+
+Information about the physical SIM card that can be inserted into the dongle
+
+r
+
+0
+
+»»telecom_operator
+
+Supported operators
+
+enum_int
+
+{"0":"Unknown","1":"Mobile","2":"China Unicom","3":"Telecommunications"}
+
+Telecom operator supported by the SIM card
+
+r
+
+0
+
+»»sim_type
+
+SIM card type
+
+enum_int
+
+{"0":"Unknown","1":"Other regular SIM card","2":"Three-network card"}
+
+Type of physical SIM card
+
+r
+
+0
+
+»»iccid
+
+sim iccid
+
+text
+
+Unique identifier for the SIM card, can be used for purchasing packages for physical SIM cards
+
+r
+
+0
+
+live_status
+
+Gateway's current overall live streaming state push
+
+array
+
+{"size": -, "item_type": struct}
+
+r
+
+1
+
+»video_id
+
+Live streaming identifier
+
+text
+
+Identifier for a certain video stream, in the format of {sn}/{camera_index}/{video_index}. Here, {sn} represents the serial number of the video source device. {camera_index} is the camera index, formatted as {type-subtype-gimbalindex}. {video_index} is the stream index that can be selected for the video source at the camera level.
+
+0
+
+»video_type
+
+Video type
+
+text
+
+{"length":"24"}
+
+Indicates the type of video lens, such as normal/wide/zoom/infrared, etc.
+
+0
+
+»video_quality
+
+Quality of the live streaming
+
+enum_int
+
+{"0":"Auto","1":"Smooth","2":"HD","3":"Ultra HD"}
+
+0
+
+»status
+
+Live streaming state
+
+enum_int
+
+{"0":"Not live streaming","1":"In live streaming"}
+
+0
+
+»error_status
+
+Error code
+
+int
+
+{"length":6}
+
+0
+
+wireless_link
+
+Image transmission link
+
+struct
+
+r
+
+0
+
+»dongle_number
+
+Number of Dongles on the aircraft
+
+int
+
+0
+
+»4g_link_state
+
+4G link connection state
+
+enum_int
+
+{"0":"Disconnected","1":"Connected"}
+
+0
+
+»sdr_link_state
+
+SDR link connection state
+
+enum_int
+
+{"0":"Disconnected","1":"Connected"}
+
+0
+
+»link_workmode
+
+Dock's video transmission link mode
+
+enum_int
+
+{"0":"SDR Mode","1":"4G Fusion Mode"}
+
+0
+
+»sdr_quality
+
+SDR signal quality
+
+int
+
+{"max":"5","min":"0","step":"1"}
+
+0
+
+»4g_quality
+
+Overall 4G signal quality
+
+int
+
+{"max":"5","min":"0","step":"1"}
+
+0
+
+»4g_uav_quality
+
+Sky-side 4G signal quality
+
+int
+
+{"max":"5","min":"0","step":"1"}
+
+Signal quality between aircraft and 4G server
+
+0
+
+»4g_gnd_quality
+
+Ground-side 4G signal quality
+
+int
+
+{"max":"5","min":"0","step":"1"}
+
+Signal quality between ground devices (for example, remote controller, DJI Dock, etc.) and 4G server
+
+0
+
+»sdr_freq_band
+
+SDR frequency band
+
+float
+
+0
+
+»4g_freq_band
+
+4G frequency band
+
+float
+
+0
+
+firmware_version
+
+Firmware version
+
+text
+
+{"length":"64"}
+
+r
+
+1
+
+latitude
+
+Latitude
+
+double
+
+{"max":"90","min":"-90","step":"0.01"}
+
+r
+
+0
+
+longitude
+
+Longitude
+
+double
+
+{"max":"180","min":"-180","step":"0.01"}
+
+Longitude of the gateway device
+
+r
+
+0
+
+cloud_control_auth
+
+List of cloud control authorizations
+
+array
+
+{"size":"-","item_type":"string"}
+
+Identifies which control permissions are granted to the cloud
+
+r
+
+1
+
+drc_state
+
+DRC link state
+
+enum_int
+
+{"0":"Not connected","1":"Connecting","2":"Connected"}
+
+r
+
+0
+
+Github Edit open in new window
+
+Last Updated: 9/3/2025, 3:08:21 AM
+
+Device Management
+
+How was your reading experience of our documentation?
+
+Device Property List
+
+Documentation Feedback
+
+
+
+
+If you have any comments or confusion about our documentation, you can click here to give feedback and we will get back to you as soon as possible.
+OK

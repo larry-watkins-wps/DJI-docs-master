@@ -1,0 +1,727 @@
+Cloud API
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+SearchK
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+Release Notes
+
+Tutorial Reading Guide
+
+Flight Safety Notification
+
+Basic Introduction
+
+Product Introduction
+
+Product Architecture
+
+Product Supported
+
+Basic Concept
+
+Noun Explanation
+
+MQTT
+
+Thing Model
+
+HTTPS
+
+WebSocket
+
+JSBridge
+
+Quick Start
+
+Environment Preparation List
+
+Source Code Deployment Steps
+
+Docker Deployment Steps
+
+Function Display Video
+
+Function Set
+
+Pilot Function Set
+
+Access to the Cloud Server
+
+Situation Awareness
+
+Live Stream
+
+Map Elements
+
+Media Management
+
+Wayline Management
+
+Obtain Log via JSBridge
+
+Pilot Launch Third-party App
+
+Live Flight Controls/Remote Control
+
+Dock Function Set
+
+Access to the Cloud Server
+
+Device Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Live Flight Controls/Remote Control
+
+Custom Flight Area
+
+Multi-dock Task
+
+AI Target Recognition
+
+Debugging Methods
+
+Pilot Webview Debugging
+
+Log Export
+
+MQTTX
+
+API Reference
+
+DJI WPML
+
+Overview
+
+Template.kml
+
+Waylines.wpml
+
+Common Elements
+
+Pilot to Cloud
+
+MQTT
+
+Topic Definition
+
+Mavic 3 Enterprise Series
+
+Properties
+
+DJI RC Pro Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 4 Series
+
+Properties
+
+DJI RC Plus 2 Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 400
+
+Properties
+
+Other Models
+
+Aircraft
+
+Properties
+
+Remote Controller
+
+Properties
+
+Device Management
+
+Live Stream
+
+HTTPS
+
+Map Elements
+
+Create Map Elements
+
+Update Map Elements
+
+Obtain Map Elements
+
+Delete Map Elements
+
+Wayline Management
+
+Obtain Wayline List
+
+Obtain Temporary Credential
+
+Obtain Wayline File Download Address
+
+Obtain Duplicated Wayline Name
+
+Obtain File Upload Result Report
+
+Batch Favorites Wayline
+
+Batch Unfavorite Wayline
+
+Media Management
+
+Media Fast Upload
+
+Obtain Exist File Tiny Fingerprint
+
+Obtain Temporary Credential
+
+App Reports File Upload Result
+
+Callback after the File Group Upload Complete
+
+Situation Awareness
+
+Obtain Device Topology List
+
+WebSocket
+
+Map Elements
+
+Push Message
+
+Situation Awareness
+
+Push Message
+
+JSBridge
+
+Dock to Cloud
+
+MQTT
+
+Topic Definition
+
+Aircraft
+
+M30/M30T Properties
+
+M3D/M3TD Properties
+
+M4D/M4TD Properties
+
+Dock
+
+DJI Dock
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+DJI Dock 2
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+Remote Control
+
+DJI Dock 3
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+AirSense
+
+Remote Control
+
+Error Code
+
+FAQ
+
+Custom Flight Area
+
+2025-03-12
+
+No Rating
+Github Edit open in new window
+
+Custom flight area alarm information push
+
+Sync state of custom flight area files
+
+Instruction to update custom flight areas
+
+Retrieve custom flight area files
+
+# Event
+
+# Custom flight area alarm information push
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: flight_areas_drone_location
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+drone_locations
+
+Aircraft custom flight area distance information
+
+struct
+
+»area_distance
+
+Distance to flight boundary
+
+float
+
+»is_in_area
+
+Whether in the custom flight area
+
+bool
+
+Example:
+
+{
+"bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"data": {
+"drone_locations": [
+{
+"area_distance": 100.11,
+"area_id": "d275c4e1-d864-4736-8b5d-5f5882ee9bdd",
+"is_in_area": true
+}
+]
+},
+"method": "flight_areas_drone_location",
+"need_reply": 0,
+"tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"timestamp": 16540709686556
+}
+
+# Sync state of custom flight area files
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: flight_areas_sync_progress
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+status
+
+Synchronization state
+
+enum_string
+
+{"fail":"Failed","switch_fail":"Enable switch failed","synchronized":"Synchronized","synchronizing":"Synchronizing","wait_sync":"To be synchronized"}
+
+reason
+
+Return code
+
+int
+
+{"1":"Failed to parse file information returned from the cloud","2":"Failed to get file information on the aircraft side","3":"Failed to download file from the cloud","4":"Link flip failed","5":"File transfer failed","6":"Disable failed","7":"Failed to delete custom flight area","8":"Failed to load job area data on the aircraft side","9":"Enable failed","10":"Dock enhanced image transmission cannot be turned off, job area data synchronization failed","11":"Aircraft startup failed, unable to synchronize job area data","12":"Checksum verification failed","13":"Synchronization exception timeout"}
+
+file
+
+Custom flight area file
+
+struct
+
+»name
+
+Customized flight area file name
+
+text
+
+»checksum
+
+File signature digest
+
+text
+
+{}
+
+File SHA256 signature
+
+Example:
+
+{
+"bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"data": {
+"file": {
+"checksum": "sha256",
+"name": "geofence_xxx.json"
+},
+"reason": 0,
+"status": "synchronized"
+},
+"method": "flight_areas_sync_progress",
+"need_reply": 1,
+"tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"timestamp": 16540709686556
+}
+
+# Service
+
+# Instruction to update custom flight areas
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: flight_areas_update
+
+Data: null
+
+Example:
+
+{
+"bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"data": null,
+"method": "flight_areas_update",
+"tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: flight_areas_update
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+Example:
+
+{
+"bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"data": {
+"result": 0
+},
+"method": "flight_areas_update",
+"tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"timestamp": 1654070968655
+}
+
+# Requests
+
+# Retrieve custom flight area files
+
+Topic: thing/product/{gateway_sn}/requests
+
+Direction: up
+
+Method: flight_areas_get
+
+Data: null
+
+Example:
+
+{
+"bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"data": null,
+"method": "flight_areas_get",
+"tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/requests_reply
+
+Direction: down
+
+Method: flight_areas_get
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+result
+
+Return code
+
+int
+
+Non-zero represents an error
+
+output
+
+Output
+
+struct
+
+»files
+
+Custom flight area file list
+
+array
+
+{"size": -, "item_type": struct}
+
+»»name
+
+File name
+
+text
+
+{}
+
+»»url
+
+File URL
+
+text
+
+{}
+
+»»checksum
+
+File signature digest
+
+text
+
+{}
+
+File SHA256 signature
+
+»»size
+
+File size
+
+int
+
+{}
+
+Example:
+
+{
+"bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"data": {
+"output": {
+"files": [
+{
+"checksum": "sha256",
+"name": "geofence_xxx.json",
+"size": 500,
+"url": "https://xx.oss-cn-hangzhou.aliyuncs.com/xx.json?Expires=xx&OSSAccessKeyId=xxx&Signature=xxx"
+}
+]
+},
+"result": 0
+},
+"method": "flight_areas_get",
+"tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+"timestamp": 1654070968655
+}
+
+Github Edit open in new window
+
+Last Updated: 3/12/2025, 9:09:23 PM
+
+Live Flight Controls PSDK Function
+
+How was your reading experience of our documentation?
+
+Custom flight area alarm information push
+
+Sync state of custom flight area files
+
+Instruction to update custom flight areas
+
+Retrieve custom flight area files
+
+Documentation Feedback
+
+
+
+
+If you have any comments or confusion about our documentation, you can click here to give feedback and we will get back to you as soon as possible.
+OK

@@ -1,0 +1,531 @@
+Cloud API
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+SearchK
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+Release Notes
+
+Tutorial Reading Guide
+
+Flight Safety Notification
+
+Basic Introduction
+
+Product Introduction
+
+Product Architecture
+
+Product Supported
+
+Basic Concept
+
+Noun Explanation
+
+MQTT
+
+Thing Model
+
+HTTPS
+
+WebSocket
+
+JSBridge
+
+Quick Start
+
+Environment Preparation List
+
+Source Code Deployment Steps
+
+Docker Deployment Steps
+
+Function Display Video
+
+Function Set
+
+Pilot Function Set
+
+Access to the Cloud Server
+
+Situation Awareness
+
+Live Stream
+
+Map Elements
+
+Media Management
+
+Wayline Management
+
+Obtain Log via JSBridge
+
+Pilot Launch Third-party App
+
+Live Flight Controls/Remote Control
+
+Dock Function Set
+
+Access to the Cloud Server
+
+Device Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Live Flight Controls/Remote Control
+
+Custom Flight Area
+
+Multi-dock Task
+
+AI Target Recognition
+
+Debugging Methods
+
+Pilot Webview Debugging
+
+Log Export
+
+MQTTX
+
+API Reference
+
+DJI WPML
+
+Overview
+
+Template.kml
+
+Waylines.wpml
+
+Common Elements
+
+Pilot to Cloud
+
+MQTT
+
+Topic Definition
+
+Mavic 3 Enterprise Series
+
+Properties
+
+DJI RC Pro Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 4 Series
+
+Properties
+
+DJI RC Plus 2 Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 400
+
+Properties
+
+Other Models
+
+Aircraft
+
+Properties
+
+Remote Controller
+
+Properties
+
+Device Management
+
+Live Stream
+
+HTTPS
+
+Map Elements
+
+Create Map Elements
+
+Update Map Elements
+
+Obtain Map Elements
+
+Delete Map Elements
+
+Wayline Management
+
+Obtain Wayline List
+
+Obtain Temporary Credential
+
+Obtain Wayline File Download Address
+
+Obtain Duplicated Wayline Name
+
+Obtain File Upload Result Report
+
+Batch Favorites Wayline
+
+Batch Unfavorite Wayline
+
+Media Management
+
+Media Fast Upload
+
+Obtain Exist File Tiny Fingerprint
+
+Obtain Temporary Credential
+
+App Reports File Upload Result
+
+Callback after the File Group Upload Complete
+
+Situation Awareness
+
+Obtain Device Topology List
+
+WebSocket
+
+Map Elements
+
+Push Message
+
+Situation Awareness
+
+Push Message
+
+JSBridge
+
+Dock to Cloud
+
+MQTT
+
+Topic Definition
+
+Aircraft
+
+M30/M30T Properties
+
+M3D/M3TD Properties
+
+M4D/M4TD Properties
+
+Dock
+
+DJI Dock
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+DJI Dock 2
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+Remote Control
+
+DJI Dock 3
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+AirSense
+
+Remote Control
+
+Error Code
+
+FAQ
+
+Configuration Update
+
+2025-06-08
+
+No Rating
+Github Edit open in new window
+
+Get configuration
+
+# Requests
+
+# Get configuration
+
+Topic: thing/product/{gateway_sn}/requests
+
+Direction: up
+
+Method: config
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+config_type
+
+Configuration type
+
+enum_string
+
+{"json":"JSON format"}
+
+config_scope
+
+Configuration scope
+
+enum_string
+
+{"product":"Product dimension"}
+
+Example:
+
+{
+"bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+"data": {
+"config_scope": "product",
+"config_type": "json"
+},
+"gateway": "sn",
+"tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+"timestamp": 1667803298000,
+"method": "config"
+}
+
+Topic: thing/product/{gateway_sn}/requests_reply
+
+Direction: down
+
+Method: config
+
+Data:
+
+Column
+
+Name
+
+Type
+
+Constraint
+
+Description
+
+ntp_server_host
+
+NTP service host
+
+text
+
+{"length":""}
+
+app_id
+
+The ID of the app created on the DJI Developer Websiteopen in new window.
+
+text
+
+{"length":""}
+
+app_key
+
+The key of the app created on the DJI Developer Websiteopen in new window.
+
+text
+
+{"length":""}
+
+app_license
+
+The license of the app created on the DJI Developer Websiteopen in new window.
+
+text
+
+{"length":""}
+
+ntp_server_port
+
+NTP server port number
+
+int
+
+{"max":"","min":"","step":"","unit_name":null}
+
+If this field is not included in the request, the default NTP port number is 123
+
+Example:
+
+{
+"bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+"data": {
+"app_id": "123456",
+"app_key": "app_key",
+"app_license": "app_license",
+"ntp_server_host": "host_url",
+"ntp_server_port": 456
+},
+"gateway": "sn",
+"tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+"timestamp": 1667803298000,
+"method": "config"
+}
+
+Github Edit open in new window
+
+Last Updated: 6/8/2025, 11:56:43 PM
+
+Remote Log Live Flight Controls
+
+How was your reading experience of our documentation?
+
+Get configuration
+
+Documentation Feedback
+
+
+
+
+If you have any comments or confusion about our documentation, you can click here to give feedback and we will get back to you as soon as possible.
+OK

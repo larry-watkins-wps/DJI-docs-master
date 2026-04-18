@@ -1,0 +1,357 @@
+==============================================================================
+DJI Cloud API -- Dock 3 FlySafe / Unlocking Services
+==============================================================================
+
+Source:    https://developer.dji.com/doc/cloud-api-tutorial/en/api-reference/
+           dock-to-cloud/mqtt/dock/dock3/flysafe.html
+Platform:  Dock 3 (DJI Dock 3 + Matrice 4 series)
+Protocol:  MQTT (dock-to-cloud)
+Category:  FlySafe / Unlocking
+
+This document covers the FlySafe unlocking services available via MQTT for
+the Dock 3 platform. These services allow enabling/disabling individual
+unlocking licenses, updating licenses (online or offline), and retrieving
+the full list of licenses on a device.
+
+==============================================================================
+
+SERVICE
+-------
+
+==============================================================================
+## Enable/disable the device's individual unlocking license
+==============================================================================
+
+  [Request]
+  Topic:     thing/product/{gateway_sn}/services
+  Direction: down
+  Method:    unlock_license_switch
+
+  Data:
+
+    Column      Name                                        Type  constraint                                      Description
+    ----------  ------------------------------------------  ----  ----------------------------------------------  -----------
+    license_id  Unique identifier of the unlocking license  int   {"max":"","min":"","step":"","unit_name":null}
+    enable      Whether to enable or not                    bool  {"0":"Not Enabled","1":"Enabled"}
+
+  Example:
+
+    {
+        "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "data": {
+            "enable": true,
+            "license_id": 240330
+        },
+        "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "timestamp": 1654070968655
+    }
+
+  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+  [Reply]
+  Topic:     thing/product/{gateway_sn}/services_reply
+  Direction: up
+  Method:    unlock_license_switch
+
+  Data:
+
+    Column      Name                                        Type  constraint                                      Description
+    ----------  ------------------------------------------  ----  ----------------------------------------------  ----------------------------
+    result      Return code                                 int   {"max":"","min":"","step":"","unit_name":null}  Non-zero represents an error
+    license_id  Unique identifier of the unlocking license  int   {"max":"","min":"","step":"","unit_name":null}
+
+  Example:
+
+    {
+        "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "data": {
+            "license_id": 240330,
+            "result": 0
+        },
+        "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "timestamp": 1234567890123
+    }
+
+==============================================================================
+## Update the device's unlocking license
+==============================================================================
+
+  [Request]
+  Topic:     thing/product/{gateway_sn}/services
+  Direction: down
+  Method:    unlock_license_update
+
+  Data:
+
+    Column        Name                  Type    constraint  Description
+    ------------  --------------------  ------  ----------  ------------------------------------------------------------
+    file          Offline license file  struct              Optional. Update with the latest license from the Flysafe...
+    »url          File URL              text
+    »fingerprint  File signature        text                File MD5 signature
+
+  Example:
+
+    {
+        "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "data": {
+            "file": {
+                "fingerprint": "xxxx",
+                "url": "https://xx.oss-cn-hangzhou.aliyuncs.com/xx.kmz?Expires=xx&OSSAccessKeyId=xxx&Signature=xxx"
+            }
+        },
+        "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "timestamp": 1654070968655
+    }
+
+  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+  [Reply]
+  Topic:     thing/product/{gateway_sn}/services_reply
+  Direction: up
+  Method:    unlock_license_update
+
+  Data:
+
+    Column  Name         Type  constraint                                      Description
+    ------  -----------  ----  ----------------------------------------------  ----------------------------
+    result  Return code  int   {"max":"","min":"","step":"","unit_name":null}  Non-zero represents an error
+
+  Example:
+
+    {
+        "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "data": {
+            "result": 0
+        },
+        "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "timestamp": 1234567890123
+    }
+
+==============================================================================
+## Get the device's unlocking license list
+==============================================================================
+
+  [Request]
+  Topic:     thing/product/{gateway_sn}/services
+  Direction: down
+  Method:    unlock_license_list
+
+  Data:
+
+    Column               Name                                   Type      constraint                   Description
+    -------------------  -------------------------------------  --------  ---------------------------  ------------------------------------------------------------
+    device_model_domain  Designated license retrieval location  enum_int  {"0":"Aircraft","3":"Dock"}  Retrieval from the aircraft refers to the successfully im...
+
+  Example:
+
+    {
+        "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "data": {
+            "device_model_domain": 0
+        },
+        "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "timestamp": 1654070968655
+    }
+
+  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+  [Reply]
+  Topic:     thing/product/{gateway_sn}/services_reply
+  Direction: up
+  Method:    unlock_license_list
+
+  Data:
+
+    Column               Name                                                         Type      constraint                                                    Description
+    -------------------  -----------------------------------------------------------  --------  ------------------------------------------------------------  ------------------------------------------------------------
+    result               Return code                                                  int       {"max":"","min":"","step":"","unit_name":null}                Non-zero represents an error
+    device_model_domain  Designated license retrieval location                        enum_int  {"0":"Aircraft","3":"Dock"}                                   Retrieval from the aircraft refers to the successfully im...
+    consistence          License consistency                                          bool      {"0":"Inconsistent","1":"Consistent"}                         Whether the currently imported licenses on the aircraft m...
+    licenses             License list                                                 array     {"size": -, "item_type": struct}
+    »common_fields       Common information                                           struct
+    »»license_id         Unique identifier of the unlocking license                   int       {"max":"","min":"","step":"","unit_name":null}
+    »»name               Unlocking license name                                       text      {"length":""}
+    »»type               Unlocking license type                                       enum_int  {"0":"Authorization Zone Unlocked","1":"Custom Circular A...
+    »»group_id           Unique identifier of the group where the license is located  int       {"max":"","min":"","step":"","unit_name":null}                All licenses applied for by a user account for a device b...
+    »»user_id            Account of the user to whom the license belongs              text      {"length":""}                                                 Applying for an unlocking license on the Flysafe website ...
+    »»device_sn          Device serial number (SN) bound to the license               text      {"length":""}
+    »»begin_time         Start timestamp of validity period                           int       {"max":"","min":"","step":"","unit_name":null}                Second-level UNIX timestamp
+    »»end_time           Expiration timestamp                                         int       {"max":"","min":"","step":"","unit_name":null}                Second-level UNIX timestamp
+    »»user_only          Whether to verificate the user account                       bool      {"0":"Not Required","1":"Required"}
+    »»enabled            Whether to enable or not                                     bool      {"0":"Not Enabled","1":"Enabled"}
+    »area_unlock         Authorization zone unlocking license information             struct
+    »»area_ids           Collection of area identifiers                               array     {"size": -, "item_type": enum_int}
+    »circle_unlock       Custom circular area unlocking license information           struct
+    »»radius             Area radius                                                  int       {"unit":"meters / m"}
+    »»latitude           Center latitude                                              double    {"max":90,"min":-90}                                          Angle value, negative for south latitude, positive for no...
+    »»longitude          Center Longitude                                             double    {"max":180,"min":-180}                                        Angle value, positive for east longitude, negative for we...
+    »»height             Altitude limit                                               int       {"max":65535,"min":0,"unit":"Meters / m"}
+    »country_unlock      Country/region unlocking license information                 struct
+    »»country_number     Country/region numeric code                                  enum_int  {}                                                            See ISO_3166-1 international standard (https://en.wikiped...
+    »»height             Altitude limit                                               int       {"max":65535,"min":0,"unit":"Meters / m"}
+    »height_unlock       Altitude limit unlocking license information                 struct
+    »»height             Altitude limit                                               int       {"max":65535,"min":0,"unit":"Meters / m"}
+    »polygon_unlock      Custom polygon area unlocking license information            struct
+    »»points             Collection of polygon vertex GPS coordinates                 array     {"size": -, "item_type": struct}
+    »»»latitude          Latitude                                                     double    {"max":90,"min":-90}                                          Angle value, negative for south latitude, positive for no...
+    »»»longitude         Longitude                                                    double    {"max":180,"min":-180}                                        Angle value, positive for east longitude, negative for we...
+    »power_unlock        Power unlocking license information                          struct
+    »rid_unlock          RID unlocking license information                            struct
+    »»level              RID type                                                     enum_int  {"1":"EU RID Unlocked","2":"China RID Unlocked"}
+
+  Example:
+
+    {
+        "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "data": {
+            "consistence": false,
+            "device_model_domain": 0,
+            "licenses": [
+                {
+                    "area_unlock": {
+                        "area_ids": [
+                            115001769,
+                            8724
+                        ]
+                    },
+                    "common_fields": {
+                        "begin_time": 1696948115,
+                        "device_sn": "xxxxxxxxx",
+                        "enabled": true,
+                        "end_time": 2145916800,
+                        "group_id": 2896,
+                        "license_id": 240330,
+                        "name": "Unlocking for XXX Area",
+                        "type": 0,
+                        "user_id": "xxxxxxxxx",
+                        "user_only": false
+                    }
+                },
+                {
+                    "circle_unlock": {
+                        "height": 500,
+                        "latitude": 22.60309,
+                        "longitude": 113.947815,
+                        "radius": 1581
+                    },
+                    "common_fields": {
+                        "begin_time": 1696948115,
+                        "device_sn": "xxxxxxxxx",
+                        "enabled": false,
+                        "end_time": 2145916800,
+                        "group_id": 2896,
+                        "license_id": 240331,
+                        "name": "Unlocking for XXX Circular Area",
+                        "type": 1,
+                        "user_id": "xxxxxxxxx",
+                        "user_only": false
+                    }
+                },
+                {
+                    "common_fields": {
+                        "begin_time": 1696948115,
+                        "device_sn": "xxxxxxxxx",
+                        "enabled": false,
+                        "end_time": 2145916800,
+                        "group_id": 2896,
+                        "license_id": 240332,
+                        "name": "Unlocking for China Country/Region",
+                        "type": 2,
+                        "user_id": "xxxxxxxxx",
+                        "user_only": false
+                    },
+                    "country_unlock": {
+                        "country_number": 156,
+                        "height": 500
+                    }
+                },
+                {
+                    "common_fields": {
+                        "begin_time": 1696948115,
+                        "device_sn": "xxxxxxxxx",
+                        "enabled": false,
+                        "end_time": 2145916800,
+                        "group_id": 2896,
+                        "license_id": 240333,
+                        "name": "Unlocking for XXX Altitude",
+                        "type": 3,
+                        "user_id": "xxxxxxxxx",
+                        "user_only": false
+                    },
+                    "height_unlock": {
+                        "height": 500
+                    }
+                },
+                {
+                    "common_fields": {
+                        "begin_time": 1696948115,
+                        "device_sn": "xxxxxxxxx",
+                        "enabled": false,
+                        "end_time": 2145916800,
+                        "group_id": 2896,
+                        "license_id": 240334,
+                        "name": "Unlocking for XXX Polygon Area",
+                        "type": 4,
+                        "user_id": "xxxxxxxxx",
+                        "user_only": false
+                    },
+                    "polygon_unlock": {
+                        "points": [
+                            {
+                                "latitude": 22.55403932,
+                                "longitude": 113.90488828
+                            },
+                            {
+                                "latitude": 22.55520018,
+                                "longitude": 113.92180215
+                            },
+                            {
+                                "latitude": 22.54656858,
+                                "longitude": 113.92051272
+                            }
+                        ]
+                    }
+                },
+                {
+                    "common_fields": {
+                        "begin_time": 1696948115,
+                        "device_sn": "xxxxxxxxx",
+                        "enabled": false,
+                        "end_time": 2145916800,
+                        "group_id": 2896,
+                        "license_id": 240335,
+                        "name": "Unlocking for XXX Power",
+                        "type": 5,
+                        "user_id": "xxxxxxxxx",
+                        "user_only": false
+                    },
+                    "power_unlock": {}
+                },
+                {
+                    "common_fields": {
+                        "begin_time": 1696948115,
+                        "device_sn": "xxxxxxxxx",
+                        "enabled": false,
+                        "end_time": 2145916800,
+                        "group_id": 2896,
+                        "license_id": 240336,
+                        "name": "Unlocking for XXX RID",
+                        "type": 6,
+                        "user_id": "xxxxxxxxx",
+                        "user_only": false
+                    },
+                    "rid_unlock": {
+                        "level": 1
+                    }
+                }
+            ],
+            "result": 0
+        },
+        "gateway": "",
+        "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+        "timestamp": 1654070968655
+    }
+
+==============================================================================
+End of document
+==============================================================================

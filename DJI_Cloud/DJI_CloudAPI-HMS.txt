@@ -1,0 +1,238 @@
+Event | Cloud API
+Cloud API v1.15
+Languages Languages English
+中文
+Search K
+v1.15
+Languages Languages English
+中文
+Release Notes
+Tutorial Reading Guide
+Flight Safety Notification
+Basic Introduction
+Product Introduction
+Product Architecture
+Product Supported
+Basic Concept
+Noun Explanation
+MQTT
+Thing Model
+HTTPS
+WebSocket
+JSBridge
+Quick Start
+Environment Preparation List
+Source Code Deployment Steps
+Docker Deployment Steps
+Function Display Video
+Function Set
+Pilot Function Set
+Access to the Cloud Server
+Situation Awareness
+Live Stream
+Map Elements
+Media Management
+Wayline Management
+Obtain Log via JSBridge
+Pilot Launch Third-party App
+Live Flight Controls/Remote Control
+Dock Function Set
+Access to the Cloud Server
+Device Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Live Flight Controls/Remote Control
+Custom Flight Area
+Multi-dock Task
+AI Target Recognition
+Debugging Methods
+Pilot Webview Debugging
+Log Export
+MQTTX
+API Reference
+DJI WPML
+Overview
+Template.kml
+Waylines.wpml
+Common Elements
+Pilot to Cloud
+MQTT
+Topic Definition
+Mavic 3 Enterprise Series
+Properties
+DJI RC Pro Enterprise
+Properties
+Device Management
+Live Stream
+Live Flight Controls
+Remote Control
+DJI Matrice 4 Series
+Properties
+DJI RC Plus 2 Enterprise
+Properties
+Device Management
+Live Stream
+Live Flight Controls
+Remote Control
+DJI Matrice 400
+Properties
+Other Models
+Aircraft
+Properties
+Remote Controller
+Properties
+Device Management
+Live Stream
+HTTPS
+Map Elements
+Create Map Elements
+Update Map Elements
+Obtain Map Elements
+Delete Map Elements
+Wayline Management
+Obtain Wayline List
+Obtain Temporary Credential
+Obtain Wayline File Download Address
+Obtain Duplicated Wayline Name
+Obtain File Upload Result Report
+Batch Favorites Wayline
+Batch Unfavorite Wayline
+Media Management
+Media Fast Upload
+Obtain Exist File Tiny Fingerprint
+Obtain Temporary Credential
+App Reports File Upload Result
+Callback after the File Group Upload Complete
+Situation Awareness
+Obtain Device Topology List
+WebSocket
+Map Elements
+Push Message
+Situation Awareness
+Push Message
+JSBridge
+Dock to Cloud
+MQTT
+Topic Definition
+Aircraft
+M30/M30T Properties
+M3D/M3TD Properties
+M4D/M4TD Properties
+Dock
+DJI Dock
+Properties
+Device Management
+Organization Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Configuration Update
+Live Flight Controls
+AirSense
+Custom Flight Area
+PSDK Function
+PSDK Interconnection
+ESDK Interconnection
+Remote Unlocking
+DJI Dock 2
+Properties
+Device Management
+Organization Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Configuration Update
+Live Flight Controls
+AirSense
+Custom Flight Area
+PSDK Function
+PSDK Interconnection
+ESDK Interconnection
+Remote Unlocking
+Remote Control
+DJI Dock 3
+Properties
+Device Management
+Organization Management
+Live Stream
+Media Management
+Wayline Management
+HMS Function
+Remote Debugging
+Firmware Upgrade
+Remote Log
+Configuration Update
+Live Flight Controls
+Custom Flight Area
+PSDK Function
+PSDK Interconnection
+ESDK Interconnection
+Remote Unlocking
+AirSense
+Remote Control
+Error Code
+FAQ
+HMS Function
+2025-03-12
+No Rating Github Edit open in new window
+Health warning
+# Event
+# Health warning
+Topic: thing/product/ {gateway_sn} /events
+Direction: up
+Method: hms
+Data:
+Column Name Type Constraint Description
+list Health warning list array {"size": 20, "item_type": struct}
+»level Warning level enum_int {"0":"Notification","1":"Reminder","2":"Warning"}
+»module Event module enum_int {"0":"Flight mission","1":"Device management","2":"Media","3":"HMS"}
+»in_the_sky Whether aircraft is in flight enum_int {"0":"On the ground","1":"In the sky"}
+»code Warning code text {"length":"10240"}
+»device_type Device type text The format is {domain-type-subtype} . Refer to Product Supported open in new window .
+»imminent Whether it is imminent enum_int {"0":"No","1":"Yes"} It indicates whether it is a imminent warning. For example, if the wind is too strong, the warning will automatically disappear as the wind decreases.
+»args Parameters struct
+»»component_index Copywriting variable int {"length":"10240"} It needs to be filled in the variable within the 'Alarm copy query json file', hms.json open in new window .
+»»sensor_index Copywriting variable int {"length":"10240"}
+Example:
+{
+"bid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"data" : {
+"list" : [
+{
+"args" : {
+"component_index" : 0 ,
+"sensor_index" : 0
+} ,
+"code" : "0x16100083" ,
+"device_type" : "0-67-0" ,
+"imminent" : 1 ,
+"in_the_sky" : 0 ,
+"level" : 2 ,
+"module" : 3
+}
+]
+} ,
+"tid" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx" ,
+"timestamp:" : 1654070968655 ,
+"method" : "hms"
+}
+Github Edit open in new window
+Last Updated: 3/12/2025, 9:09:23 PM
+Wayline Management Remote Debugging
+How was your reading experience of our documentation?
+Health warning
+Documentation Feedback
+If you have any comments or confusion about our documentation, you can click here to give feedback and we will get back to you as soon as possible. OK

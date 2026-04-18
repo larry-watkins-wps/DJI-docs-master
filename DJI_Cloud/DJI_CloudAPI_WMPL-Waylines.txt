@@ -1,0 +1,936 @@
+Cloud API
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+SearchK
+
+v1.15
+
+LanguagesLanguages
+English
+
+中文
+
+Release Notes
+
+Tutorial Reading Guide
+
+Flight Safety Notification
+
+Basic Introduction
+
+Product Introduction
+
+Product Architecture
+
+Product Supported
+
+Basic Concept
+
+Noun Explanation
+
+MQTT
+
+Thing Model
+
+HTTPS
+
+WebSocket
+
+JSBridge
+
+Quick Start
+
+Environment Preparation List
+
+Source Code Deployment Steps
+
+Docker Deployment Steps
+
+Function Display Video
+
+Function Set
+
+Pilot Function Set
+
+Access to the Cloud Server
+
+Situation Awareness
+
+Live Stream
+
+Map Elements
+
+Media Management
+
+Wayline Management
+
+Obtain Log via JSBridge
+
+Pilot Launch Third-party App
+
+Live Flight Controls/Remote Control
+
+Dock Function Set
+
+Access to the Cloud Server
+
+Device Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Live Flight Controls/Remote Control
+
+Custom Flight Area
+
+Multi-dock Task
+
+AI Target Recognition
+
+Debugging Methods
+
+Pilot Webview Debugging
+
+Log Export
+
+MQTTX
+
+API Reference
+
+DJI WPML
+
+Overview
+
+Template.kml
+
+Waylines.wpml
+
+Common Elements
+
+Pilot to Cloud
+
+MQTT
+
+Topic Definition
+
+Mavic 3 Enterprise Series
+
+Properties
+
+DJI RC Pro Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 4 Series
+
+Properties
+
+DJI RC Plus 2 Enterprise
+
+Properties
+
+Device Management
+
+Live Stream
+
+Live Flight Controls
+
+Remote Control
+
+DJI Matrice 400
+
+Properties
+
+Other Models
+
+Aircraft
+
+Properties
+
+Remote Controller
+
+Properties
+
+Device Management
+
+Live Stream
+
+HTTPS
+
+Map Elements
+
+Create Map Elements
+
+Update Map Elements
+
+Obtain Map Elements
+
+Delete Map Elements
+
+Wayline Management
+
+Obtain Wayline List
+
+Obtain Temporary Credential
+
+Obtain Wayline File Download Address
+
+Obtain Duplicated Wayline Name
+
+Obtain File Upload Result Report
+
+Batch Favorites Wayline
+
+Batch Unfavorite Wayline
+
+Media Management
+
+Media Fast Upload
+
+Obtain Exist File Tiny Fingerprint
+
+Obtain Temporary Credential
+
+App Reports File Upload Result
+
+Callback after the File Group Upload Complete
+
+Situation Awareness
+
+Obtain Device Topology List
+
+WebSocket
+
+Map Elements
+
+Push Message
+
+Situation Awareness
+
+Push Message
+
+JSBridge
+
+Dock to Cloud
+
+MQTT
+
+Topic Definition
+
+Aircraft
+
+M30/M30T Properties
+
+M3D/M3TD Properties
+
+M4D/M4TD Properties
+
+Dock
+
+DJI Dock
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+DJI Dock 2
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+AirSense
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+Remote Control
+
+DJI Dock 3
+
+Properties
+
+Device Management
+
+Organization Management
+
+Live Stream
+
+Media Management
+
+Wayline Management
+
+HMS Function
+
+Remote Debugging
+
+Firmware Upgrade
+
+Remote Log
+
+Configuration Update
+
+Live Flight Controls
+
+Custom Flight Area
+
+PSDK Function
+
+PSDK Interconnection
+
+ESDK Interconnection
+
+Remote Unlocking
+
+AirSense
+
+Remote Control
+
+Error Code
+
+FAQ
+
+Waylines.wpml
+
+2025-03-12
+4.5 Ratings
+2 customers rated
+Github Edit open in new window
+
+File Introduction
+
+Element Introduction
+
+# File Introduction
+
+The waylines.wpml file consists of two parts.
+
+Mission information: Contains mainly the wpml:missionConfig element, which defines the global parameters of the waylines mission, etc.
+
+Waylines information: Contains mainly Folder elements, which define detailed waylines information (path definition, action definition, etc.). Each Folder represents an executable route. In particular, when using the "mapping3d" template, 5 executable routes are generated, corresponding to the 5 Folder elements in waylines.wpml.
+
+# File Sample
+
+waylines.wpml The sample file is as follows.
+
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:wpml="http://www.dji.com/wpmz/1.0.2">
+<Document>
+<!-- Step 1: Setup Mission Configuration -->
+<wpml:missionConfig>
+<wpml:flyToWaylineMode>safely</wpml:flyToWaylineMode>
+<wpml:finishAction>goHome</wpml:finishAction>
+<wpml:exitOnRCLost>goContinue</wpml:exitOnRCLost>
+<wpml:executeRCLostAction>hover</wpml:executeRCLostAction>
+<wpml:takeOffSecurityHeight>20</wpml:takeOffSecurityHeight>
+<wpml:globalTransitionalSpeed>10</wpml:globalTransitionalSpeed>
+<!-- Declare drone model with M30 -->
+<wpml:droneInfo>
+<wpml:droneEnumValue>67</wpml:droneEnumValue>
+<wpml:droneSubEnumValue>0</wpml:droneSubEnumValue>
+</wpml:droneInfo>
+<!-- Declare drone model with M30 -->
+<wpml:payloadInfo>
+<wpml:payloadEnumValue>52</wpml:payloadEnumValue>
+<wpml:payloadPositionIndex>0</wpml:payloadPositionIndex>
+</wpml:payloadInfo>
+</wpml:missionConfig>
+
+<!-- Step 2: Setup A Folder for Waypoint Template -->
+<Folder>
+<wpml:templateId>0</wpml:templateId>
+<wpml:executeHeightMode>WGS84</wpml:executeHeightMode>
+<wpml:waylineId>0</wpml:waylineId>
+<wpml:autoFlightSpeed>10</wpml:autoFlightSpeed>
+<Placemark>
+<Point>
+<coordinates>
+longitude,latitude
+</coordinates>
+</Point>
+<wpml:index>0</wpml:index>
+<wpml:executeHeight>116.57</wpml:executeHeight>
+<wpml:waypointSpeed>10</wpml:waypointSpeed>
+<wpml:waypointHeadingParam>
+<wpml:waypointHeadingMode>followWayline</wpml:waypointHeadingMode>
+</wpml:waypointHeadingParam>
+<wpml:waypointTurnParam>
+<wpml:waypointTurnMode>toPointAndStopWithDiscontinuityCurvature</wpml:waypointTurnMode>
+<wpml:waypointTurnDampingDist>0</wpml:waypointTurnDampingDist>
+</wpml:waypointTurnParam>
+</Placemark>
+<Placemark>
+<Point>
+<coordinates>
+longitude,latitude
+</coordinates>
+</Point>
+<wpml:index>1</wpml:index>
+<wpml:executeHeight>116.57</wpml:executeHeight>
+<wpml:waypointSpeed>7</wpml:waypointSpeed>
+<wpml:waypointHeadingParam>
+<wpml:waypointHeadingMode>followWayline</wpml:waypointHeadingMode>
+</wpml:waypointHeadingParam>
+<wpml:waypointTurnParam>
+<wpml:waypointTurnMode>toPointAndStopWithDiscontinuityCurvature</wpml:waypointTurnMode>
+<wpml:waypointTurnDampingDist>0</wpml:waypointTurnDampingDist>
+</wpml:waypointTurnParam>
+<!-- Declare action group for waypoint 1# -->
+<wpml:actionGroup>
+<wpml:actionGroupId>0</wpml:actionGroupId>
+<wpml:actionGroupStartIndex>1</wpml:actionGroupStartIndex>
+<wpml:actionGroupEndIndex>1</wpml:actionGroupEndIndex>
+<wpml:actionGroupMode>sequence</wpml:actionGroupMode>
+<wpml:actionTrigger>
+<wpml:actionTriggerType>reachPoint</wpml:actionTriggerType>
+</wpml:actionTrigger>
+<!-- Declare the 1st action: rotate gimbal -->
+<wpml:action>
+<wpml:actionId>0</wpml:actionId>
+<wpml:actionActuatorFunc>gimbalRotate</wpml:actionActuatorFunc>
+<wpml:actionActuatorFuncParam>
+<wpml:gimbalRotateMode>absoluteAngle</wpml:gimbalRotateMode>
+<wpml:gimbalPitchRotateEnable>0</wpml:gimbalPitchRotateEnable>
+<wpml:gimbalPitchRotateAngle>0</wpml:gimbalPitchRotateAngle>
+<wpml:gimbalRollRotateEnable>0</wpml:gimbalRollRotateEnable>
+<wpml:gimbalRollRotateAngle>0</wpml:gimbalRollRotateAngle>
+<wpml:gimbalYawRotateEnable>1</wpml:gimbalYawRotateEnable>
+<wpml:gimbalYawRotateAngle>30</wpml:gimbalYawRotateAngle>
+<wpml:gimbalRotateTimeEnable>0</wpml:gimbalRotateTimeEnable>
+<wpml:gimbalRotateTime>0</wpml:gimbalRotateTime>
+<wpml:payloadPositionIndex>0</wpml:payloadPositionIndex>
+</wpml:actionActuatorFuncParam>
+</wpml:action>
+<!-- Declare the 2nd action: take photo -->
+<wpml:action>
+<wpml:actionId>1</wpml:actionId>
+<wpml:actionActuatorFunc>takePhoto</wpml:actionActuatorFunc>
+<wpml:actionActuatorFuncParam>
+<wpml:fileSuffix>point1</wpml:fileSuffix>
+<wpml:payloadPositionIndex>0</wpml:payloadPositionIndex>
+</wpml:actionActuatorFuncParam>
+</wpml:action>
+</wpml:actionGroup>
+</Placemark>
+</Folder>
+
+</Document>
+</kml>
+
+# Element Introduction
+
+# Mission Information(Parent Element:<wpml:missionConfig>)
+
+Element
+
+Name
+
+Type
+
+unit
+
+Value
+
+Is it required (default)
+
+Product Support
+
+wpml:flyToWaylineMode
+
+Fly to first point mode
+
+enum
+
+-
+
+safely: (M300)The aircraft takes off, rises to the altitude of the first waypoint, and then flies level to the first waypoint. If the first waypoint is lower than the take-off point, after takeoff, it will level fly to the top of the first waypoint and then descend.
+(M30)The aircraft takes off, rises to the altitude of the first waypoint, and then flies level to the first waypoint. If the first waypoint is lower than the "safe take-off altitude", after taking off to the "safe take-off altitude", level flight to the first waypoint and then descend. Note that the "safe takeoff altitude" only takes effect when the aircraft is not taking off.
+
+pointToPoint
+(M300)After the aircraft takes off, it tilts to the first waypoint.
+(M30)The aircraft takes off to the "safe takeoff altitude", and then tilts to the first waypoint. If the altitude of the first waypoint is lower than the "safe take-off altitude", it will first level flight and then descend.
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:finishAction
+
+finish action
+
+enum
+
+-
+
+goHome: After the aircraft completes the waylines mission, exit the waylines mode and go home.
+noAction: After the aircraft completes the waylines mission, exit the waylines mode.
+autoLand: After the aircraft completes the waylines mission, exit the waylines mode and land on the spot.
+gotoFirstWaypoint: After the aircraft completes the waylines mission, it immediately flies to the first point of the waylines, and exits the waylines mode when it arrives.
+Note: During the above actions, if the aircraft exits the waylines mode and enters the runaway state, the runaway action will be executed first.
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:exitOnRCLost
+
+Whether to continue the waylines if out of control
+
+enum
+
+-
+
+goContinue
+executeLostAction: Exit the waylines mode and execute a runaway action.
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:executeRCLostAction
+
+Type of runaway action
+
+enum
+
+-
+
+goBack: The aircraft flies from the out-of-control position to the take-off point.
+landing: The aircraft landed on the spot in an out-of-control position.
+hover: The aircraft is hovering in an out-of-control position.
+
+None. When the wpml:exitOnRCLost is executeLostAction, it is required.
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:takeOffSecurityHeight
+
+Safe take-off height
+
+float
+
+m
+
+For the remote controller, the value range is [1.2,1500]. For the dock, the value range is [8,1500]. (height mode: height relative to take-off point)
+Note: After take-off, the aircraft will ascend to this altitude and then fly to the first waypoint according to the "Fly to first waypoint mode" setting. This element is only valid when the aircraft is not taking off.
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:globalTransitionalSpeed
+
+global transitional speed
+
+float
+
+m/s
+
+[0,15]
+Note: The speed at which the drone flies to the first waypoint of each waylines. The speed at which the drone resumes from its current position to the break point when the waylines mission is interrupted.
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:globalRTHHeight
+
+global RTH height
+
+float
+
+m
+
+[2,1500] Note: When returning to home, the aircraft climbs to this height first.
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:droneInfo
+
+drone information
+
+-
+
+-
+
+Note: Please read detailed information at Common Elementsopen in new window
+
+-
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:payloadInfo
+
+payload information
+
+-
+
+-
+
+Note: Please read detailed information at Common Elementsopen in new window
+
+-
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:autoRerouteInfo
+
+Wayline reroute information
+
+-
+
+-
+
+-
+
+-
+
+M3D/M3TD, M4E/M4T
+
+# Waylines Information(Parent Element:<Folder>)
+
+Element
+
+Name
+
+Type
+
+unit
+
+Value
+
+Is it required (default)
+
+Product Support
+
+wpml:templateId
+
+template id
+Note: The ID is unique within a kmz file. It is recommended to increment it monotonically and continuously from 0. This id will be used in the template.kml and waylines.wpml files to associate the template with the generated executable waylines.
+
+int
+
+-
+
+[0, 65535]
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:waylineId
+
+waylines ID
+Note: The ID is unique within a kmz file. It is recommended to increment it monotonically and continuously from 0.
+
+int
+
+-
+
+[0, 65535]
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:autoFlightSpeed
+
+Global waylines flight speed
+
+float
+
+m/s
+
+(0, Maximum flight speed of the current drone]
+Note: The maximum flight speed of different drones is different. This element defines the target flight speed of the aircraft in the entire wayline generated by this template. If this element of a waypoint is additionally defined, the local definition overrides the global definition.
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:executeHeightMode
+
+Execute height mode
+Note: This element is only used in waylines.wpml.
+
+enum
+
+-
+
+WGS84: Ellipsoid height model.
+relativeToStartPoint: Relative take-off point altitude model.
+realTimeFollowSurface: Using real-time follow surface mode. Only supported by M3E/M3T/M3M.
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+Placemark(Point)
+
+Waypoint information (including waypoint latitude, longitude, altitude, etc.)
+
+-
+
+-
+
+Please read the tutorial content, DJI WPML > Template.kml > Placemark(Point)
+
+-
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:startActionGroup
+
+Wayline initial action
+*Note: This element is used to plan a series of initial actions, which is executed before the wayline starts. When the interruption of wayline is recovered, the initial action is executed before the waypoint action.
+
+-
+
+-
+
+For more information,please read <wpml:actionGroup> in Common Elementsopen in new window
+
+-
+
+M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+# Waypoint Info (<Placemark>)
+
+Element
+
+Name
+
+Type
+
+unit
+
+Value
+
+Is it required (default)
+
+Product Support
+
+wpml:isRisky
+
+Whether is risky point
+
+bool
+
+-
+
+0: Normal point, 1: Risky point
+
+-
+
+M30/M30T, M3D/M3TD, M4E/M4T
+
+Point
+
+The format is as follows.<Point> <coordinates> Longitude, Latitude </coordinates> </Point>
+
+float
+
+°,°
+
+[-180,180],[-90,90]
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:index
+
+Waypoint number.
+Note: This ID is unique within a route. The sequence number must be monotonously and continuously increasing from 0.
+
+int
+
+-
+
+[0, 65535]
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:executeHeight
+
+Execution altitude of waypoint.
+Note: This element is only used in waylines.wpml. The specific elevation reference plane is declared in "wpml:executeHeightMode".
+
+float
+
+m
+
+-
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:waypointSpeed
+
+Waypoint flight speed. Speed of drone flying from current waypoint to the next waypoint.
+
+float
+
+m/s
+
+(0, Maximum flight speed of this drone]
+Note: Maximum flight speed varies between drones
+
+Yes
+Note: Required if "wpml:useGlobalSpeed" is 0.
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:waypointHeadingParam
+
+waypoint heading param
+
+-
+
+-
+
+-
+
+Yes
+Note: Required if “wpml:useGlobalHeadingParam” is 0.
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:waypointTurnParam
+
+waypoint turn param
+
+-
+
+-
+
+-
+
+Yes
+
+M300 RTK, M350 RTK, M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+wpml:useStraightLine
+
+Whether the segment fits a straight line
+
+bool
+
+-
+
+0: The whole trajectory of the segment is curved
+1: The segment trajectory is as close to the line of two points as possible.
+
+Yes
+Note: Required if "waypointTurnMode" in "wpml:waypointTurnParam" is set to "toPointAndStopWithContinuityCurvature" or "toPointAndPassWithContinuityCurvature". If this element is set, local definitions override global definitions.
+
+M30/M30T, M3E/M3T/M3M, M3D/M3TD, M4E/M4T
+
+Github Edit open in new window
+
+Last Updated: 3/12/2025, 9:09:23 PM
+
+Template.kml Common Elements
+
+How was your reading experience of our documentation?
+
+File Introduction
+
+Element Introduction
+
+Documentation Feedback
+
+
+
+
+If you have any comments or confusion about our documentation, you can click here to give feedback and we will get back to you as soon as possible.
+OK
