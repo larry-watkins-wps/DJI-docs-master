@@ -99,7 +99,8 @@ The reply is a plain ACK — it does **not** carry per-file upload status. The a
 ## Relationship to other methods
 
 - Typically preceded by [`fileupload_list`](fileupload_list.md) (to choose `boot_index` values).
-- Followed by [`fileupload_progress`](../events/fileupload_progress.md) events until the batch finishes — but the correlation key is not documented by DJI; see [`OPEN-QUESTIONS.md` OQ-005](../../../OPEN-QUESTIONS.md#oq-005--fileupload_start--fileupload_progress-correlation-key-is-undocumented).
+- Followed by [`fileupload_progress`](../events/fileupload_progress.md) events until the batch finishes.
+- **Correlation key from start to progress is `params.files[].object_key`** (not `bid`). The cloud should record the `object_key` values it issues in this command and match each incoming `fileupload_progress.output.ext.files[].key` against them. `fingerprint` is a secondary cross-check. DJI does not guarantee `bid` reuse across the two messages, so `bid` must not be the primary correlation mechanism. Resolved as [OQ-005](../../../OPEN-QUESTIONS.md#oq-005--fileupload_start--fileupload_progress-correlation-key-is-undocumented) 2026-04-19.
 - Cancelled via [`fileupload_update`](fileupload_update.md) with `status: cancel`.
 - The credential bundle shape overlaps with [`storage_config_get`](../requests/storage_config_get.md) (which the dock uses for media, not logs). `fileupload_start` is cloud-initiated with a pre-chosen file list; `storage_config_get` is dock-initiated and returns only credentials.
 

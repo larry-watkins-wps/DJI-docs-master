@@ -49,8 +49,8 @@ Part of the Phase 4 MQTT catalog. Shared conventions (envelope, services-reply) 
 | `files[].result` | int | Per-module result (non-zero = that module failed to enumerate). |
 | `files[].list` | array of struct | One entry per boot/session. |
 | `files[].list[].boot_index` | int | Boot session index — the device's internal counter that identifies which boot produced the log slice. |
-| `files[].list[].start_time` | int | Start of the log window. **Unit is inconsistent across sources** — the v1.11 Dock 2 and v1.15 Dock 2 tables say "Seconds / s", the v1.15 Dock 3 table says "Milliseconds / ms", and the example values in every source (`1654070968655`, `1659427398806`) are epoch-ms. Treat as epoch-milliseconds. See [`OPEN-QUESTIONS.md` OQ-004](../../../OPEN-QUESTIONS.md#oq-004--fileupload_list-log-window-timestamp-unit-is-inconsistent-across-dji-sources). |
-| `files[].list[].end_time` | int | End of the log window — same unit convention as `start_time`. |
+| `files[].list[].start_time` | int (ms epoch) | Start of the log window, epoch-milliseconds. DJI's v1.11 and Dock 2 v1.15 tables label this "Seconds / s" but every source's example uses millisecond-scale values (`1654070968655`, `1659427398806`); Dock 3 v1.15 is the only table that labels it correctly as "Milliseconds / ms". Treat the v1.11 / Dock 2 "seconds" label as a DJI source-table typo. Resolved as [OQ-004](../../../OPEN-QUESTIONS.md#oq-004--fileupload_list-log-window-timestamp-unit-is-inconsistent-across-dji-sources) 2026-04-19. |
+| `files[].list[].end_time` | int (ms epoch) | End of the log window — epoch-milliseconds, same convention as `start_time`. |
 | `files[].list[].size` | int (bytes) | Log file size. |
 
 ### Example
@@ -117,7 +117,7 @@ Part of the Phase 4 MQTT catalog. Shared conventions (envelope, services-reply) 
 
 - **`end_ime` typo** (missing `t`) in the second element of each `list` array in every source example. The schema is `end_time`; the typo reproduces verbatim across v1.11, v1.15 Dock 2, and v1.15 Dock 3. Treat as a copy-paste artifact in DJI's example — on the wire the field is `end_time`.
 - **`module_list` declared `enum_int`, sent as `enum_string`.** All examples quote the enum values; treat them as strings.
-- **Time-unit label disagreement** — see [`OPEN-QUESTIONS.md` OQ-004](../../../OPEN-QUESTIONS.md#oq-004--fileupload_list-log-window-timestamp-unit-is-inconsistent-across-dji-sources).
+- **Time-unit label disagreement** — v1.11 and Dock 2 v1.15 mislabel `start_time` / `end_time` as seconds; Dock 3 v1.15 and every source's example values confirm the fields are epoch-milliseconds. Resolved as [OQ-004](../../../OPEN-QUESTIONS.md#oq-004--fileupload_list-log-window-timestamp-unit-is-inconsistent-across-dji-sources).
 
 ## Source provenance
 

@@ -103,7 +103,7 @@ The schema tables declare only three fields here (`progress`, `finish_time`, `up
 
 - Follows a [`fileupload_start`](../services/fileupload_start.md) service command that delivered the STS credentials and per-module file list to upload.
 - A follow-up [`fileupload_update`](../services/fileupload_update.md) can cancel the batch mid-stream.
-- **How the cloud correlates events back to the triggering batch is undocumented by DJI** — see [`OPEN-QUESTIONS.md` OQ-005](../../../OPEN-QUESTIONS.md#oq-005--fileupload_start--fileupload_progress-correlation-key-is-undocumented). The per-file `key` and `fingerprint` are the most reliable correlation handles; `bid` reuse is plausible but not confirmed by source.
+- **Correlate back to the triggering `fileupload_start` by `output.ext.files[].key`** (matched against `fileupload_start.params.files[].object_key`). `fingerprint` is a secondary cross-check. `bid` reuse is not guaranteed across the two messages and must not be the primary correlation mechanism. Resolved as [OQ-005](../../../OPEN-QUESTIONS.md#oq-005--fileupload_start--fileupload_progress-correlation-key-is-undocumented) 2026-04-19.
 
 ## Source inconsistencies flagged by DJI's own example
 

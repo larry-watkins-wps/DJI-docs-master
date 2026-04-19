@@ -79,7 +79,7 @@ The v1.11 markdown set has zero matches for `Dock 3`, `Dock3`, `Matrice 4`, `M4D
 
 ## OQ-004 — `fileupload_list` log-window timestamp unit is inconsistent across DJI sources
 
-**Status**: open — a cloud implementer handling Remote-Log has to pick a unit to interpret `start_time` / `end_time`, and the three DJI sources disagree.
+**Status**: **resolved 2026-04-19** — user decision: treat as epoch-milliseconds. The v1.11 and Dock 2 v1.15 "Seconds / s" label is a DJI source-table error (the example values are epoch-ms in all three sources, confirming Dock 3's "Milliseconds / ms" label).
 
 **Raised**: 2026-04-19, during Phase 4e drafting of [`mqtt/dock-to-cloud/services/fileupload_list.md`](mqtt/dock-to-cloud/services/fileupload_list.md).
 
@@ -91,20 +91,13 @@ The v1.11 markdown set has zero matches for `Dock 3`, `Dock3`, `Matrice 4`, `M4D
 
 Examples in every source use values in the range `1654070968655` and `1659427398806`, which are epoch-milliseconds. If the fields were seconds, the same payload would reference dates in the year ~54400. The example values therefore contradict every v1.11/Dock-2 label *and* confirm the Dock-3 label.
 
-**Why it matters.** A cloud implementation building a "list logs and let the operator choose a time window" UI must decide which unit to display. Picking seconds per v1.11 misreads every timestamp as a wall-clock date thousands of years in the future. Picking ms per Dock 3 matches the examples but contradicts two of three sources' declared labels.
-
-**Proposed resolution.**
-- Treat the fields as **epoch-milliseconds** in the `fileupload_list` doc — backed by the actual example values in all three sources.
-- Flag the v1.11 / Dock 2 "seconds" label as a DJI source-table error.
-- Revisit if DJI publishes corrected labels or a live firmware differs.
-
-**Remaining open thread.** Verify against a real Dock 2 deployment if one becomes available (or the v1.10 Java demo's `FileuploadListResponse` handling) before closing.
+**Resolution (2026-04-19).** User directed: use **milliseconds**. [`fileupload_list.md`](mqtt/dock-to-cloud/services/fileupload_list.md) now states epoch-milliseconds as authoritative and notes the v1.11/Dock-2 "seconds" label is a DJI source-table typo. Revisit if a live Dock 2 deployment reveals different behaviour.
 
 ---
 
 ## OQ-005 — `fileupload_start` → `fileupload_progress` correlation key is undocumented
 
-**Status**: open — affects how a cloud matches per-file progress events back to the upload batch that triggered them.
+**Status**: **resolved 2026-04-19** — user decision: correlate by `object_key` / `fingerprint` (present on both messages) rather than by `bid`. Documented in the affected docs.
 
 **Raised**: 2026-04-19, during Phase 4e drafting of [`mqtt/dock-to-cloud/services/fileupload_start.md`](mqtt/dock-to-cloud/services/fileupload_start.md) and [`mqtt/dock-to-cloud/events/fileupload_progress.md`](mqtt/dock-to-cloud/events/fileupload_progress.md).
 
@@ -112,13 +105,4 @@ Examples in every source use values in the range `1654070968655` and `1659427398
 
 For the log-upload flow, DJI never says whether `fileupload_progress` events echo the `bid` of the originating `fileupload_start` command. All three sources use `"bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx"` placeholders in both messages, so the examples don't disambiguate. The `fileupload_progress` payload does carry per-file identifiers (`key`, `fingerprint`, `device_sn`, `module`) that would let the cloud match by file identity independent of `bid`.
 
-**Why it matters.** A server implementation needs to decide:
-- Subscribe to `fileupload_progress` and correlate events back to the triggering `fileupload_start` by `bid`, or
-- Subscribe and correlate by `object_key` / `fingerprint`.
-
-Picking the wrong approach silently misattributes progress in scenarios where multiple uploads are in flight concurrently (possible for multi-module batches, or after operator-retriggered uploads).
-
-**Proposed resolution.**
-- Phase 4e `fileupload_start.md` and `fileupload_progress.md` note the ambiguity: a cloud should expect to correlate by `object_key` / `fingerprint` (available in both `fileupload_start.params.files[].object_key` and `fileupload_progress.output.ext.files[].key`), and treat `bid` reuse as unconfirmed.
-- Flag this for Phase 9 workflow `media-upload-from-dock.md` (or a dedicated `log-upload-from-dock.md`).
-- Verify against `DJI-Cloud-API-Demo/` log-upload handler if one is present when Phase 9 arrives.
+**Resolution (2026-04-19).** User directed: treat **`object_key` / `fingerprint`** as the correlation key. The cloud should match `fileupload_progress.output.ext.files[].key` against the `fileupload_start.params.files[].object_key` it issued earlier (and use `fingerprint` as a secondary check). `bid` reuse across the two messages is not guaranteed by DJI and must not be the primary correlation mechanism. Documented in [`fileupload_start.md`](mqtt/dock-to-cloud/services/fileupload_start.md) and [`fileupload_progress.md`](mqtt/dock-to-cloud/events/fileupload_progress.md). Carry into Phase 9 workflow authoring.
