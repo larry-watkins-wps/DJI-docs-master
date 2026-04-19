@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f landed 2026-04-19. Review gate pending before Phase 4g).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f landed 2026-04-19. Review gate 4f closed; Phase 4g next).
 
 ---
 
@@ -170,7 +170,7 @@ Actual method count was **9** (not ~35). DJI's FlySafe surface is a 3-service tu
 - [x] Update `mqtt/dock-to-cloud/README.md` with 4f rows + sub-phase status (landed 2026-04-19) + per-sub-area tables (FlySafe / CFA / AirSense / HMS).
 - [x] Update `mqtt/README.md` + corpus `README.md` (method count 181).
 - [x] Append to `RESUME-NOTES.md` with a 4f close handoff entry.
-- [ ] **Review gate 4f**
+- [x] **Review gate 4f** closed 2026-04-19. Landing commit `b186bba` (9 method docs + index updates + session handoff).
 
 ### Sub-phase 4g — PSDK + PSDK-Interconnection + ESDK-Interconnection (dock-to-cloud)
 
