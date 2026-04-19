@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f + 4g landed 2026-04-19. Review gate 4g closed; Phase 4h next).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f + 4g + 4h landed 2026-04-19. Review gate 4h open; Phase 4i next).
 
 ---
 
@@ -189,9 +189,18 @@ Actual method count was **16** (not ~40). PSDK source yields 4 events + 8 servic
 
 ### Sub-phase 4h — Pilot-to-Cloud (RC Plus 2 Enterprise + RC Pro Enterprise)
 
-- [ ] Enumerate methods across RC Plus 2 + RC Pro feature files (est. ~70 methods).
-- [ ] Create `mqtt/pilot-to-cloud/` subtree with same family structure.
-- [ ] Write path-level index.
+Actual method count is **94 unique methods** across the two RC cohorts (est. was ~70). Filing strategy adapted to avoid ~70 thin pointer files: **27 new method docs** for pilot-specific additions (2 events + 5 services + 20 DRC variants + `status/update_topo`), and ~67 parallels covered via cross-reference tables in [`mqtt/pilot-to-cloud/README.md`](mqtt/pilot-to-cloud/README.md) that link directly to their dock-to-cloud counterparts.
+
+- [x] Enumerate methods across `DJI_CloudAPI_RC-Plus-2-Enterprise-*.txt` (4 source files) + `DJI_CloudAPI_RC-Pro-Enterprise-*.txt` (4 source files) + v1.11 Cloud-API-Doc RC Pro subtree. 94 unique methods total.
+- [x] Create `mqtt/pilot-to-cloud/` subtree with `status/`, `events/`, `services/`, `drc/` family dirs. No `requests/` dir — RC sources carry no request-family methods.
+- [x] Write path-level index [`mqtt/pilot-to-cloud/README.md`](mqtt/pilot-to-cloud/README.md) with filing-convention explainer + five cross-reference tables (status, new events, parallel events, new services, parallel services, new DRC variants, parallel DRC methods) + cohort roll-up + DJI-source inconsistencies section.
+- [x] Draft 27 new method docs:
+  - `status/update_topo.md` — pilot-specific gateway-sn semantics.
+  - Events (2): `events/cloud_control_auth_notify.md`, `events/poi_status_notify.md`.
+  - Services (5): `services/cloud_control_auth_request.md`, `services/cloud_control_release.md`, `services/poi_mode_enter.md`, `services/poi_mode_exit.md`, `services/poi_circle_speed_set.md`.
+  - DRC variants (20): `drc/drc_live_lens_change.md` + 19 `drc/drc_camera_*.md` / `drc/drc_ir_metering_*.md` / `drc/drc_gimbal_reset.md` (pilot-side lightweight-DRC variants of the dock-to-cloud 4c camera / IR / gimbal services).
+- [x] Update `mqtt/README.md` + corpus `README.md` to cite the 94-method count and the 4h landing.
+- [x] Append to `RESUME-NOTES.md` with a 4h close handoff entry.
 - [ ] **Review gate 4h**
 
 ### Sub-phase 4i — Property-family shells (dock-to-cloud + pilot-to-cloud)

@@ -6,6 +6,94 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 4h close, ready for 4i
+
+### State of play
+
+- Phases 0, 1, 2, 3 complete and committed.
+- Phase 4 (MQTT topic catalog) — **sub-phases 4a, 4b, 4c, 4d, 4e-1, 4e-2, 4f, 4g, and 4h all landed**. Dock-to-cloud catalog at 197 methods (sealed at 4g). Pilot-to-cloud catalog at 94 methods (landed in 4h).
+- **4i is next** — property-family shells (`osd/`, `state/`, `property/set`) for both the dock-to-cloud and pilot-to-cloud paths. Thin pointer docs to Phase 6 `device-properties/`, not content-bearing. Est. ~16 shell docs (8 devices × 2 shell types on average).
+
+### What 4h produced
+
+- `mqtt/pilot-to-cloud/` — new subtree with `status/`, `events/`, `services/`, `drc/` family dirs. No `requests/` dir (pilot-to-cloud has no request-family methods per enumeration).
+- `mqtt/pilot-to-cloud/README.md` — path-level index with a filing-convention explainer, five cross-reference tables (status, new events, parallel events, new services, parallel services, new DRC variants, parallel DRC methods), cohort roll-up, and a DJI-source inconsistencies section.
+- 27 pilot-specific method docs:
+  - `status/update_topo.md` — pilot gateway-sn semantics.
+  - Events (2): `cloud_control_auth_notify`, `poi_status_notify`.
+  - Services (5): `cloud_control_auth_request`, `cloud_control_release`, `poi_mode_enter`, `poi_mode_exit`, `poi_circle_speed_set`.
+  - DRC variants (20): `drc_live_lens_change` + 19 drc-prefixed camera / gimbal / IR-metering methods pilot-to-cloud-specific.
+- `mqtt/README.md` + corpus `README.md` updated with 4h landing + 94-method pilot-to-cloud total.
+- `TODO.md` — 4h section re-scoped (94 methods vs ~70 estimate) with full method inventory; only the 4h review gate remains open.
+
+### Filing-strategy decision for 4h
+
+**27 new-method docs + cross-reference tables for ~67 parallels.** Rather than creating ~70 thin pointer files that repeat nothing but a cohort marker and a cross-link, the 4h [`pilot-to-cloud/README.md`](mqtt/pilot-to-cloud/README.md) carries rich tables that list every method with a direct link to its dock-to-cloud doc (same payload, RC is the `{gateway_sn}`). This preserves the grep-by-method-name ergonomic — the method name still appears verbatim in the README — while avoiding the file-bloat cost of near-duplicate pointer docs. Net: 29 new .md files under `pilot-to-cloud/` (1 README + 1 status + 7 new events/services + 20 DRC variants) covers a 94-method method surface.
+
+This is a **deviation from the 4a–4g one-file-per-method convention.** Rationale: the dock-to-cloud catalog exercised that convention on a ~197-method set where every method was distinct. For pilot-to-cloud, ~70% of the methods are pure parallels with identical payloads — creating a thin doc for each adds no new information and dilutes the grep signal when searching for pilot-specific material. Flag during the 4h review gate if the user wants full pointer docs after all; trivial to mass-generate.
+
+### Why the method count (94) is materially higher than the ~70 estimate
+
+The 4g handoff projected "~70 methods" for 4h. Actual counts by source:
+
+- **RC Plus 2 Enterprise Remote-Control (4420 lines)**: 40+ methods. The file is the largest pilot-to-cloud source and carries every drc-prefixed camera / IR / gimbal variant plus the shared DRC services that also appear on dock-to-cloud 4e-2. Most methods are parallels of 4e-2; 19 are genuinely new variants (pilot-side DRC versions of 4c non-prefixed camera methods).
+- **RC Plus 2 Enterprise Live-Flight-Controls (1164 lines)**: 21 methods — 11 events + 13 services (includes POI mode + cloud-control trio).
+- **RC Pro Enterprise Live-Flight-Controls (1670 lines)**: 27 methods — more camera services than RC Plus 2 because RC Pro ships the non-prefixed `camera_*` methods on `/services` (not the drc-prefixed versions).
+- **Live-Stream × 2 (358 + 196 lines)**: 5 unique methods (4 shared + `drc_live_lens_change` RC Plus 2 only).
+- **Device-Management × 2**: `update_topo` (status-family).
+
+Net: 94 unique method names across the two RC cohorts.
+
+### DJI-source inconsistencies flagged during 4h drafting
+
+Carry into Phase 9 workflow authoring:
+
+- **Pervasive `"timestamp:"` trailing-colon typo in RC Plus 2 Live-Stream examples.** Every method in `DJI_CloudAPI_RC-Plus-2-Enterprise-Live-Stream.txt` has the typo. RC Pro Live-Stream and all other pilot-to-cloud sources are clean. Matches the Dock 3 pattern first flagged in 4c.
+- **`poi_status_notify` 14-digit timestamp example** (`16540709686556`). Same 14-digit pattern as 4f's CFA / AirSense examples.
+- **`drc_gimbal_reset` garbled `payload_index` schema cell** — DJI source reads `{_{type-subtype-gimbalindex}__aembLbhPpc}` as the Name column. Clearly a copy-paste artifact. Flagged inline in the doc.
+- **`drc_camera_screen_split` reply example duplicates down-side fields** (`enable: true, payload_index: "89-0-0"`) instead of carrying `{"result": 0}`. DJI copy-paste error. Flagged inline.
+- **`cloud_control_auth_request` / `cloud_control_release` replies carry `output.status: "ok"`** in the examples, but the `services_reply` schema declares only `result`. Treat `result` as authoritative; `output` is an extra convenience field DJI returns but does not document.
+- **`drc_live_lens_change` example omits `seq`** — the DRC envelope specification requires `seq` as the correlation key. DJI's example omits it. Cloud implementations should include `seq` per the envelope spec.
+- **RC Plus 2 `live_start_push` still supports Agora** (`url_type: 0` in the enum), contrasting Dock 3 which dropped Agora in 4d. Cohort split: dock-to-cloud Dock 3 has `{1, 3, 4}` only; pilot-to-cloud both RC Plus 2 and RC Pro have `{0, 1, 3, 4}`.
+- **v1.11 RC Pro `update_topo` uses `thing_version`** (not Dock-2-v1.11's `version`). Matches v1.15 convention; the Dock-2-v1.11 `version` is the outlier.
+
+None of these rise to `OPEN-QUESTIONS.md` level — doc-level callouts are sufficient.
+
+### After 4h review gate (= kick-off of 4i)
+
+**4i scope — property-family shells for both paths.** Sources:
+
+1. `DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt` (shared aircraft properties).
+2. `DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt` (625 lines — the larger of the two RC properties files).
+3. `DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt` (68 lines).
+4. `DJI_Cloud/DJI_CloudAPI_RC-Properties.txt` (67 lines — out-of-scope cohort; do not document).
+5. Dock 2 + Dock 3 properties across `DJI_CloudAPI-Dock2-*.txt` / `DJI_CloudAPI-Dock3-*.txt` wherever per-feature property tables appear.
+6. v1.11 Cloud-API-Doc: `Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/*.md` (dock-side) and `Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md` + `10.m3-series/00.properties.md` (pilot-side).
+
+Expected 4i deliverables:
+- Thin `osd/`, `state/`, `property-set/` family shells per device **that link to Phase 6** `device-properties/` for content. Avoid duplicating property catalogs — 4i shells are pointers, not content-bearing.
+- Per-device breakdown under both `mqtt/dock-to-cloud/osd/` and `mqtt/pilot-to-cloud/osd/` (similar for `state/` and `property-set/`).
+- Estimated ~16 shell docs total (8 in-scope devices × 2 major shell types; `property-set/` may be subsumed into the `state/` shell per device if the writable property set is small).
+- 4i closes Phase 4 — final Phase 4 review gate after 4i.
+
+### Known gotchas carried forward
+
+- Property family shells at 4i are deliberately thin — they say *"this device publishes these properties on this topic; see `device-properties/<device>.md` for the property catalog"* and nothing more. Do not inline property tables; they belong in Phase 6.
+- 4h's cross-reference table approach in [`pilot-to-cloud/README.md`](mqtt/pilot-to-cloud/README.md) is an experiment — if it works well for 4h, 4i can use the same approach (cross-ref table per device, minimal per-device shell files). The filing convention decision is not final until the 4h review gate closes.
+- Review gate: user checkpoint before 4i starts. Don't push through.
+
+### Open questions potentially affecting 4i
+
+- [`OQ-001`](OPEN-QUESTIONS.md) — v1.11 vs v1.15 property enum divergences. Phase 6 is the canonical place for these to be resolved; 4i only provides transport-shell pointers.
+- [`OQ-002`](OPEN-QUESTIONS.md) — pilot-to-cloud OSD example copy-paste bug. The `mqtt/pilot-to-cloud/osd.md` shell (4i) will explicitly cite the per-aircraft property files and warn against relying on DJI's pilot-to-cloud OSD example.
+- [`OQ-003`](OPEN-QUESTIONS.md) — QoS / retain / clean-session values still unspecified. Property-family shells do not resolve this; defer.
+
+### Remaining Phase 4 work (4i only)
+
+- **4i** — property-family shells (`osd/`, `state/`, `property-set/`) per device, linking to Phase 6. Final Phase 4 review gate after 4i.
+
+---
+
 ## 2026-04-19 — handoff at Phase 4g close, ready for 4h
 
 ### State of play
