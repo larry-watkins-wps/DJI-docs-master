@@ -2,7 +2,54 @@
 
 Conventions for every HTTPS interaction between the in-scope devices (Dock 2, Dock 3, Matrice 3D / 3TD / 4D / 4TD, RC Plus 2 Enterprise, RC Pro Enterprise) and a DJI-Cloud-compatible server. This document is the canonical home for the HTTP envelope, header set, request-method rules, and the error-code-to-app-behavior mapping.
 
-Per-endpoint catalog is Phase 3 under [`http/`](.) (one `.md` per endpoint, grouped by resource).
+---
+
+## Catalog
+
+Phase 3 per-endpoint docs, 16 endpoints across five resources:
+
+### `wayline/`
+
+| Method + path | Doc |
+|---|---|
+| `GET /wayline/api/v1/workspaces/{workspace_id}/waylines` | [`wayline/list.md`](wayline/list.md) |
+| `GET /wayline/api/v1/workspaces/{workspace_id}/waylines/{id}/url` | [`wayline/download.md`](wayline/download.md) |
+| `GET /wayline/api/v1/workspaces/{workspace_id}/waylines/duplicate-names` | [`wayline/duplicate-name.md`](wayline/duplicate-name.md) |
+| `POST /wayline/api/v1/workspaces/{workspace_id}/upload-callback` | [`wayline/upload-callback.md`](wayline/upload-callback.md) |
+| `POST /wayline/api/v1/workspaces/{workspace_id}/favorites` | [`wayline/favorites-add.md`](wayline/favorites-add.md) |
+| `DELETE /wayline/api/v1/workspaces/{workspace_id}/favorites` | [`wayline/favorites-remove.md`](wayline/favorites-remove.md) |
+
+### `media/`
+
+| Method + path | Doc |
+|---|---|
+| `POST /media/api/v1/workspaces/{workspace_id}/fast-upload` | [`media/fast-upload.md`](media/fast-upload.md) |
+| `POST /media/api/v1/workspaces/{workspace_id}/files/tiny-fingerprints` | [`media/tiny-fingerprint.md`](media/tiny-fingerprint.md) |
+| `POST /media/api/v1/workspaces/{workspace_id}/upload-callback` | [`media/upload-callback.md`](media/upload-callback.md) |
+| `POST /media/api/v1/workspaces/{workspace_id}/group-upload-callback` | [`media/group-upload-callback.md`](media/group-upload-callback.md) |
+
+### `map/`
+
+| Method + path | Doc |
+|---|---|
+| `POST /map/api/v1/workspaces/{workspace_id}/element-groups/{group_id}/elements` | [`map/create.md`](map/create.md) |
+| `PUT /map/api/v1/workspaces/{workspace_id}/elements/{id}` | [`map/update.md`](map/update.md) |
+| `GET /map/api/v1/workspaces/{workspace_id}/element-groups` | [`map/obtain.md`](map/obtain.md) |
+| `DELETE /map/api/v1/workspaces/{workspace_id}/elements/{id}` | [`map/delete.md`](map/delete.md) |
+
+### `storage/`
+
+| Method + path | Doc |
+|---|---|
+| `POST /storage/api/v1/workspaces/{workspace_id}/sts` | [`storage/sts-credential.md`](storage/sts-credential.md) |
+
+### `device/`
+
+| Method + path | Doc |
+|---|---|
+| `GET /manage/api/v1/workspaces/{workspace_id}/devices/topologies` | [`device/topology.md`](device/topology.md) |
+
+**Scope note.** The catalog covers the 18 Pilot-to-Cloud HTTPS endpoints documented by DJI in both v1.11 (`Cloud-API-Doc/`) and v1.15 (`DJI_Cloud/DJI_CloudAPI_Pilot-HTTPS-*.txt`), collapsed to 16 unique endpoints (the STS-credential endpoint appears under both the Waypoint and Media sections of DJI's own docs but is a single endpoint on the wire). An additional ~70 dock-to-cloud HTTPS endpoints appear only in the deprecated `DJI-Cloud-API-Demo/` (v1.10) reference implementation and are **out of scope for Phase 3**; they will be revisited in Phase 9 workflows where the demo is cited as wire-behavior evidence for specific choreographies (binding, firmware, DRC, etc.).
 
 ---
 

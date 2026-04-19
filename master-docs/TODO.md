@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 2 — Transport protocol references (three docs drafted 2026-04-18; review gate pending).
+**Current phase**: Phase 3 — HTTP endpoint catalog (16 endpoint docs drafted 2026-04-18; review gate pending).
 
 ---
 
@@ -42,14 +42,18 @@ Checklist:
 - [x] `websocket/README.md` — Pilot-to-Cloud only; session lifecycle, envelope, 8 observed `biz_code` values in two families (map-elements, situation-awareness), push-and-fetch coordination pattern.
 - [x] Update corpus `README.md` TOC.
 - [x] Log OQ-003 (MQTT QoS / retain / clean-session not specified by DJI) in `OPEN-QUESTIONS.md`.
-- [ ] **Review gate**
+- [x] **Review gate** closed 2026-04-18. Landing commit `56455eb` (http/README.md + mqtt/README.md + websocket/README.md + OQ-003 + plan compression).
 
 ## Phase 3 — HTTP endpoint catalog
 
-- [ ] Enumerate all HTTP endpoints from `Cloud-API-Doc/docs/en/` and `DJI-Cloud-API-Demo/api/`
-- [ ] Group by resource (device / workspace / wayline / media / livestream / map / user / auth)
-- [ ] One `.md` per endpoint (method, path, request schema, response schema, errors, real example, provenance)
-- [ ] Update corpus `README.md`
+**Scope decision (2026-04-18):** Tier A only — the 18 Pilot-to-Cloud HTTPS endpoints documented by DJI in both v1.11 and v1.15 sources, collapsed to **16 unique endpoints**. The ~70 dock-to-cloud endpoints that appear only in the deprecated demo (`DJI-Cloud-API-Demo/`, v1.10) are deferred to Phase 9 workflow authoring where the demo is citable as wire-behavior evidence.
+
+Checklist:
+- [x] Enumerate HTTP endpoints from `Cloud-API-Doc/docs/en/` + `DJI_Cloud/DJI_CloudAPI_Pilot-HTTPS-*.txt` + `DJI-Cloud-API-Demo/api/` (via Explore agent).
+- [x] Group by resource — `wayline/` (6), `media/` (4), `map/` (4), `storage/` (1 shared STS endpoint), `device/` (1 topology).
+- [x] One `.md` per endpoint — method, path, parameters, request body, response body, examples, provenance. All 16 cite both v1.11 canonical + v1.15 corroboration.
+- [x] Add catalog index to `http/README.md`.
+- [x] Update corpus `README.md` TOC.
 - [ ] **Review gate**
 
 ## Phase 4 — MQTT topic catalog
