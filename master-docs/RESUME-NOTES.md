@@ -6,6 +6,81 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 4e-1 close, ready for 4e-2
+
+### State of play
+
+- Phases 0, 1, 2, 3 complete and committed.
+- Phase 4 (MQTT topic catalog) is in progress. Sub-drops landed to date: **4a** (commit `8059992`, 5 methods), **4b** (commit `7742419`, 21 methods), **4c** (commit `663ae85`, 42 methods), **4d** (commit `debf5f8`, 9 methods), **4e-1** (this commit, 42 methods). **119 methods total** across Phase 4 so far.
+- **4e was re-scoped into 4e-1 + 4e-2.** Enumeration found ~90 methods across the four source files (vs. the ~30 estimated in the 4d handoff); Remote-Control alone is 53. Splitting keeps per-drop size aligned with the 4c drop (42 methods).
+- **4e-2 is next** — Remote-Control (dock-to-cloud), ~53 methods.
+
+### What 4e-1 produced
+
+- `mqtt/dock-to-cloud/events/` — 15 new docs:
+  - Firmware-Upgrade: `ota_progress`.
+  - Remote-Log: `fileupload_progress` (`need_reply: 0`).
+  - Remote-Debugging (13): `esim_operator_switch`, `esim_activate`, `device_format`, `drone_format`, `charge_close`, `charge_open`, `cover_open`, `cover_close`, `device_reboot`, `cover_force_close`, `drone_close`, `drone_open`, `rtk_calibration` (Dock 3 only, `need_reply: 1` — first `need_reply: 1` event since 4d's `file_upload_callback`).
+- `mqtt/dock-to-cloud/services/` — 27 new docs:
+  - Firmware-Upgrade (1): `ota_create`.
+  - Remote-Log (3): `fileupload_list`, `fileupload_start`, `fileupload_update`.
+  - Remote-Debugging (23): `esim_operator_switch`, `sim_slot_switch`, `esim_activate`, `sdr_workmode_switch`, `charge_close`, `charge_open`, `cover_close`, `cover_open`, `drone_format`, `device_format`, `drone_close`, `drone_open`, `device_reboot`, `battery_store_mode_switch`, `alarm_state_switch`, `air_conditioner_mode_switch`, `battery_maintenance_switch`, `supplement_light_close`, `supplement_light_open`, `debug_mode_close`, `debug_mode_open`, `cover_force_close`, `rtk_calibration` (Dock 3 only).
+- **New OQ entries:** [OQ-004](OPEN-QUESTIONS.md#oq-004--fileupload_list-log-window-timestamp-unit-is-inconsistent-across-dji-sources) — `fileupload_list` timestamp unit (s vs ms disagreement); [OQ-005](OPEN-QUESTIONS.md#oq-005--fileupload_start--fileupload_progress-correlation-key-is-undocumented) — `fileupload_start`→`fileupload_progress` correlation key (bid vs object_key vs fingerprint) undocumented by DJI.
+- No new family directory — Firmware + Log + Debugging fit entirely into existing `events/` + `services/` structure.
+- `mqtt/dock-to-cloud/README.md`, `mqtt/README.md`, corpus `README.md`, `TODO.md` all updated to 119-method total and 4e-1 landed. TODO re-scoped 4e into 4e-1 (landed) and 4e-2 (pending).
+
+### Why the method count differs from the 4d estimate
+
+The 4d handoff projected "~30 methods" for 4e covering all four feature areas. Actual counts by source:
+
+- Firmware-Upgrade: 2 methods (1 event + 1 service). Matches expectations.
+- Remote-Log: 4 methods (1 event + 3 services). Slightly lower than expected (estimate implied distinct "firmware list fetch" / "log file slot fetch" methods; in reality `fileupload_list` covers both).
+- Remote-Debugging: 36 methods (13 events + 23 services). Much higher than expected — DJI treats every dock operation (charge, cover, power cycle, format, reboot, AC mode, battery mode, alarm, fill-light, SIM slot, eSIM activate, SDR mode) as its own service + progress-event pair, yielding a long list.
+- Remote-Control: 53 methods — reason for the split. Remote-Control is not just DRC flight commands; it's the PSDK-payload API for speaker, spotlight, widgets, photo-format, plus the full AI-identify / AI-spotlight-zoom family. The 4d handoff underestimated this substantially.
+
+### DJI-source inconsistencies flagged during 4e-1 drafting
+
+Carry into Phase 9 workflow authoring:
+
+- **Pervasive `"timestamp:"` typo (trailing colon in key) on Dock 3 Remote-Debugging examples.** Every event in `DJI_CloudAPI-Dock3-Remote-Debugging.txt` except `cover_force_close` and `rtk_calibration` has the typo. Dock 2 examples are correct. Same pattern first seen in 4c.
+- **`ota_progress`: step field renamed `step_key` → `current_step` between v1.11 and v1.15.** Wire-level change; cloud must accept the correct name per firmware version.
+- **`ota_create` Dock 3 adds `firmware_upgrade_type: 4 = psdk update`.** Dock 2 enum is `{2, 3}`; Dock 3 is `{2, 3, 4}`.
+- **`fileupload_progress` Dock 3 schema typo `prgress` (missing "o").** Only in the table; example correctly uses `progress`. Dock 2 spells it correctly.
+- **`fileupload_list` `end_ime` typo** (missing `t`) in the second list element of every source example. Pervasive across v1.11 + Dock 2 v1.15 + Dock 3 v1.15.
+- **`fileupload_list` timestamp unit disagreement** — v1.11 and Dock 2 v1.15 say "Seconds / s"; Dock 3 v1.15 says "Milliseconds / ms". Example values are epoch-ms across all three sources. Logged as [OQ-004](OPEN-QUESTIONS.md#oq-004--fileupload_list-log-window-timestamp-unit-is-inconsistent-across-dji-sources).
+- **`fileupload_start` `credentials.expire` unit/value mismatch.** Schema says "Seconds / s" (TTL); example is an epoch-ms timestamp.
+- **`device_format` / `drone_format` Dock 3 example placeholder `step_key: "xxx"`.** Schema has no `step_key` field for these methods; example carries the literal `"xxx"` placeholder. Treat as copy-paste leftover.
+- **`device_format` Dock 3 source typo — services-side labelled `Method: drone_format`** (duplicating the prior `drone_format` section) while the `services_reply` below correctly says `Method: device_format`. Dock 2 has the method name correct on both sides. Treat Dock 2 as authoritative.
+- **`esim_operator_switch` enum description drift** — Dock 3 says `{"China Mobile", "China Unicom", "China Telecom"}`; Dock 2 says `{"Mobile", "China Unicom", "Telecommunications"}`. Wire values (`1 / 2 / 3`) are stable.
+- **`sdr_workmode_switch` reply omits `output.status`** — every other Remote-Debugging service reply carries `output.status`, but this one doesn't (consistent across Dock 2 and Dock 3 — intentional variance).
+- **Dock 2 has explicit `events_reply` sections for Remote-Debugging events; Dock 3 v1.15 omits them.** Dock 3 examples do not carry `need_reply: 1`, so the absence is consistent (no reply expected). Treat Dock 2 `events_reply` as the authoritative reply pattern when one is needed: `data.result: 0`.
+- **`rtk_calibration` event description typo** — Dock 3 schema says `"ok":""` (empty description) while siblings have descriptions. Minor.
+- **`rtk_calibration` event `type` enum** only defines `{1: Manual Calibration}` — automatic/scheduled calibration types may exist but are unspecified in DJI source.
+
+### After 4e-1 review gate (= kick-off of 4e-2)
+
+**4e-2 scope — Remote-Control (dock-to-cloud).** Source: `DJI_Cloud/DJI_CloudAPI-Dock3-Remote-Control.txt` (4611 lines — the largest 4e source) + `DJI_CloudAPI-Dock2-Remote-Control.txt` + v1.11 Dock 2 `180.remote-control.md`. See [`TODO.md` 4e-2 section](TODO.md#sub-phase-4e-2--remote-control-dock-to-cloud) for the full 53-method inventory and filing-convention questions.
+
+**Key decisions to make at 4e-2 kickoff**:
+1. **Filing convention for cross-topic methods.** Several Dock 3 `drc_*` events land on `/events` (standard envelope) while the matching Dock 2 events land on `/drc/up` (lightweight envelope). Proposal: file in `drc/` with a topic-divergence note per doc. Alternative: split cohorts across folders — messier.
+2. **Which docs get Phase 10 annex callouts.** Dock-2-only methods like `drc_video_storage_set` (replaced by `video_storage_set` in 4c) and `drc_interval_photo_set` (moved to OSD property in Dock 3) should cross-reference their Dock 3 replacements when known.
+
+Template unchanged from 4a–4e-1. Same cohort pattern and source-provenance table.
+
+### Known gotchas carried forward
+
+- DRC envelope is lighter (no `tid`/`bid`/`timestamp`, just `method` + `seq` + `data`). 4e-2 will add many `drc/` entries — `seq` is the correlation key, not `bid`.
+- `bid` grouping still applies for 4e-1's Firmware + Debugging flows — `ota_create` → `ota_progress` events share `bid`, and every debugging service → matching event carries the same `bid`.
+- `need_reply: 1` on the `rtk_calibration` event is the only one in 4e-1; cloud ACKs with `{"result": 0}` on `events_reply`.
+- Review gate: user checkpoint before 4e-2 starts. Don't push through.
+
+### Open questions potentially affecting 4e-2
+
+- [`OQ-003`](OPEN-QUESTIONS.md) — QoS / retain / clean-session values still unspecified. DRC topics in 4e-2 are the most latency-sensitive of the corpus; cite the gap, don't invent.
+- Filing-convention question (§"After 4e-1 review gate") is a project decision, not an OQ. Flag in the commit message and let the user confirm at 4e-2 kickoff.
+
+---
+
 ## 2026-04-18 — handoff at Phase 4d close, ready for 4e
 
 ### State of play

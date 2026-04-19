@@ -16,7 +16,8 @@ Phase 4 is being landed in feature-area sub-drops. This index grows as drops lan
 | 4b | WaylineManagement — flight-task lifecycle + Virtual Cockpit routes | **landed 2026-04-18** |
 | 4c | Live-Flight-Controls — DRC, camera/gimbal/IR control, authority grab | **landed 2026-04-18** |
 | 4d | LiveStream + Media-Management | **landed 2026-04-18** |
-| 4e | Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control | pending |
+| 4e-1 | Firmware-Upgrade + Remote-Log + Remote-Debugging | **landed 2026-04-19** |
+| 4e-2 | Remote-Control (DRC PSDK + AI identify + camera/speaker/light) | pending |
 | 4f | FlySafe + Custom-Flight-Area + AirSense + HMS | pending |
 | 4g | PSDK + PSDK-Interconnection + ESDK-Interconnection | pending |
 
@@ -48,6 +49,21 @@ Topics under `thing/product/{gateway_sn}/events`. Device → cloud pushes.
 | `camera_photo_take_progress` | [`events/camera_photo_take_progress.md`](events/camera_photo_take_progress.md) | Persistent photo-capture progress (currently panorama). |
 | `highest_priority_upload_flighttask_media` | [`events/highest_priority_upload_flighttask_media.md`](events/highest_priority_upload_flighttask_media.md) | Dock announces the flight task whose media will be uploaded first. |
 | `file_upload_callback` | [`events/file_upload_callback.md`](events/file_upload_callback.md) | Single media file has been uploaded; carries file descriptor + metadata. |
+| `ota_progress` | [`events/ota_progress.md`](events/ota_progress.md) | Firmware-update task progress (percent + current step). |
+| `fileupload_progress` | [`events/fileupload_progress.md`](events/fileupload_progress.md) | Per-file progress for a log-upload batch (`need_reply: 0`). |
+| `esim_operator_switch` | [`events/esim_operator_switch.md`](events/esim_operator_switch.md) | eSIM operator-switch progress (dock / aircraft dongle). |
+| `esim_activate` | [`events/esim_activate.md`](events/esim_activate.md) | eSIM activation progress. |
+| `device_format` | [`events/device_format.md`](events/device_format.md) | Dock-storage formatting progress. |
+| `drone_format` | [`events/drone_format.md`](events/drone_format.md) | Aircraft-storage formatting progress. |
+| `charge_close` | [`events/charge_close.md`](events/charge_close.md) | Stop-charging progress (4 safety-check steps). |
+| `charge_open` | [`events/charge_open.md`](events/charge_open.md) | Start-charging progress (6 safety-check steps). |
+| `cover_open` | [`events/cover_open.md`](events/cover_open.md) | Dock-cover open progress (5 safety-check steps). |
+| `cover_close` | [`events/cover_close.md`](events/cover_close.md) | Dock-cover close progress (9-step propeller-paddle sequence). |
+| `device_reboot` | [`events/device_reboot.md`](events/device_reboot.md) | Dock-reboot progress (6 safety-check steps). |
+| `cover_force_close` | [`events/cover_force_close.md`](events/cover_force_close.md) | Forced dock-cover close progress (no step_key decomposition). |
+| `drone_close` | [`events/drone_close.md`](events/drone_close.md) | Aircraft power-off progress (7 safety-check steps). |
+| `drone_open` | [`events/drone_open.md`](events/drone_open.md) | Aircraft power-on state change (no progress percent / step_key). |
+| `rtk_calibration` | [`events/rtk_calibration.md`](events/rtk_calibration.md) | RTK manual-calibration result (Dock 3 only; `need_reply: 1`). |
 
 ### `services/`
 
@@ -105,6 +121,33 @@ Topics under `thing/product/{gateway_sn}/services`. Cloud → device commands.
 | `live_camera_change` | [`services/live_camera_change.md`](services/live_camera_change.md) | Switch FPV camera between inside-the-dock and outside-the-dock. |
 | `live_lens_change` | [`services/live_lens_change.md`](services/live_lens_change.md) | Switch aircraft lens (IR / Normal / Wide / Zoom) on an active stream. |
 | `upload_flighttask_media_prioritize` | [`services/upload_flighttask_media_prioritize.md`](services/upload_flighttask_media_prioritize.md) | Cloud bumps a flight task to the top of the media-upload queue. |
+| `ota_create` | [`services/ota_create.md`](services/ota_create.md) | Deliver firmware artifacts and start an OTA upgrade task. |
+| `fileupload_list` | [`services/fileupload_list.md`](services/fileupload_list.md) | Enumerate uploadable log files by module. |
+| `fileupload_start` | [`services/fileupload_start.md`](services/fileupload_start.md) | Deliver STS credentials + per-module file list; start log upload. |
+| `fileupload_update` | [`services/fileupload_update.md`](services/fileupload_update.md) | Cancel an in-progress log-upload batch. |
+| `esim_operator_switch` | [`services/esim_operator_switch.md`](services/esim_operator_switch.md) | Select eSIM carrier on a dongle. |
+| `sim_slot_switch` | [`services/sim_slot_switch.md`](services/sim_slot_switch.md) | Switch dongle between physical-SIM and eSIM slots. |
+| `esim_activate` | [`services/esim_activate.md`](services/esim_activate.md) | Activate an eSIM profile. |
+| `sdr_workmode_switch` | [`services/sdr_workmode_switch.md`](services/sdr_workmode_switch.md) | Select SDR-only vs SDR+4G image transmission. |
+| `charge_close` | [`services/charge_close.md`](services/charge_close.md) | Stop aircraft charging. |
+| `charge_open` | [`services/charge_open.md`](services/charge_open.md) | Start aircraft charging. |
+| `cover_close` | [`services/cover_close.md`](services/cover_close.md) | Close the dock cover. |
+| `cover_open` | [`services/cover_open.md`](services/cover_open.md) | Open the dock cover. |
+| `drone_format` | [`services/drone_format.md`](services/drone_format.md) | Format the aircraft-side storage. |
+| `device_format` | [`services/device_format.md`](services/device_format.md) | Format the dock-side storage. |
+| `drone_close` | [`services/drone_close.md`](services/drone_close.md) | Power off the aircraft inside the dock. |
+| `drone_open` | [`services/drone_open.md`](services/drone_open.md) | Power on the aircraft inside the dock. |
+| `device_reboot` | [`services/device_reboot.md`](services/device_reboot.md) | Reboot the dock. |
+| `battery_store_mode_switch` | [`services/battery_store_mode_switch.md`](services/battery_store_mode_switch.md) | Switch aircraft battery between Schedule and Standby modes. |
+| `alarm_state_switch` | [`services/alarm_state_switch.md`](services/alarm_state_switch.md) | Enable / disable dock sound-and-light alarm. |
+| `air_conditioner_mode_switch` | [`services/air_conditioner_mode_switch.md`](services/air_conditioner_mode_switch.md) | Force dock AC to idle / cooling / heating / dehumidification. |
+| `battery_maintenance_switch` | [`services/battery_maintenance_switch.md`](services/battery_maintenance_switch.md) | Enable / disable aircraft-battery maintenance mode. |
+| `supplement_light_close` | [`services/supplement_light_close.md`](services/supplement_light_close.md) | Turn off dock auxiliary fill-light. |
+| `supplement_light_open` | [`services/supplement_light_open.md`](services/supplement_light_open.md) | Turn on dock auxiliary fill-light. |
+| `debug_mode_close` | [`services/debug_mode_close.md`](services/debug_mode_close.md) | Exit remote-debugging mode. |
+| `debug_mode_open` | [`services/debug_mode_open.md`](services/debug_mode_open.md) | Enter remote-debugging mode. |
+| `cover_force_close` | [`services/cover_force_close.md`](services/cover_force_close.md) | Force the dock cover closed (bypasses safety interlocks). |
+| `rtk_calibration` | [`services/rtk_calibration.md`](services/rtk_calibration.md) | Trigger manual RTK calibration (Dock 3 only). |
 
 ### `requests/`
 

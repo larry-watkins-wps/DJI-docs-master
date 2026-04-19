@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, review gate pending before 4e).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phase 4e-1 landed 2026-04-19, review gate pending before 4e-2).
 
 ---
 
@@ -119,8 +119,40 @@ Estimated 3500–4200 lines of doc output — at the edge of a single-drop budge
 
 ### Sub-phase 4e — Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control (dock-to-cloud)
 
-- [ ] Enumerate + draft (est. ~30 methods).
-- [ ] **Review gate 4e**
+Re-scoped 2026-04-19 after enumeration — the four source files together contain ~90 methods (not the ~30 estimated in the 4d handoff). Remote-Control alone is 53 methods, so 4e is split into two sub-drops.
+
+#### Sub-phase 4e-1 — Firmware-Upgrade + Remote-Log + Remote-Debugging
+
+- [x] Enumerate + draft 42 methods (2 firmware + 4 log + 13 debug events + 23 debug services).
+  - Firmware events: `ota_progress`. Firmware services: `ota_create`.
+  - Log events: `fileupload_progress`. Log services: `fileupload_list`, `fileupload_start`, `fileupload_update`.
+  - Debug events (13): `esim_operator_switch`, `esim_activate`, `device_format`, `drone_format`, `charge_close`, `charge_open`, `cover_open`, `cover_close`, `device_reboot`, `cover_force_close`, `drone_close`, `drone_open`, `rtk_calibration` (Dock 3 only, `need_reply: 1`).
+  - Debug services (23): `esim_operator_switch`, `sim_slot_switch`, `esim_activate`, `sdr_workmode_switch`, `charge_close`, `charge_open`, `cover_close`, `cover_open`, `drone_format`, `device_format`, `drone_close`, `drone_open`, `device_reboot`, `battery_store_mode_switch`, `alarm_state_switch`, `air_conditioner_mode_switch`, `battery_maintenance_switch`, `supplement_light_close`, `supplement_light_open`, `debug_mode_close`, `debug_mode_open`, `cover_force_close`, `rtk_calibration` (Dock 3 only).
+- [x] Log [OQ-004](OPEN-QUESTIONS.md#oq-004--fileupload_list-log-window-timestamp-unit-is-inconsistent-across-dji-sources) (log-timestamp unit) and [OQ-005](OPEN-QUESTIONS.md#oq-005--fileupload_start--fileupload_progress-correlation-key-is-undocumented) (fileupload bid linkage).
+- [x] Update `mqtt/dock-to-cloud/README.md` with 4e-1 rows (events + services) and mark 4e-1 landed in the sub-phase status table.
+- [x] Update `mqtt/README.md` + corpus `README.md` (method count 119).
+- [x] Append to `RESUME-NOTES.md` with a 4e-1 close handoff entry.
+- [ ] **Review gate 4e-1**
+
+#### Sub-phase 4e-2 — Remote-Control (dock-to-cloud)
+
+Source: `DJI_Cloud/DJI_CloudAPI-Dock3-Remote-Control.txt` (4611 lines) + `DJI_CloudAPI-Dock2-Remote-Control.txt` (2-file comparison), plus v1.11 Dock 2 `180.remote-control.md`. Estimated 53 methods:
+
+- Events (9, mix of `/events` on Dock 3 and `/drc/up` on Dock 2 — see filing-convention note below): `drc_psdk_floating_window_text`, `drc_speaker_play_progress`, `drc_psdk_state_info`, `drc_psdk_ui_resource`, `drc_drone_state_push`, `drc_camera_state_push`, `drc_camera_osd_info_push`, `drc_ai_info_push`, `drc_camera_photo_info_push` (Dock 2 only; Dock 3 equivalent is 4c's `camera_photo_take_progress`).
+- Shared DRC services (10): `drc_force_landing`, `drc_emergency_landing`, `drc_initial_state_subscribe`, `drc_night_lights_state_set`, `drc_stealth_state_set`, `drc_camera_aperture_value_set`, `drc_camera_shutter_set`, `drc_camera_iso_set`, `drc_camera_mechanical_shutter_set`, `drc_camera_dewarping_set`.
+- Dock-2-only DRC services (6): `drc_camera_mode_switch`, `drc_linkage_zoom_set`, `drc_video_resolution_set`, `drc_video_storage_set`, `drc_photo_storage_set`, `drc_interval_photo_set`.
+- Dock-3-only DRC services (28): `drc_camera_night_mode_set`, `drc_camera_denoise_level_set`, `drc_camera_night_vision_enable`, `drc_infrared_fill_light_enable`, `drc_light_brightness_set`, `drc_light_mode_set`, `drc_light_fine_tuning_set`, `drc_light_calibration`, `drc_speaker_play_mode_set`, `drc_speaker_tts_set`, `drc_speaker_play_volume_set`, `drc_speaker_play_stop`, `drc_speaker_replay`, `drc_speaker_tts_play_start`, `drc_psdk_input_box_text_set`, `drc_psdk_widget_value_set`, `drc_camera_photo_format_set`, `drc_ai_model_select`, `drc_ai_identify_set`, `drc_ai_spotlight_zoom_set`, `drc_ai_spotlight_zoom_track`, `drc_ai_spotlight_zoom_select`, `drc_ai_spotlight_zoom_confirm`, `drc_ai_spotlight_zoom_stop`, `drc_ai_identify_score_mode_set`, `drc_ai_identify_score_set`, `drc_ai_identify_score_reset`, `drc_ai_identify_filter_set`.
+- Already covered in 4c: `drone_emergency_stop` — cross-cite, do not re-document.
+
+**Open filing-convention questions** (raise in the resume-notes handoff and decide at 4e-2 kickoff):
+1. Several Dock 3 `drc_*` events land on `/events` (standard envelope) while the matching Dock 2 events land on `/drc/up` (lightweight envelope). The method name is identical; only the topic differs. Should these docs live in `events/` or `drc/`? Proposal: file in `drc/` with a prominent topic-divergence note, since the method-name convention (`drc_*` prefix) matches the DRC family rather than the topic.
+2. A few Dock 2 services (`drc_camera_mode_switch`) reply on `services_reply` instead of `drc/up`. Filing under `drc/` with the anomaly noted is the simplest option.
+
+- [ ] Enumerate + draft 53 methods.
+- [ ] Update `mqtt/dock-to-cloud/README.md` with 4e-2 rows.
+- [ ] Update `mqtt/README.md` + corpus `README.md`.
+- [ ] Append to `RESUME-NOTES.md`.
+- [ ] **Review gate 4e** (closes the whole 4e sub-phase, not just 4e-2).
 
 ### Sub-phase 4f — FlySafe + Custom-Flight-Area + AirSense + HMS (dock-to-cloud)
 
