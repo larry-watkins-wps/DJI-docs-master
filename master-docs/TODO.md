@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b landed 2026-04-18, review gate pending before 4c).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c landed 2026-04-18, review gate pending before 4d).
 
 ---
 
@@ -100,10 +100,10 @@ Re-scoped 2026-04-18 to cover WaylineManagement only (the original 4b-plus-Live-
 
 Estimated 3500–4200 lines of doc output — at the edge of a single-drop budget. If context pressure is high, consider splitting into `4c-1` (authority + DRC mode + flight commands + events, ~15 methods) and `4c-2` (camera/gimbal/IR + drc-family, ~27 methods).
 
-- [ ] Enumerate + draft 42 methods.
-- [ ] Update `mqtt/dock-to-cloud/README.md` with events/services/drc sections.
-- [ ] Update `mqtt/README.md` + corpus `README.md`.
-- [ ] Append to `RESUME-NOTES.md` with a 4c-close handoff entry.
+- [x] Enumerate + draft 42 methods (5 events + 30 services + 7 drc).
+- [x] Update `mqtt/dock-to-cloud/README.md` with events/services/drc sections.
+- [x] Update `mqtt/README.md` + corpus `README.md`.
+- [x] Append to `RESUME-NOTES.md` with a 4c-close handoff entry.
 - [ ] **Review gate 4c**
 
 ### Sub-phase 4d — LiveStream + Media-Management (dock-to-cloud)

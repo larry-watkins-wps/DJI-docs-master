@@ -6,6 +6,61 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-18 — handoff at Phase 4c close, ready for 4d
+
+### State of play
+
+- Phases 0, 1, 2, 3 complete and committed.
+- Phase 4 (MQTT topic catalog) is in progress. Sub-drops landed to date: **4a** (commit `8059992`, 5 methods), **4b** (commit `7742419`, 21 methods), **4c** (this commit, 42 methods).
+- **4c landed single-drop** (not split into 4c-1 / 4c-2). All 42 Live-Flight-Controls methods are identical across v1.15 Dock 2 + Dock 3 sources and covered by v1.11 Dock 2 canonical (`110.drc.md`). Cohort field on every doc is `Dock 2 + Dock 3`.
+- **4d is next** — LiveStream + Media-Management (dock-to-cloud).
+
+### What 4c produced
+
+- `mqtt/dock-to-cloud/events/` — 5 new docs: `fly_to_point_progress`, `takeoff_to_point_progress`, `drc_status_notify` (flagged abandoned in v1.15), `joystick_invalid_notify`, `camera_photo_take_progress`.
+- `mqtt/dock-to-cloud/services/` — 30 new docs covering authority grab (2), DRC mode enter/exit (2), flight commands (4: `takeoff_to_point`, `fly_to_point`, `fly_to_point_stop`, `fly_to_point_update`), payload capture/recording/mode (6), gimbal + aim + look + screen (6), storage + exposure + focus (7), IR metering (3).
+- `mqtt/dock-to-cloud/drc/` — **new directory** with 7 docs on the `drc/up` + `drc/down` channel: `stick_control`, `drone_control` (flagged abandoned), `drone_emergency_stop`, `heart_beat`, `hsi_info_push`, `delay_info_push`, `osd_info_push`.
+- `mqtt/dock-to-cloud/README.md` updated — status table marks 4c landed, new rows added in events/services tables, new `drc/` section added.
+- `mqtt/README.md` updated — blurb now says "Phase 4a + 4b + 4c landed (68 methods total)".
+- `README.md` (corpus TOC) updated — same.
+
+### DJI-source inconsistencies flagged during 4c drafting
+
+Worth knowing when you audit these docs, and worth carrying into Phase 9 workflow write-ups:
+
+- `stick_control` — DJI's v1.15 example includes a `gimbal_pitch` key that is not in the schema table. Flagged in the doc; don't treat it as authoritative.
+- `drone_control.h` — DJI documents the bounds as `{"min":5,"max":-4}`. Reversed numbers (typo); real semantic is ±m/s vertical velocity. Flagged in the doc.
+- `drone_control` — DJI's own description marks it abandoned in favor of `stick_control`. `drc_status_notify` also marked abandoned in v1.15 (pointer to `drc_state` device property or `heart_beat`).
+- `hsi_info_push` — DJI's example uses `around_distance` (singular) while the schema says `around_distances` (plural), and includes eight additional enable/work pairs (`left_*`, `right_*`, `front_*`, `back_*`, `vertical_*`, `horizontal_*`) not in the table. Flagged in the doc.
+- `heart_beat` — DJI example has two `method` keys in the same JSON (one would overwrite the other on parse). Noted as a source error.
+- `osd_info_push.height` — DJI lists the unit as "degree"; it's an altitude in meters. Noted.
+- `camera_exposure_set.exposure_value` — declared `enum_string` in the table but sent as integer in the example. Treated as integer per the example.
+- `camera_photo_take_progress.progress.current_step` — documented enum is `3000 / 3002 / 3005`; example shows `0` (not a valid enum value). Noted.
+- `device_exit_homing_notify.reason` — Phase 4b precedent: `enum_int` declared, string `"0"` in example. (Same class of DJI typo.)
+
+None of these rise to `OPEN-QUESTIONS.md` level — they're source-level inconsistencies that the per-doc "Source inconsistencies flagged by DJI's own example" callouts surface for any reader. Keep the pattern for 4d.
+
+### After 4c review gate (= kick-off of 4d)
+
+**4d scope — LiveStream + Media-Management (dock-to-cloud).** Sources:
+
+1. `DJI_Cloud/DJI_CloudAPI-Dock3-LiveStream.txt` (or similar — confirm exact filename with `ls DJI_Cloud/ | grep -i live`)
+2. `DJI_Cloud/DJI_CloudAPI-Dock3-Media-Management.txt` (likewise confirm filename)
+3. Dock 2 counterparts
+4. Cloud-API-Doc v1.11 Dock 2: `Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/30.live.md` + `40.file.md`
+
+Expected method count: ~20. Expected families: mostly `services/` (livestream start/stop, quality set, media list request) + `events/` (media upload status, livestream state changes) + possibly `requests/` (media pull).
+
+Template is unchanged from 4a–4c. Use the same cohort pattern and source-provenance table.
+
+### Known gotchas carried forward from 4b + 4c
+
+- DRC envelope is lighter (no `tid`/`bid`/`timestamp`, just `method` + `seq` + `data`). 4c added `drc/` as a family; 4d won't need new family dirs unless LiveStream/Media exposes one.
+- `in_flight_wayline_*` docs in `services/` show that `bid` groups related transactions across a multi-step flow. Same pattern will apply to livestream start → quality set → stop.
+- Review gate: user checkpoint before 4d starts. Don't push through.
+
+---
+
 ## 2026-04-18 — handoff at Phase 4b close, ready for 4c
 
 ### State of play
