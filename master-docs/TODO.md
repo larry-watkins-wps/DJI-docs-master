@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 5 — WebSocket message catalog (landed 2026-04-19; review gate open). Phase 4 closed 2026-04-19.
+**Current phase**: Phase 5 closed 2026-04-19. Phase 6 (Device properties) is next.
 
 ---
 
@@ -225,7 +225,7 @@ Enumerated 8 push messages across two families from the v1.15 extracts (`DJI_Clo
 - [x] Update `websocket/README.md` with per-message catalog links (jump table in §4).
 - [x] Update corpus `README.md`.
 - [x] Append to `RESUME-NOTES.md` with a Phase 5 close handoff.
-- [ ] **Review gate**
+- [x] **Review gate** closed 2026-04-19. Landing commit `9f93a3a` (8 WebSocket push messages + catalog index + session handoff).
 
 ## Phase 6 — Device properties
 
