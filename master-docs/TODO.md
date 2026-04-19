@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f + 4g landed 2026-04-19. Review gate 4g pending; Phase 4h next).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f + 4g landed 2026-04-19. Review gate 4g closed; Phase 4h next).
 
 ---
 
@@ -185,7 +185,7 @@ Actual method count was **16** (not ~40). PSDK source yields 4 events + 8 servic
 - [x] Update `mqtt/dock-to-cloud/README.md` with 4g rows + sub-phase status + new "Sub-phase 4g sub-areas" section grouped by PSDK speaker / PSDK widgets / PSDK-Interconnection / ESDK-Interconnection + filing note for 4g-vs-4e-2 parallel.
 - [x] Update `mqtt/README.md` + corpus `README.md` (method count 197).
 - [x] Append to `RESUME-NOTES.md` with a 4g close handoff entry.
-- [ ] **Review gate 4g**
+- [x] **Review gate 4g** closed 2026-04-19. Landing commit `8c24c7b` (16 method docs + `storage_config_get` update + index updates + session handoff).
 
 ### Sub-phase 4h — Pilot-to-Cloud (RC Plus 2 Enterprise + RC Pro Enterprise)
 
