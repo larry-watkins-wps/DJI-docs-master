@@ -5,6 +5,7 @@ type: project
 ---
 
 **Project root**: `C:\repos\DJI-docs-master`
+**Git remote** (`origin`): `https://github.com/larry-watkins-wps/DJI-docs-master.git` — clone from here on any new machine to resume work; push after each meaningful commit so the other machine can pull.
 **Output directory**: `master-docs/` (only writable location for documentation output)
 **Source directories** (read-only reference): `Cloud-API-Doc/`, `DJI-Cloud-API-Demo/`, `DJI_Cloud/`, `dji_cloud_dock3/`
 
