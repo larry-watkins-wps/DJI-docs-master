@@ -36,7 +36,7 @@ New docs are added to the table below as they land.
 |---|---|
 | `architecture/` | [`README.md`](architecture/README.md) — transports, device-edge-cloud model, thing model, topic taxonomy, in-scope topologies |
 | `http/` | [`README.md`](http/README.md) — URI form, `X-Auth-Token`, response envelope, status-code behavior + Phase 3 catalog of 16 endpoints across wayline / media / map / storage / device |
-| `mqtt/` | [`README.md`](mqtt/README.md) — topic taxonomy, 13-topic list, envelope, per-family payloads, QoS gap (OQ-003) · *per-topic catalog pending Phase 4* |
+| `mqtt/` | [`README.md`](mqtt/README.md) — topic taxonomy, 13-topic list, envelope, per-family payloads + Phase 4a [`dock-to-cloud/`](mqtt/dock-to-cloud/README.md) catalog (5 methods for binding / topology / config) |
 | `websocket/` | [`README.md`](websocket/README.md) — session lifecycle, envelope, v1.15 message families, push-and-fetch pattern · *per-message catalog pending Phase 5* |
 | `device-properties/` | *(pending Phase 6)* |
 | `wpml/` | *(pending Phase 7)* |

@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 3 — HTTP endpoint catalog (16 endpoint docs drafted 2026-04-18; review gate pending).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phase 4a landed 2026-04-18, review gate pending before 4b).
 
 ---
 
@@ -54,15 +54,65 @@ Checklist:
 - [x] One `.md` per endpoint — method, path, parameters, request body, response body, examples, provenance. All 16 cite both v1.11 canonical + v1.15 corroboration.
 - [x] Add catalog index to `http/README.md`.
 - [x] Update corpus `README.md` TOC.
-- [ ] **Review gate**
+- [x] **Review gate** closed 2026-04-18. Landing commit `aa0c590` (16 endpoint docs + catalog index).
 
 ## Phase 4 — MQTT topic catalog
 
-- [ ] Enumerate all topics from `DJI_Cloud/DJI_CloudAPI-TopicDefinitions.txt` + `Cloud-API-Doc/`
-- [ ] Group by family (OSD / state / services / events / property-set / requests / DRC)
-- [ ] One `.md` per topic
-- [ ] Update corpus `README.md`
-- [ ] **Review gate**
+**Scope decision (2026-04-18):** Phase 4 is being landed in feature-area sub-drops because the full method count (~240 methods across dock-to-cloud + pilot-to-cloud) is too large for a single drop. Each sub-phase has its own review gate. Property families (`osd/`, `state/`, `property-set/`) will be thin shells that link to Phase 6 `device-properties/` — they do not duplicate the property catalog. Dock 2 vs Dock 3 (and RC Plus 2 vs RC Pro) are co-documented per method with a **Cohort** field; per-cohort quirks larger than a note go to Phase 10 annexes. File names are the verbatim DJI `method` string (e.g., `airport_organization_bind.md`) for grep-ability.
+
+Also adds an 8th family directory, `status/`, for the `sys/product/{gateway_sn}/status` topic which doesn't fit the PLAN's seven thing-model families.
+
+### Sub-phase 4a — DeviceManagement + Organization + Configuration (dock-to-cloud)
+
+- [x] Enumerate methods across `DJI_CloudAPI-Dock3-DeviceManagement.txt`, `DJI_CloudAPI-Dock3-Organization-Management.txt`, `DJI_CloudAPI-Dock3-Configuration-Update.txt`, and their Dock 2 counterparts. 5 methods total.
+- [x] Write `mqtt/dock-to-cloud/status/update_topo.md`.
+- [x] Write `mqtt/dock-to-cloud/requests/config.md`.
+- [x] Write `mqtt/dock-to-cloud/requests/airport_bind_status.md`.
+- [x] Write `mqtt/dock-to-cloud/requests/airport_organization_get.md`.
+- [x] Write `mqtt/dock-to-cloud/requests/airport_organization_bind.md`.
+- [x] Write `mqtt/dock-to-cloud/README.md` as path-level index with sub-phase status table.
+- [x] Update `mqtt/README.md` to link the new dock-to-cloud index.
+- [x] Update corpus `README.md`.
+- [ ] **Review gate 4a**
+
+### Sub-phase 4b — WaylineManagement + Live-Flight-Controls (dock-to-cloud)
+
+- [ ] Enumerate methods across `DJI_CloudAPI-Dock3-WaylineManagement.txt`, `DJI_CloudAPI-Dock3-Live-Flight-Controls.txt`, Dock 2 counterparts.
+- [ ] Draft per-method docs (est. ~45 methods covering flight-task lifecycle, DRC, AI identify for Dock 3).
+- [ ] Update dock-to-cloud index.
+- [ ] **Review gate 4b**
+
+### Sub-phase 4c — LiveStream + Media-Management (dock-to-cloud)
+
+- [ ] Enumerate + draft (est. ~20 methods).
+- [ ] **Review gate 4c**
+
+### Sub-phase 4d — Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control (dock-to-cloud)
+
+- [ ] Enumerate + draft (est. ~30 methods).
+- [ ] **Review gate 4d**
+
+### Sub-phase 4e — FlySafe + Custom-Flight-Area + AirSense + HMS (dock-to-cloud)
+
+- [ ] Enumerate + draft (est. ~35 methods).
+- [ ] **Review gate 4e**
+
+### Sub-phase 4f — PSDK + PSDK-Interconnection + ESDK-Interconnection (dock-to-cloud)
+
+- [ ] Enumerate + draft (est. ~40 methods).
+- [ ] **Review gate 4f**
+
+### Sub-phase 4g — Pilot-to-Cloud (RC Plus 2 Enterprise + RC Pro Enterprise)
+
+- [ ] Enumerate methods across RC Plus 2 + RC Pro feature files (est. ~70 methods).
+- [ ] Create `mqtt/pilot-to-cloud/` subtree with same family structure.
+- [ ] Write path-level index.
+- [ ] **Review gate 4g**
+
+### Sub-phase 4h — Property-family shells (dock-to-cloud + pilot-to-cloud)
+
+- [ ] Write thin `osd/`, `state/`, `property-set/` shells per device that link to Phase 6.
+- [ ] **Final Phase 4 review gate**
 
 ## Phase 5 — WebSocket message catalog
 
