@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f + 4g + 4h landed 2026-04-19. Review gate 4h open; Phase 4i next).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f + 4g + 4h landed 2026-04-19. Review gate 4h closed; Phase 4i in progress).
 
 ---
 
@@ -201,7 +201,7 @@ Actual method count is **94 unique methods** across the two RC cohorts (est. was
   - DRC variants (20): `drc/drc_live_lens_change.md` + 19 `drc/drc_camera_*.md` / `drc/drc_ir_metering_*.md` / `drc/drc_gimbal_reset.md` (pilot-side lightweight-DRC variants of the dock-to-cloud 4c camera / IR / gimbal services).
 - [x] Update `mqtt/README.md` + corpus `README.md` to cite the 94-method count and the 4h landing.
 - [x] Append to `RESUME-NOTES.md` with a 4h close handoff entry.
-- [ ] **Review gate 4h**
+- [x] **Review gate 4h** closed 2026-04-19. Landing commit `2228c33` (27 pilot-specific method docs + cross-reference tables + session handoff).
 
 ### Sub-phase 4i — Property-family shells (dock-to-cloud + pilot-to-cloud)
 
