@@ -1,6 +1,6 @@
 # `storage_config_get` — dock requests temporary object-storage credentials
 
-Request by which the dock fetches a short-lived credential bundle for uploading media (photos, videos, logs) to the server's object-storage bucket. The cloud replies with bucket name, endpoint, provider, and STS-style credentials that the dock uses directly against the storage provider's SDK. The dock then follows up with [`file_upload_callback`](../events/file_upload_callback.md) once each file has been uploaded.
+Request by which the dock fetches a short-lived credential bundle for uploading to the server's object storage. Two independent subsystems use this request, selected by the `module` field: **Media** (photos, videos, logs — `module = 0`) and **PSDK UI resources** (widget tarballs — `module = 1`). The cloud replies with bucket name, endpoint, provider, and STS-style credentials that the dock uses directly against the storage provider's SDK. Once a media file has uploaded the dock reports it via [`file_upload_callback`](../events/file_upload_callback.md); once a PSDK UI-resource tarball has uploaded, the dock reports it via [`psdk_ui_resource_upload_result`](../events/psdk_ui_resource_upload_result.md).
 
 Part of the Phase 4 MQTT catalog. Shared conventions (envelope, requests-reply) live in [`../../README.md`](../../README.md).
 
@@ -19,7 +19,7 @@ Part of the Phase 4 MQTT catalog. Shared conventions (envelope, requests-reply) 
 
 | Field | Type | Description |
 |---|---|---|
-| `module` | enum int | Subsystem requesting credentials. `0` = Media. Reserved for future modules. |
+| `module` | enum int | Subsystem requesting credentials. `0` = Media (photos, videos, logs; see [4d Media-Management docs](../events/file_upload_callback.md)); `1` = PSDK UI resources (widget resource tarball; see [`psdk_ui_resource_upload_result`](../events/psdk_ui_resource_upload_result.md)). |
 
 ### Example
 
@@ -82,14 +82,17 @@ Part of the Phase 4 MQTT catalog. Shared conventions (envelope, requests-reply) 
 ## Relationship to other methods
 
 - After receiving credentials, the dock uploads files directly to the storage provider (not over MQTT).
-- Once a file has been uploaded, the dock reports it via [`file_upload_callback`](../events/file_upload_callback.md) so the cloud can index it.
-- Upload ordering can be hinted by the cloud via [`upload_flighttask_media_prioritize`](../services/upload_flighttask_media_prioritize.md) or announced by the dock via [`highest_priority_upload_flighttask_media`](../events/highest_priority_upload_flighttask_media.md).
+- For **Media** uploads (`module = 0`), the dock reports completion via [`file_upload_callback`](../events/file_upload_callback.md). Upload ordering can be hinted by the cloud via [`upload_flighttask_media_prioritize`](../services/upload_flighttask_media_prioritize.md) or announced by the dock via [`highest_priority_upload_flighttask_media`](../events/highest_priority_upload_flighttask_media.md).
+- For **PSDK UI resource** uploads (`module = 1`), the dock reports completion via [`psdk_ui_resource_upload_result`](../events/psdk_ui_resource_upload_result.md).
 - Full media-upload flow documented in Phase 9 workflow `workflows/media-upload-from-dock.md`.
 
 ## Source provenance
 
 | Source | Role |
 |---|---|
-| `[Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/40.file.md]` | v1.11 canonical (Dock 2). |
-| `[DJI_Cloud/DJI_CloudAPI-Dock2-Media-Management.txt]` | v1.15 (Dock 2) — identical to v1.11 apart from case of `minio` enum label. |
-| `[DJI_Cloud/DJI_CloudAPI-Dock3-Media-Management.txt]` | v1.15 (Dock 3) — identical payload. |
+| `[Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/40.file.md]` | v1.11 canonical (Dock 2) — Media-only view of `module`. |
+| `[Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/140.psdk.md]` | v1.11 canonical (Dock 2) — introduces `module = 1` PSDK UI resources enum. |
+| `[DJI_Cloud/DJI_CloudAPI-Dock2-Media-Management.txt]` | v1.15 (Dock 2 Media) — identical to v1.11 apart from case of `minio` enum label. |
+| `[DJI_Cloud/DJI_CloudAPI-Dock3-Media-Management.txt]` | v1.15 (Dock 3 Media) — identical payload. |
+| `[DJI_Cloud/DJI_CloudAPI-Dock2-PSDK.txt]` | v1.15 (Dock 2 PSDK) — full `module` enum (`0` + `1`). |
+| `[DJI_Cloud/DJI_CloudAPI-Dock3-PSDK.txt]` | v1.15 (Dock 3 PSDK) — full `module` enum (`0` + `1`). |

@@ -19,7 +19,7 @@ Phase 4 is being landed in feature-area sub-drops. This index grows as drops lan
 | 4e-1 | Firmware-Upgrade + Remote-Log + Remote-Debugging | **landed 2026-04-19** |
 | 4e-2 | Remote-Control (DRC PSDK + AI identify + camera/speaker/light) | **landed 2026-04-19** |
 | 4f | FlySafe + Custom-Flight-Area + AirSense + HMS | **landed 2026-04-19** |
-| 4g | PSDK + PSDK-Interconnection + ESDK-Interconnection | pending |
+| 4g | PSDK + PSDK-Interconnection + ESDK-Interconnection | **landed 2026-04-19** |
 
 ## Current catalog
 
@@ -68,6 +68,12 @@ Topics under `thing/product/{gateway_sn}/events`. Device → cloud pushes.
 | `flight_areas_sync_progress` | [`events/flight_areas_sync_progress.md`](events/flight_areas_sync_progress.md) | Custom-flight-area file sync state + failure reason (`need_reply: 1`). |
 | `airsense_warning` | [`events/airsense_warning.md`](events/airsense_warning.md) | ADS-B proximity warning (five levels; `need_reply: 1`). |
 | `hms` | [`events/hms.md`](events/hms.md) | Health Management System warning push (batch up to 20 entries). |
+| `speaker_tts_play_start_progress` | [`events/speaker_tts_play_start_progress.md`](events/speaker_tts_play_start_progress.md) | PSDK TTS-playback progress (`md5` correlates back to the service request). |
+| `speaker_audio_play_start_progress` | [`events/speaker_audio_play_start_progress.md`](events/speaker_audio_play_start_progress.md) | PSDK audio-playback progress (adds `download` + `encoding` pipeline steps). |
+| `psdk_floating_window_text` | [`events/psdk_floating_window_text.md`](events/psdk_floating_window_text.md) | PSDK floating-window text push (outside DRC; mirror of [`drc_psdk_floating_window_text`](drc/drc_psdk_floating_window_text.md)). |
+| `psdk_ui_resource_upload_result` | [`events/psdk_ui_resource_upload_result.md`](events/psdk_ui_resource_upload_result.md) | PSDK widget UI-resource tarball uploaded to object storage (`object_key` + `size`). |
+| `custom_data_transmission_from_psdk` | [`events/custom_data_transmission_from_psdk.md`](events/custom_data_transmission_from_psdk.md) | **PSDK-Interconnection** passthrough — opaque bytes pushed by PSDK payload. |
+| `custom_data_transmission_from_esdk` | [`events/custom_data_transmission_from_esdk.md`](events/custom_data_transmission_from_esdk.md) | **ESDK-Interconnection** passthrough — opaque bytes pushed by aircraft onboard-SDK. |
 
 ### `services/`
 
@@ -156,6 +162,16 @@ Topics under `thing/product/{gateway_sn}/services`. Cloud → device commands.
 | `unlock_license_update` | [`services/unlock_license_update.md`](services/unlock_license_update.md) | Push a refreshed FlySafe license file (or trigger online resync). |
 | `unlock_license_list` | [`services/unlock_license_list.md`](services/unlock_license_list.md) | Enumerate the unlocking licenses loaded on aircraft or dock. |
 | `flight_areas_update` | [`services/flight_areas_update.md`](services/flight_areas_update.md) | Tell the device to refresh its custom-flight-area set (no params). |
+| `speaker_play_volume_set` | [`services/speaker_play_volume_set.md`](services/speaker_play_volume_set.md) | Set PSDK speaker volume outside DRC (mirror of [`drc_speaker_play_volume_set`](drc/drc_speaker_play_volume_set.md)). |
+| `speaker_play_mode_set` | [`services/speaker_play_mode_set.md`](services/speaker_play_mode_set.md) | Set PSDK speaker single / loop playback mode outside DRC. |
+| `speaker_play_stop` | [`services/speaker_play_stop.md`](services/speaker_play_stop.md) | Stop PSDK speaker playback outside DRC. |
+| `speaker_replay` | [`services/speaker_replay.md`](services/speaker_replay.md) | Replay last PSDK speaker audio outside DRC. |
+| `speaker_tts_play_start` | [`services/speaker_tts_play_start.md`](services/speaker_tts_play_start.md) | Play TTS text on PSDK speaker outside DRC. |
+| `speaker_audio_play_start` | [`services/speaker_audio_play_start.md`](services/speaker_audio_play_start.md) | Play pre-recorded audio file on PSDK speaker outside DRC. |
+| `psdk_input_box_text_set` | [`services/psdk_input_box_text_set.md`](services/psdk_input_box_text_set.md) | Set PSDK text-box widget content outside DRC. |
+| `psdk_widget_value_set` | [`services/psdk_widget_value_set.md`](services/psdk_widget_value_set.md) | Set PSDK generic widget value outside DRC (mirror of [`drc_psdk_widget_value_set`](drc/drc_psdk_widget_value_set.md)). |
+| `custom_data_transmission_to_psdk` | [`services/custom_data_transmission_to_psdk.md`](services/custom_data_transmission_to_psdk.md) | **PSDK-Interconnection** passthrough — cloud sends opaque bytes to PSDK payload. |
+| `custom_data_transmission_to_esdk` | [`services/custom_data_transmission_to_esdk.md`](services/custom_data_transmission_to_esdk.md) | **ESDK-Interconnection** passthrough — cloud sends opaque bytes to aircraft onboard-SDK. |
 
 ### `requests/`
 
@@ -169,7 +185,7 @@ Topics under `thing/product/{gateway_sn}/requests`. Device → cloud requests, c
 | `airport_organization_bind` | [`requests/airport_organization_bind.md`](requests/airport_organization_bind.md) | Gateway binds a device set to an organization. |
 | `flighttask_progress_get` | [`requests/flighttask_progress_get.md`](requests/flighttask_progress_get.md) | In multi-dock tasks, query the other dock's latest progress. |
 | `flighttask_resource_get` | [`requests/flighttask_resource_get.md`](requests/flighttask_resource_get.md) | Fetch a fresh pre-signed URL for the KMZ wayline file. |
-| `storage_config_get` | [`requests/storage_config_get.md`](requests/storage_config_get.md) | Dock requests short-lived object-storage credentials for media upload. |
+| `storage_config_get` | [`requests/storage_config_get.md`](requests/storage_config_get.md) | Dock requests short-lived object-storage credentials. `module = 0` = Media (4d); `module = 1` = PSDK UI resources (4g). |
 | `flight_areas_get` | [`requests/flight_areas_get.md`](requests/flight_areas_get.md) | Dock pulls the cloud's current custom-flight-area file inventory. |
 
 ### `drc/`
@@ -323,6 +339,52 @@ Cross-cohort topic divergence (Dock 3 `/events` vs Dock 2 `/drc/up`) is flagged 
 | Method | Doc | Purpose |
 |---|---|---|
 | `hms` | [`events/hms.md`](events/hms.md) | Health warning batch (up to 20 entries). Code catalog belongs to Phase 8 (`hms-codes/`). |
+
+### Sub-phase 4g sub-areas
+
+16 methods covering the non-DRC PSDK speaker/widget surface and the PSDK / ESDK interconnection passthrough channels. All identical across Dock 2 + Dock 3. See the [4g filing note](#filing-note-for-4g-psdk-speakerwidget-methods) below for why `speaker_*` and `psdk_*` methods live in `events/` + `services/` while their `drc_*` siblings live in `drc/`.
+
+**PSDK — speaker (2 events + 6 services):**
+
+| Method | Doc | Family | Purpose |
+|---|---|---|---|
+| `speaker_tts_play_start_progress` | [`events/speaker_tts_play_start_progress.md`](events/speaker_tts_play_start_progress.md) | event | TTS playback progress (`md5` correlation). |
+| `speaker_audio_play_start_progress` | [`events/speaker_audio_play_start_progress.md`](events/speaker_audio_play_start_progress.md) | event | Audio playback progress (adds `download` + `encoding` steps). |
+| `speaker_play_volume_set` | [`services/speaker_play_volume_set.md`](services/speaker_play_volume_set.md) | service | Set volume `0`–`100`. |
+| `speaker_play_mode_set` | [`services/speaker_play_mode_set.md`](services/speaker_play_mode_set.md) | service | Single vs loop playback. |
+| `speaker_play_stop` | [`services/speaker_play_stop.md`](services/speaker_play_stop.md) | service | Stop playback. |
+| `speaker_replay` | [`services/speaker_replay.md`](services/speaker_replay.md) | service | Replay last audio. |
+| `speaker_tts_play_start` | [`services/speaker_tts_play_start.md`](services/speaker_tts_play_start.md) | service | Play TTS text (`tts.md5` correlation). |
+| `speaker_audio_play_start` | [`services/speaker_audio_play_start.md`](services/speaker_audio_play_start.md) | service | Play pre-recorded PCM audio (`file.md5` correlation). |
+
+**PSDK — widgets (2 events + 2 services):**
+
+| Method | Doc | Family | Purpose |
+|---|---|---|---|
+| `psdk_floating_window_text` | [`events/psdk_floating_window_text.md`](events/psdk_floating_window_text.md) | event | Floating-window text push. |
+| `psdk_ui_resource_upload_result` | [`events/psdk_ui_resource_upload_result.md`](events/psdk_ui_resource_upload_result.md) | event | Widget UI-resource tarball uploaded (`object_key`). |
+| `psdk_input_box_text_set` | [`services/psdk_input_box_text_set.md`](services/psdk_input_box_text_set.md) | service | Set text-box widget content. |
+| `psdk_widget_value_set` | [`services/psdk_widget_value_set.md`](services/psdk_widget_value_set.md) | service | Set generic widget value (switch / slider / etc.). |
+
+**PSDK-Interconnection (1 event + 1 service):**
+
+| Method | Doc | Family | Purpose |
+|---|---|---|---|
+| `custom_data_transmission_from_psdk` | [`events/custom_data_transmission_from_psdk.md`](events/custom_data_transmission_from_psdk.md) | event | Opaque bytes (<256 B) pushed by PSDK payload. |
+| `custom_data_transmission_to_psdk` | [`services/custom_data_transmission_to_psdk.md`](services/custom_data_transmission_to_psdk.md) | service | Cloud sends opaque bytes to PSDK payload. |
+
+**ESDK-Interconnection (1 event + 1 service):**
+
+| Method | Doc | Family | Purpose |
+|---|---|---|---|
+| `custom_data_transmission_from_esdk` | [`events/custom_data_transmission_from_esdk.md`](events/custom_data_transmission_from_esdk.md) | event | Opaque bytes (<256 B) pushed by aircraft ESDK application. |
+| `custom_data_transmission_to_esdk` | [`services/custom_data_transmission_to_esdk.md`](services/custom_data_transmission_to_esdk.md) | service | Cloud sends opaque bytes to aircraft ESDK application. |
+
+#### Filing note for 4g PSDK speaker/widget methods
+
+The 4g PSDK speaker + widget methods (`speaker_*` / `psdk_*`) live in `events/` + `services/` because their topic is the standard `/events` + `/services` pair — not `/drc/down` + `/drc/up`. Their DRC-session siblings (with the `drc_` prefix, filed under `drc/` in 4e-2) exist as parallel methods for in-session use. The two sets are **not** aliases: same payload shape, different topic envelopes, different MQTT flow semantics. A cloud that operates the speaker / widget outside of a DRC session must use the 4g methods; inside a session, the 4e-2 `drc_*` counterparts.
+
+The PSDK-Interconnection + ESDK-Interconnection `custom_data_transmission_*` passthrough methods are not DRC-related and have no `drc_*` siblings.
 
 ### `property/set`, `osd/`, `state/`
 

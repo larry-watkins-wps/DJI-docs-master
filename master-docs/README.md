@@ -36,7 +36,7 @@ New docs are added to the table below as they land.
 |---|---|
 | `architecture/` | [`README.md`](architecture/README.md) — transports, device-edge-cloud model, thing model, topic taxonomy, in-scope topologies |
 | `http/` | [`README.md`](http/README.md) — URI form, `X-Auth-Token`, response envelope, status-code behavior + Phase 3 catalog of 16 endpoints across wayline / media / map / storage / device |
-| `mqtt/` | [`README.md`](mqtt/README.md) — topic taxonomy, 13-topic list, envelope, per-family payloads + Phase 4a–4f [`dock-to-cloud/`](mqtt/dock-to-cloud/README.md) catalog (181 methods: binding / topology / config + WaylineManagement + Live-Flight-Controls + LiveStream + Media-Management + Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control DRC / PSDK / AI + FlySafe + Custom-Flight-Area + AirSense + HMS) |
+| `mqtt/` | [`README.md`](mqtt/README.md) — topic taxonomy, 13-topic list, envelope, per-family payloads + Phase 4a–4g [`dock-to-cloud/`](mqtt/dock-to-cloud/README.md) catalog (197 methods: binding / topology / config + WaylineManagement + Live-Flight-Controls + LiveStream + Media-Management + Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control DRC / PSDK / AI + FlySafe + Custom-Flight-Area + AirSense + HMS + PSDK speaker / widgets + PSDK / ESDK Interconnection) |
 | `websocket/` | [`README.md`](websocket/README.md) — session lifecycle, envelope, v1.15 message families, push-and-fetch pattern · *per-message catalog pending Phase 5* |
 | `device-properties/` | *(pending Phase 6)* |
 | `wpml/` | *(pending Phase 7)* |

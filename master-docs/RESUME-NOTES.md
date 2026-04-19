@@ -6,6 +6,83 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 4g close, ready for 4h
+
+### State of play
+
+- Phases 0, 1, 2, 3 complete and committed.
+- Phase 4 (MQTT topic catalog) — **sub-phases 4a, 4b, 4c, 4d, 4e-1, 4e-2, 4f, and 4g all landed**. **197 methods total** across the dock-to-cloud MQTT catalog.
+- **4h is next** — pilot-to-cloud (RC Plus 2 Enterprise + RC Pro Enterprise). Est. ~70 methods (to be re-verified at enumeration).
+
+### What 4g produced
+
+- `mqtt/dock-to-cloud/events/` — 6 new docs: `speaker_tts_play_start_progress`, `speaker_audio_play_start_progress`, `psdk_floating_window_text`, `psdk_ui_resource_upload_result`, `custom_data_transmission_from_psdk`, `custom_data_transmission_from_esdk`.
+- `mqtt/dock-to-cloud/services/` — 10 new docs: `speaker_play_volume_set`, `speaker_play_mode_set`, `speaker_play_stop`, `speaker_replay`, `speaker_tts_play_start`, `speaker_audio_play_start`, `psdk_input_box_text_set`, `psdk_widget_value_set`, `custom_data_transmission_to_psdk`, `custom_data_transmission_to_esdk`.
+- `mqtt/dock-to-cloud/requests/storage_config_get.md` — **updated, not duplicated.** Pre-4g version documented `module = 0 = Media` only; 4g PSDK source shows `module = 1 = PSDK UI resources`. Added the second enum value, expanded the intro + relationship section, added PSDK sources to the provenance table.
+- No new family directory — all 16 new methods fit into existing `events/` + `services/`.
+- `mqtt/dock-to-cloud/README.md` — added sub-phase 4g status row (landed), added events + services table rows, extended the `storage_config_get` row with the `module` split, added a new "Sub-phase 4g sub-areas" section grouping by PSDK speaker / PSDK widgets / PSDK-Interconnection / ESDK-Interconnection, and added a "Filing note for 4g PSDK speaker/widget methods" explaining the 4g-vs-4e-2 parallel.
+- `mqtt/README.md` + corpus `README.md` updated to 197-method total.
+- `TODO.md` — 4g section re-scoped (16 methods vs ~40 estimate) and checkboxes ticked; only the 4g review gate remains open.
+
+### Why the method count (16) is much lower than the ~40 estimate
+
+The 4e-2 handoff projected "~40 methods" for 4g. Actual counts by source:
+
+- **PSDK** (`DJI_CloudAPI-Dock3-PSDK.txt`, 647 lines): 4 events + 8 services + 1 request-that-already-exists = 12 new methods + 1 update to `storage_config_get`. The file is mostly the "outside-DRC" speaker/widget surface — parallel to the 4e-2 `drc_*` family.
+- **PSDK-Interconnection**: 1 event + 1 service = 2 methods. Plain `value: text<256B` passthrough, no complex payload.
+- **ESDK-Interconnection**: 1 event + 1 service = 2 methods. Mirror of PSDK-Interconnection.
+
+The estimate over-projected because the RESUME-NOTES anticipated "payload state/event methods" beyond the transmit passthrough. In reality, payload state methods (`drc_psdk_state_info`, `drc_psdk_ui_resource`, `drc_speaker_play_progress`, `drc_psdk_floating_window_text`) landed under 4e-2's `drc/`. 4g's new surface is the **non-DRC** counterparts of those methods plus the two interconnection passthrough families.
+
+### Filing decision for 4g (vs. 4e-2 `drc_*` siblings)
+
+**`speaker_*` / `psdk_*` methods live in `events/` + `services/`; their `drc_speaker_*` / `drc_psdk_*` siblings live in `drc/` (4e-2).** The two sets are not aliases — same payload shape, different topic envelopes (`/services` vs `/drc/down`), different flow semantics. A cloud operates the speaker/widget outside an active DRC session via 4g methods and inside a session via 4e-2 `drc_*` methods. The 4g docs cross-cite their DRC siblings in a "Relationship to other methods" section.
+
+The `custom_data_transmission_*` passthrough methods are not DRC-related and have no `drc_*` siblings.
+
+### DJI-source inconsistencies flagged during 4g drafting
+
+Carry into Phase 9 workflow authoring:
+
+- **Pervasive `"timestamp:"` trailing-colon typo in Dock 3 service-reply examples.** Every service in `DJI_CloudAPI-Dock3-PSDK.txt` has it; Dock 2 + v1.11 are correct. Same pattern first seen in 4c and re-flagged in every sub-phase since.
+- **`speaker_tts_play_start_progress` example `output.status: "success"` is not in the declared enum** (`{"in_progress", "ok"}`). Bug is present in **all three sources** (v1.11 + Dock 2 v1.15 + Dock 3 v1.15). Cloud implementations should accept `"success"` as equivalent to `"ok"`, or rely on `progress.percent == 100 && progress.step_key == "play"` as the authoritative completion signal. The sibling `speaker_audio_play_start_progress` example uses `"in_progress"` (valid) so the bug is only in the TTS progress event.
+- **`upload` step-key wording diverges.** Dock 3 reads "Dock uploads audio to payload"; Dock 2 + v1.11 read "Dock uploads audio to psdk". Enum key is stable.
+- **`speaker_audio_play_start` example URL has `.webm.pcm` double extension.** The URL is opaque to the dock logic; `file.format: "pcm"` is authoritative for the wire format.
+- **`storage_config_get.module` gap closed.** Pre-4g doc documented `module = 0` only (from the 4d Media-Management source). PSDK sources (Dock 2 + Dock 3, v1.11 + v1.15) add `module = 1 = PSDK UI resources`. Doc now carries both values with source citations. Classification: source-coverage gap rather than a DJI-source inconsistency.
+
+None of these rise to `OPEN-QUESTIONS.md` level — doc-level callouts are sufficient.
+
+### After 4g review gate (= kick-off of 4h)
+
+**4h scope — pilot-to-cloud (RC Plus 2 Enterprise + RC Pro Enterprise).** Sources to enumerate (confirm filenames with `ls DJI_Cloud/ | grep -iE "(pilot|rc)"`):
+
+1. Per-feature pilot-to-cloud files under `DJI_Cloud/` — FlightTask, Live-Flight-Controls, LiveStream, HMS, FlySafe, DeviceManagement (there's likely a `DJI_CloudAPI-Pilot*-*.txt` set).
+2. Cloud-API-Doc v1.11 pilot-to-cloud: `Cloud-API-Doc/docs/en/60.api-reference/30.pilot-to-cloud/` subtree.
+3. `DJI_Cloud/DJI_CloudAPI-PilotToCloud-Topic-Definition.txt` (already cited in [`mqtt/README.md`](mqtt/README.md) §2).
+
+Expected method count: ~70 (to be revised after enumeration). Expected families: mostly the same seven thing-model families as dock-to-cloud (`status/`, `events/`, `services/`, `requests/`, `drc/`, plus the property families in 4i). RC-specific divergences to watch: RC Plus 2 Enterprise pairs with M4D (current gen); RC Pro Enterprise pairs with M3D/M3TD (older gen). Any cohort split will mirror the Dock 2 / Dock 3 pattern.
+
+**Filing convention from 4e-2 carries over** — all `drc_*` methods in `drc/`, all `_progress` events in `events/`.
+
+### Known gotchas carried forward
+
+- Pilot-to-cloud uses the same MQTT envelope + topic list as dock-to-cloud (verified at Phase 2). The `{device_sn}` parameterization differs: `{gateway_sn}` becomes the RC's serial number, and the sub-device aircraft SN is the inner `device_sn`. Phase 2 [`mqtt/README.md`](mqtt/README.md) has the canonical taxonomy.
+- The pilot-to-cloud tree (`mqtt/pilot-to-cloud/`) does **not** yet exist — 4h creates it. Path-level index (`mqtt/pilot-to-cloud/README.md`) must mirror the dock-to-cloud one.
+- Property-family shells (`osd/`, `state/`, `property-set/`) are 4i scope — Phase 6 catalogs properties per device, and the MQTT property shells are thin pointers to it. Do not duplicate property content in 4h.
+- Review gate: user checkpoint before 4h starts. Don't push through.
+
+### Open questions potentially affecting 4h
+
+- [`OQ-003`](OPEN-QUESTIONS.md) — QoS / retain / clean-session values still unspecified. Pilot-to-cloud DRC topics are highly latency-sensitive; cite the gap, don't invent.
+- [`OQ-002`](OPEN-QUESTIONS.md) — pilot OSD copy-paste issue. May resurface in 4h if pilot OSD lives as a `state/` property shell vs an `osd/` topic. Flag at enumeration.
+
+### Remaining Phase 4 work (4i only, after 4h)
+
+After 4h the remaining MQTT work is:
+- **4i** — property-family shells (`osd/`, `state/`, `property-set/`) that link to Phase 6 `device-properties/`. Thin pointer docs, not content-bearing.
+
+---
+
 ## 2026-04-19 — handoff at Phase 4f close, ready for 4g
 
 ### State of play

@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f landed 2026-04-19. Review gate 4f closed; Phase 4g next).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f + 4g landed 2026-04-19. Review gate 4g pending; Phase 4h next).
 
 ---
 
@@ -174,7 +174,17 @@ Actual method count was **9** (not ~35). DJI's FlySafe surface is a 3-service tu
 
 ### Sub-phase 4g — PSDK + PSDK-Interconnection + ESDK-Interconnection (dock-to-cloud)
 
-- [ ] Enumerate + draft (est. ~40 methods).
+Actual method count was **16** (not ~40). PSDK source yields 4 events + 8 services + 1 already-documented request (`storage_config_get`, updated to add `module = 1`). PSDK-Interconnection = 1 event + 1 service. ESDK-Interconnection = 1 event + 1 service. The estimate anticipated payload-state/event methods beyond the transmit passthrough; most of those landed in 4e-2 under `drc/` as their `drc_*` siblings. 4g is the non-DRC counterparts of 4e-2's speaker/widget methods plus the two interconnection passthrough families.
+
+- [x] Enumerate + draft 16 methods (4 events + 8 services from PSDK; 1 event + 1 service each from PSDK-Interconnection + ESDK-Interconnection). Plus `storage_config_get` update.
+  - PSDK events: `speaker_tts_play_start_progress`, `speaker_audio_play_start_progress`, `psdk_floating_window_text`, `psdk_ui_resource_upload_result`.
+  - PSDK services: `speaker_play_volume_set`, `speaker_play_mode_set`, `speaker_play_stop`, `speaker_replay`, `speaker_tts_play_start`, `speaker_audio_play_start`, `psdk_input_box_text_set`, `psdk_widget_value_set`.
+  - PSDK-Interconnection: event `custom_data_transmission_from_psdk`, service `custom_data_transmission_to_psdk`.
+  - ESDK-Interconnection: event `custom_data_transmission_from_esdk`, service `custom_data_transmission_to_esdk`.
+  - `storage_config_get` updated — `module` enum now documents `0 = Media` (4d) + `1 = PSDK UI resources` (4g); intro + relationship + provenance sections expanded.
+- [x] Update `mqtt/dock-to-cloud/README.md` with 4g rows + sub-phase status + new "Sub-phase 4g sub-areas" section grouped by PSDK speaker / PSDK widgets / PSDK-Interconnection / ESDK-Interconnection + filing note for 4g-vs-4e-2 parallel.
+- [x] Update `mqtt/README.md` + corpus `README.md` (method count 197).
+- [x] Append to `RESUME-NOTES.md` with a 4g close handoff entry.
 - [ ] **Review gate 4g**
 
 ### Sub-phase 4h — Pilot-to-Cloud (RC Plus 2 Enterprise + RC Pro Enterprise)
