@@ -1,4 +1,21 @@
-"""Extract primary text content from MHTML files into .txt files for Claude Code ingestion."""
+"""Extract primary text content from MHTML files into .txt files for Claude Code ingestion.
+
+Running this script does two passes:
+
+1. For every *.mhtml in this directory, extract text and write a trimmed .txt
+   (overwriting an existing .txt of the same base name).
+2. For every remaining *.txt in this directory (existing extractions with no
+   paired .mhtml), trim the same top/bottom page-chrome in place.
+
+"Trimming" means keeping only the lines strictly between the first and last
+line ending with `Github Edit open in new window`. Those markers bracket the
+actual doc content in the live DJI docs site UI and are emitted on every page.
+Dropping them removes ~380 lines of repeated left-nav header and ~5-15 lines
+of footer per file while leaving every byte of documentation content intact.
+
+Files with zero or one marker are reported as warnings and left untouched so
+the human can triage them.
+"""
 
 import email
 import email.policy
@@ -94,25 +111,85 @@ def html_to_text(html: str) -> str:
     return extractor.get_text()
 
 
+MARKER_RE = re.compile(r"Github Edit open in new window\s*$")
+
+
+def trim_boilerplate(text: str):
+    """Trim top page-chrome and bottom footer using the 'Github Edit open in new window' marker.
+
+    Returns (new_text, marker_count). Caller checks marker_count:
+      - >= 2 : trimmed, new_text is the content between first and last marker
+      - <  2 : untrimmed, new_text == text. Caller should warn and skip writing.
+    """
+    lines = text.splitlines()
+    marker_indices = [i for i, line in enumerate(lines) if MARKER_RE.search(line)]
+    if len(marker_indices) < 2:
+        return text, len(marker_indices)
+    first = marker_indices[0]
+    last = marker_indices[-1]
+    kept = lines[first + 1 : last]
+    while kept and not kept[0].strip():
+        kept.pop(0)
+    while kept and not kept[-1].strip():
+        kept.pop()
+    return "\n".join(kept) + "\n", len(marker_indices)
+
+
 def main():
     docs_dir = os.path.dirname(os.path.abspath(__file__))
+    warnings = []
+
+    # Pass 1: extract every .mhtml -> trimmed .txt (overwriting if present).
     mhtml_files = sorted(glob.glob(os.path.join(docs_dir, "*.mhtml")))
-
-    if not mhtml_files:
-        print("No .mhtml files found in", docs_dir)
-        return
-
+    extracted_basenames = set()
     for mhtml_path in mhtml_files:
         basename = os.path.splitext(os.path.basename(mhtml_path))[0]
+        extracted_basenames.add(basename)
         txt_path = os.path.join(docs_dir, f"{basename}.txt")
 
-        print(f"Processing: {os.path.basename(mhtml_path)}")
+        print(f"Extracting: {os.path.basename(mhtml_path)}")
         html = extract_html_from_mhtml(mhtml_path)
-        text = html_to_text(html)
+        raw_text = html_to_text(html)
+        trimmed, marker_count = trim_boilerplate(raw_text)
+        if marker_count < 2:
+            warnings.append(
+                f"{os.path.basename(mhtml_path)}: found {marker_count} 'Github Edit...' marker(s); "
+                f"writing untrimmed .txt ({len(raw_text)} chars)"
+            )
+            payload = raw_text
+        else:
+            payload = trimmed
         with open(txt_path, "w", encoding="utf-8") as f:
-            f.write(text)
-        print(f"  -> {os.path.basename(txt_path)} ({len(text)} chars)")
+            f.write(payload)
+        print(f"  -> {os.path.basename(txt_path)} ({len(payload)} chars)")
 
+    # Pass 2: trim every other .txt in place (existing extractions without a paired .mhtml).
+    all_txts = sorted(glob.glob(os.path.join(docs_dir, "*.txt")))
+    for txt_path in all_txts:
+        basename = os.path.splitext(os.path.basename(txt_path))[0]
+        if basename in extracted_basenames:
+            continue  # already written in pass 1
+        with open(txt_path, "r", encoding="utf-8") as f:
+            original = f.read()
+        trimmed, marker_count = trim_boilerplate(original)
+        if marker_count < 2:
+            warnings.append(
+                f"{os.path.basename(txt_path)}: found {marker_count} 'Github Edit...' marker(s); left untouched"
+            )
+            continue
+        if trimmed != original:
+            with open(txt_path, "w", encoding="utf-8") as f:
+                f.write(trimmed)
+            print(f"Trimmed: {os.path.basename(txt_path)} ({len(original)} -> {len(trimmed)} chars)")
+        else:
+            print(f"No change: {os.path.basename(txt_path)}")
+
+    if warnings:
+        print("\n=== Warnings ===")
+        for w in warnings:
+            print(f"  {w}")
+    else:
+        print("\nNo warnings.")
     print("Done.")
 
 

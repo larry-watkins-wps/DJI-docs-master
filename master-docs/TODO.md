@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 0 — Setup (pending initial commit)
+**Current phase**: Phase 1 — Architecture overview (awaiting user review)
 
 ---
 
@@ -22,9 +22,10 @@ Cross-session source of truth. Update checkboxes as work completes. Before endin
 
 ## Phase 1 — Architecture overview
 
-- [ ] Draft `architecture/README.md` — transports, connection model, device relationships, auth model high-level
-- [ ] Cross-check with `Cloud-API-Doc/` overview pages and `DJI-Cloud-API-Demo/` module boundaries
-- [ ] Update corpus `README.md`
+- [x] Draft `architecture/README.md` — transports, connection model, device relationships, auth model high-level
+- [x] Cross-check with `Cloud-API-Doc/` overview pages and `DJI_Cloud/` v1.15 extract
+- [x] Update corpus `README.md`
+- [x] Record v1.11 vs v1.15 source-version mismatch (`OPEN-QUESTIONS.md` OQ-001) and revise `SOURCES.md` authority ranking
 - [ ] **Review gate**
 
 ## Phase 2 — Transport protocol references
@@ -68,12 +69,12 @@ Cross-session source of truth. Update checkboxes as work completes. Before endin
 - [ ] Update corpus `README.md`
 - [ ] **Review gate**
 
-## Phase 7 — WMPL
+## Phase 7 — WPML
 
-- [ ] `wmpl/overview.md`
-- [ ] `wmpl/template-kml.md`
-- [ ] `wmpl/waylines.md`
-- [ ] `wmpl/common-elements.md`
+- [ ] `wpml/overview.md`
+- [ ] `wpml/template-kml.md`
+- [ ] `wpml/waylines.md`
+- [ ] `wpml/common-elements.md`
 - [ ] Update corpus `README.md`
 - [ ] **Review gate**
 

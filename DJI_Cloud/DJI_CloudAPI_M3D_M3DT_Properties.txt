@@ -1,0 +1,2373 @@
+Device Property List
+
+# Device Property List
+
+pushMode:
+
+0: Stable frequency data. Device will report in the frequency of 0.5HZ.(Topic:thing/product/{sn}/osd
+
+1: State data. It is reported when the state changes.(Topic:thing/product/{sn}/state)
+
+accessMode:
+
+r: Property can only be read
+
+rw: Property can be read and written (Topic:thing/product/{sn}/property/set)
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+accessMode
+
+pushMode
+
+best_link_gateway
+
+The gateway with the best aircraft image transmission connection quality SN
+
+text
+
+In the multi-dock scenario, after the aircraft frequency matches with two docks, the SN of the best connected dock is pushed
+
+r
+
+1
+
+wireless_link_topo
+
+Image transmission connection topology
+
+struct
+
+r
+
+1
+
+»secret_code
+
+Encryption code
+
+array
+
+{"size": 28, "item_type": int}
+
+0
+
+»center_node
+
+Aircraft frequency matching information
+
+struct
+
+0
+
+»»sdr_id
+
+Scrambling code information
+
+int
+
+0
+
+»»sn
+
+Device SN
+
+text
+
+0
+
+»leaf_nodes
+
+Current connection dock or remote controller frequency matching information
+
+array
+
+{"size": -, "item_type": struct}
+
+0
+
+»»sdr_id
+
+Scrambling code information
+
+int
+
+0
+
+»»sn
+
+Device SN
+
+text
+
+0
+
+»»control_source_index
+
+Control source index
+
+int
+
+{"max":"2","min":"1","step":"1","unit_name":"None / "}
+
+0
+
+cameras
+
+Aircraft camera information
+
+array
+
+{"size": -, "item_type": struct}
+
+r
+
+0
+
+»remain_photo_num
+
+Remaining number of photos to take
+
+int
+
+Remaining number of photos to take
+
+0
+
+»remain_record_duration
+
+Remaining recording time
+
+int
+
+{"unit_name":"Seconds / s"}
+
+Remaining recording time
+
+0
+
+»record_time
+
+Video recording duration
+
+int
+
+{"unit_name":"Seconds / s"}
+
+Video recording duration
+
+0
+
+»payload_index
+
+Payload index
+
+text
+
+Payload index. Camera enumeration values. Non-standard device_mode_key, formatted as {type-subtype-gimbalindex}. Please refer to Product Supportedopen in new window
+
+0
+
+»camera_mode
+
+Camera mode
+
+enum_int
+
+{"0":"Capturing","1":"Recording","2":"Smart Low-Light","3":"Panoramic photography"}
+
+Camera mode
+
+0
+
+»photo_state
+
+Capturing state
+
+enum_int
+
+{"0":"Idle","1":"Capturing photo"}
+
+Capturing state
+
+0
+
+»screen_split_enable
+
+Is split screen enabled
+
+bool
+
+{"0":"Disable split screen","1":"Enable split screen"}
+
+0
+
+»recording_state
+
+Recording state
+
+enum_int
+
+{"0":"Idle","1":"Recording"}
+
+Recording state
+
+0
+
+»zoom_factor
+
+Zoom factor
+
+float
+
+{"max":200,"min":2,"step":"","unit_name":null}
+
+0
+
+»ir_zoom_factor
+
+Infrared zoom factor
+
+float
+
+{"max":20,"min":2,"step":"","unit_name":null}
+
+Infrared zoom factor
+
+0
+
+»liveview_world_region
+
+Field of view (FOV) region in liveview
+
+struct
+
+The field of view angle of the zoom camera relative to the wide-angle camera or infrared camera may differ in liveview. The coordinate origin is the upper-left corner of the lens.
+
+0
+
+»»left
+
+X-axis starting point in the top-left corner
+
+float
+
+X-axis starting point in the top-left corner
+
+r
+
+0
+
+»»top
+
+Top-left corner's starting point on the y-axis
+
+float
+
+Top-left corner's starting point on the y-axis
+
+r
+
+0
+
+»»right
+
+Starting point of the x-axis in the bottom right corner
+
+float
+
+Starting point of the x-axis in the bottom right corner
+
+r
+
+0
+
+»»bottom
+
+Y-axis starting point in the lower right corner
+
+float
+
+Y-axis starting point in the lower right corner
+
+r
+
+0
+
+»photo_storage_settings
+
+Photo storage settings collection
+
+array
+
+{"size": -, "item_type": enum_string}
+
+Value range {current, wide, zoom, ir}
+
+0
+
+»video_storage_settings
+
+Collection of video storage settings
+
+array
+
+{"size": -, "item_type": enum_string}
+
+Value range {current, wide, zoom, ir}
+
+0
+
+»wide_exposure_mode
+
+Wide lens exposure mode
+
+enum_int
+
+{"1":"Auto","2":"Shutter priority exposure","3":"Aperture priority exposure","4":"Manual exposure"}
+
+Current wide lens exposure mode
+
+0
+
+»wide_iso
+
+Wide lens sensitivity
+
+enum_int
+
+{"0":"Auto","1":"Auto(high sense)","2":"50","3":"100","4":"200","5":"400","6":"800","7":"1600","8":"3200","9":"6400","10":"12800","11":"25600","255":"Fixed"}
+
+Current wide lens sensitivity
+
+0
+
+»wide_shutter_speed
+
+Wide lens shutter speed
+
+enum_int
+
+{"0":"1/8000 s","1":"1/6400 s","2":"1/6000 s","3":"1/5000 s","4":"1/4000 s","5":"1/3200 s","6":"1/3000 s","7":"1/2500 s","8":"1/2000 s","9":"1/1600 s","10":"1/1500 s","11":"1/1250 s","12":"1/1000 s","13":"1/800 s","14":"1/725 s","15":"1/640 s","16":"1/500 s","17":"1/400 s","18":"1/350 s","19":"1/320 s","20":"1/250 s","21":"1/240 s","22":"1/200 s","23":"1/180 s","24":"1/160 s","25":"1/125 s","26":"1/120 s","27":"1/100 s","28":"1/90 s","29":"1/80 s","30":"1/60 s","31":"1/50 s","32":"1/40 s","33":"1/30 s","34":"1/25 s","35":"1/20 s","36":"1/15 s","37":"1/12.5 s","38":"1/10 s","39":"1/8 s","40":"1/6.25 s","41":"1/5 s","42":"1/4 s","43":"1/3 s","44":"1/2.5 s","45":"1/2 s","46":"1/1.67 s","47":"1/1.25 s","48":"1.0 s","49":"1.3 s","50":"1.6 s","51":"2.0 s","52":"2.5 s","53":"3.0 s","54":"3.2 s","55":"4.0 s","56":"5.0 s","57":"6.0 s","58":"7.0 s","59":"8.0 s","65534":"Auto"}
+
+Current wide lens shutter speed
+
+0
+
+»wide_exposure_value
+
+Wide lens exposure value
+
+enum_int
+
+{"1":"-5.0ev","2":"-4.7ev","3":"-4.3ev","4":"-4.0ev","5":"-3.7ev","6":"-3.3ev","7":"-3.0ev","8":"-2.7ev","9":"-2.3ev","10":"-2.0ev","11":"-1.7ev","12":"-1.3ev","13":"-1.0ev","14":"-0.7ev","15":"-0.3ev","16":"0ev","17":"0.3ev","18":"0.7ev","19":"1.0ev","20":"1.3ev","21":"1.7ev","22":"2.0ev","23":"2.3ev","24":"2.7ev","25":"3.0ev","26":"3.3ev","27":"3.7ev","28":"4.0ev","29":"4.3ev","30":"4.7ev","31":"5.0ev","255":"Fixed"}
+
+Current wide lens exposure value
+
+0
+
+»zoom_exposure_mode
+
+Zoom lens exposure mode
+
+enum_int
+
+{"1":"Auto","2":"Shutter priority exposure","3":"Aperture priority exposure","4":"Manual exposure"}
+
+Current zoom lens exposure mode
+
+0
+
+»zoom_iso
+
+Zoom lens sensitivity
+
+enum_int
+
+{"0":"Auto","1":"Auto(high sense)","2":"50","3":"100","4":"200","5":"400","6":"800","7":"1600","8":"3200","9":"6400","10":"12800","11":"25600","255":"Fixed"}
+
+Current zoom lens sensitivity
+
+0
+
+»zoom_shutter_speed
+
+Zoom lens shutter speed
+
+enum_int
+
+{"0":"1/8000 s","1":"1/6400 s","2":"1/6000 s","3":"1/5000 s","4":"1/4000 s","5":"1/3200 s","6":"1/3000 s","7":"1/2500 s","8":"1/2000 s","9":"1/1600 s","10":"1/1500 s","11":"1/1250 s","12":"1/1000 s","13":"1/800 s","14":"1/725 s","15":"1/640 s","16":"1/500 s","17":"1/400 s","18":"1/350 s","19":"1/320 s","20":"1/250 s","21":"1/240 s","22":"1/200 s","23":"1/180 s","24":"1/160 s","25":"1/125 s","26":"1/120 s","27":"1/100 s","28":"1/90 s","29":"1/80 s","30":"1/60 s","31":"1/50 s","32":"1/40 s","33":"1/30 s","34":"1/25 s","35":"1/20 s","36":"1/15 s","37":"1/12.5 s","38":"1/10 s","39":"1/8 s","40":"1/6.25 s","41":"1/5 s","42":"1/4 s","43":"1/3 s","44":"1/2.5 s","45":"1/2 s","46":"1/1.67 s","47":"1/1.25 s","48":"1.0 s","49":"1.3 s","50":"1.6 s","51":"2.0 s","52":"2.5 s","53":"3.0 s","54":"3.2 s","55":"4.0 s","56":"5.0 s","57":"6.0 s","58":"7.0 s","59":"8.0 s","65534":"auto"}
+
+Current zoom lens shutter speed
+
+0
+
+»zoom_exposure_value
+
+Zoom lens exposure value
+
+enum_int
+
+{"1":"-5.0ev","2":"-4.7ev","3":"-4.3ev","4":"-4.0ev","5":"-3.7ev","6":"-3.3ev","7":"-3.0ev","8":"-2.7ev","9":"-2.3ev","10":"-2.0ev","11":"-1.7ev","12":"-1.3ev","13":"-1.0ev","14":"-0.7ev","15":"-0.3ev","16":"0ev","17":"0.3ev","18":"0.7ev","19":"1.0ev","20":"1.3ev","21":"1.7ev","22":"2.0ev","23":"2.3ev","24":"2.7ev","25":"3.0ev","26":"3.3ev","27":"3.7ev","28":"4.0ev","29":"4.3ev","30":"4.7ev","31":"5.0ev","255":"Fixed"}
+
+Current zoom lens exposure value
+
+0
+
+»zoom_focus_mode
+
+Zoom lens focus mode
+
+enum_int
+
+{"0":"MF","1":"AFS","2":"AFC"}
+
+0
+
+»zoom_focus_value
+
+Zoom lens focus value
+
+int
+
+0
+
+»zoom_max_focus_value
+
+Zoom lens max focus value
+
+int
+
+0
+
+»zoom_min_focus_value
+
+Zoom lens min focus value
+
+int
+
+0
+
+»zoom_calibrate_farthest_focus_value
+
+Zoom lens calibrate farthest focus value
+
+int
+
+Most clear farthest focus value
+
+0
+
+»zoom_calibrate_nearest_focus_value
+
+Zoom lens calibrate nearest focus value
+
+int
+
+Most clear nearest focus value
+
+0
+
+»zoom_focus_state
+
+Zoom lens focus state
+
+enum_int
+
+{"0":"Idle","1":"Focusing","2":"Focus succeeded","3":"Focus failed"}
+
+0
+
+»ir_metering_mode
+
+Ir metering mode
+
+enum_int
+
+{"0":"Ir metering off","1":"Spot metering","2":"Area metering"}
+
+0
+
+»ir_metering_point
+
+Ir metering point
+
+struct
+
+Ir metering point information
+
+0
+
+»»x
+
+Metering point coordinate x
+
+double
+
+{"max":1,"min":0}
+
+With the upper left corner of the lens as the coordinate center, horizontal direction is x
+
+r
+
+0
+
+»»y
+
+Metering point coordinate y
+
+double
+
+{"max":1,"min":0}
+
+With the upper left corner of the lens as the coordinate center, vertical direction is y
+
+r
+
+0
+
+»»temperature
+
+Metering point temperature
+
+double
+
+r
+
+0
+
+»ir_metering_area
+
+Ir metering area
+
+struct
+
+Ir metering area information
+
+0
+
+»»x
+
+Metering area upper left corner coordinate x
+
+double
+
+{"max":1,"min":0}
+
+With the upper left corner of the lens as the coordinate center, horizontal direction is x
+
+r
+
+0
+
+»»y
+
+Metering area upper left corner coordinate y
+
+double
+
+{"max":1,"min":0}
+
+With the upper left corner of the lens as the coordinate center, vertical direction is y
+
+r
+
+0
+
+»»width
+
+Metering area width
+
+double
+
+{"max":1,"min":0}
+
+Metering area width
+
+r
+
+0
+
+»»height
+
+Metering area height
+
+double
+
+{"max":1,"min":0}
+
+Metering area height
+
+r
+
+0
+
+»»aver_temperature
+
+Metering area average temperature
+
+double
+
+Metering area average temperature
+
+r
+
+0
+
+»»min_temperature_point
+
+Metering area lowest temperature point
+
+struct
+
+Metering area lowest temperature point information
+
+r
+
+0
+
+»»»x
+
+Lowest temperature point coordinate x
+
+double
+
+{"max":1,"min":0}
+
+With the upper left corner of the lens as the coordinate center, horizontal direction is x
+
+r
+
+0
+
+»»»y
+
+Lowest temperature point coordinate y
+
+double
+
+{"max":1,"min":0}
+
+With the upper left corner of the lens as the coordinate center, vertical direction is y
+
+r
+
+0
+
+»»»temperature
+
+Temperature of the lowest temperature point
+
+double
+
+Temperature of the lowest temperature point
+
+r
+
+0
+
+»»max_temperature_point
+
+Metering area highest temperature point
+
+struct
+
+Metering area highest temperature point information
+
+r
+
+0
+
+»»»x
+
+Highest temperature point coordinate x
+
+double
+
+{"max":1,"min":0}
+
+With the upper left corner of the lens as the coordinate center, horizontal direction is x
+
+r
+
+0
+
+»»»y
+
+Highest temperature point coordinate y
+
+double
+
+{"max":1,"min":0}
+
+With the upper left corner of the lens as the coordinate center, vertical direction is y
+
+r
+
+0
+
+»»»temperature
+
+Temperature of the highest temperature point
+
+double
+
+Temperature of the highest temperature point
+
+r
+
+0
+
+flysafe_database_version
+
+Flysafe database version
+
+text
+
+{"length":"64"}
+
+r
+
+1
+
+offline_map_enable
+
+Offline map switch
+
+bool
+
+{"0":"Disable","1":"Enable"}
+
+When the offline map is turned off, offline map synchronization will no longer be automatically performed
+
+r
+
+1
+
+dongle_infos
+
+4G Dongle information
+
+array
+
+{"size": -, "item_type": struct}
+
+r
+
+1
+
+»imei
+
+dongle imei
+
+text
+
+Unique identifier for the Dongle
+
+r
+
+0
+
+»dongle_type
+
+Dongle type
+
+enum_int
+
+{"6":"Old Dongle","10":"New Dongle with eSIM support"}
+
+Dongle type
+
+r
+
+0
+
+»eid
+
+dongle eid
+
+text
+
+Unique identifier for eSIM, used for public account query of plans and service purchase
+
+r
+
+0
+
+»esim_activate_state
+
+eSIM activation state
+
+enum_int
+
+{"0":"Unknown","1":"Not activated","2":"Activated"}
+
+Requires activation to use
+
+r
+
+0
+
+»sim_card_state
+
+SIM card state
+
+enum_int
+
+{"0":"Not inserted","1":"Inserted"}
+
+Insertion state of the physical SIM card in the dongle
+
+r
+
+0
+
+»sim_slot
+
+SIM card slot enable state
+
+enum_int
+
+{"0":"Unknown","1":"Physical SIM card","2":"eSIM"}
+
+Identifies the SIM card slot currently in use by the dongle
+
+r
+
+0
+
+»esim_infos
+
+eSIM information
+
+array
+
+{"size": -, "item_type": struct}
+
+r
+
+0
+
+»»telecom_operator
+
+Supported operators
+
+enum_int
+
+{"0":"Unknown","1":"Mobile","2":"China Unicom","3":"Telecommunications"}
+
+Telecom operators supported by eSIM
+
+r
+
+0
+
+»»enabled
+
+eSIM enable state
+
+bool
+
+{"false":"Not in use","true":"In use"}
+
+Only one eSIM can be enabled at a time
+
+r
+
+0
+
+»»iccid
+
+sim iccid
+
+text
+
+Unique identifier for the SIM card, can be used for purchasing packages for physical SIM cards
+
+r
+
+0
+
+»sim_info
+
+SIM card information
+
+struct
+
+Information about the physical SIM card that can be inserted into the dongle
+
+r
+
+0
+
+»»telecom_operator
+
+Supported operators
+
+enum_int
+
+{"0":"Unknown","1":"Mobile","2":"China Unicom","3":"Telecommunications"}
+
+Telecom operator supported by the SIM card
+
+r
+
+0
+
+»»sim_type
+
+SIM card type
+
+enum_int
+
+{"0":"Unknown","1":"Other regular SIM card","2":"Three-network card"}
+
+Type of physical SIM card
+
+r
+
+0
+
+»»iccid
+
+sim iccid
+
+text
+
+Unique identifier for the SIM card, can be used for purchasing packages for physical SIM cards
+
+r
+
+0
+
+current_rth_mode
+
+Current value of the return-to-home altitude mode
+
+enum_int
+
+{"0":"Intelligent altitude","1":"Preset altitude"}
+
+Actual return-to-home altitude mode currently used by DJI Dock
+
+r
+
+1
+
+rth_mode
+
+Return home altitude mode setting value
+
+enum_int
+
+{"0":"Intelligent altitude","1":"Preset altitude"}
+
+In intelligent return home mode, the aircraft will automatically plan the optimal return home altitude. The DJI dock currently does not support setting the return home altitude mode and can only choose the 'Preset Altitude' mode. When the environment or lighting does not meet the requirements of the visual system (such as direct sunlight in the evening, weak or no light at night), the aircraft will use the return home altitude you set for straight-line return home.
+
+r
+
+1
+
+obstacle_avoidance
+
+Aircraft obstacle sensing state
+
+struct
+
+rw
+
+0
+
+»horizon
+
+Horizontal obstacle sensing state
+
+enum_int
+
+{"0":"Disable","1":"Enable"}
+
+0
+
+»upside
+
+Upward obstacle sensing state
+
+enum_int
+
+{"0":"Disable","1":"Enable"}
+
+0
+
+»downside
+
+Downward obstacle sensing state
+
+enum_int
+
+{"0":"Disable","1":"Enable"}
+
+0
+
+is_near_area_limit
+
+Whether approaching the GEO Zone
+
+enum_int
+
+{"0":"Not reaching the GEO Zone","1":"Approaching the GEO Zone"}
+
+r
+
+0
+
+is_near_height_limit
+
+Whether approaching the set height limit
+
+enum_int
+
+{"0":"Not reaching the set height limit","1":"Approaching the set height limit"}
+
+r
+
+0
+
+height_limit
+
+Aircraft height limit
+
+int
+
+{"max":"1500","min":"20","step":"1","unit_name":"Meters / m"}
+
+rw
+
+0
+
+night_lights_state
+
+Aircraft night lights state
+
+enum_int
+
+{"0":"Disable","1":"On"}
+
+rw
+
+0
+
+activation_time
+
+Aircraft activation time (Unix timestamp)
+
+int
+
+{"unit_name":"Seconds / s"}
+
+r
+
+0
+
+maintain_status
+
+Maintenance information
+
+struct
+
+r
+
+0
+
+»maintain_status_array
+
+Maintenance information array
+
+array
+
+{"size": -, "item_type": struct}
+
+0
+
+»»state
+
+Maintenance state
+
+enum_int
+
+{"0":"No maintenance","1":"With maintenance"}
+
+0
+
+»»last_maintain_type
+
+Last maintenance type
+
+enum_int
+
+{"1":"Basic maintenance of the aircraft","2":"Regular maintenance of the aircraft","3":"Deep maintenance of the aircraft"}
+
+0
+
+»»last_maintain_time
+
+Last maintenance time
+
+date
+
+{"unit_name":"Seconds / s"}
+
+0
+
+»»last_maintain_flight_time
+
+Last maintenance flight hours
+
+int
+
+{"unit_name":"Hours / h"}
+
+0
+
+»»last_maintain_flight_sorties
+
+Last maintenance flight sorties
+
+int
+
+{"max":"2147483647","min":"0","step":"1"}
+
+0
+
+total_flight_sorties
+
+Accumulated total sorties of the aircraft
+
+int
+
+{"max":"2147483647","min":"0","step":"1"}
+
+r
+
+0
+
+type_subtype_gimbalindex
+
+Payload index
+
+struct
+
+Consistent with the payload_index field
+
+r
+
+0
+
+»gimbal_pitch
+
+Gimbal pitch axis angle
+
+double
+
+{"max":"180","min":"-180","step":0.1,"unit_name":"Degrees / °"}
+
+0
+
+»gimbal_roll
+
+Gimbal roll axis angle
+
+double
+
+{"max":"180","min":"-180","step":0.1,"unit_name":"Degrees / °"}
+
+0
+
+»gimbal_yaw
+
+Gimbal yaw axis angle
+
+double
+
+{"max":"180","min":"-180","step":0.1,"unit_name":"Degrees / °"}
+
+0
+
+»measure_target_longitude
+
+Laser ranging target longitude
+
+double
+
+{"max":"180","min":"-180","unit_name":"Degrees / °"}
+
+r
+
+0
+
+»measure_target_latitude
+
+Laser ranging target latitude
+
+double
+
+{"max":"90","min":"-90","unit_name":"Degrees / °"}
+
+r
+
+0
+
+»measure_target_altitude
+
+Laser ranging target altitude
+
+double
+
+{"unit_name":"Meters / m"}
+
+r
+
+0
+
+»measure_target_distance
+
+Laser ranging distance
+
+double
+
+{"unit_name":"Meters / m"}
+
+r
+
+0
+
+»measure_target_error_state
+
+Laser ranging state
+
+enum_int
+
+{"0":"NORMAL","1":"TOO_CLOSE","2":"TOO_FAR","3":"NO_SIGNAL"}
+
+r
+
+0
+
+»payload_index
+
+Payload index. The format is {type-subtype-gimbalindex}
+
+text
+
+0
+
+»zoom_factor
+
+Zoom factor
+
+double
+
+0
+
+»thermal_current_palette_style
+
+Palette style
+
+enum_int
+
+{"0":"WHITE_HOT","1":"BLACK_HOT","2":"RED_HOT","3":"GREEN_HOT","5":"RAINBOW","6":"IRONBOW1","8":"ICE_FIRE","11":"COLOR1","12":"COLOR2","13":"RAIN"}
+
+The infrared camera offers various color styles, allowing users to choose different color palettes based on different scenes for clearer visibility of targets
+
+rw
+
+0
+
+»thermal_supported_palette_styles
+
+Collection of supported palette styles by the device
+
+array
+
+{"size": -, "item_type": enum_int}
+
+The capability of supported styles varies for different devices
+
+r
+
+1
+
+»thermal_gain_mode
+
+Gain Mode
+
+enum_int
+
+{"0":"Auto","1":"Low Gain. Temperature Range is from 0°C to 500°C","2":"High Gain. Temperature Range is from -20°C to 150°C"}
+
+Low gain provides a larger temperature measurement range, while high gain offers higher temperature measurement accuracy.
+
+rw
+
+0
+
+»thermal_isotherm_state
+
+Whether isotherm is enabled
+
+enum_int
+
+{"0":"Disable","1":"Enable"}
+
+Isotherm allows users to observe the content of temperature ranges of interest, making objects in the temperature range more prominent.
+
+rw
+
+0
+
+»thermal_isotherm_upper_limit
+
+Upper limit of the temperature range for isotherm
+
+int
+
+{"unit_name":"Celsius / °C"}
+
+Effective only when Isotherm is enabled
+
+rw
+
+0
+
+»thermal_isotherm_lower_limit
+
+Lower limit of the temperature range for isotherm
+
+int
+
+{"unit_name":"Celsius / °C"}
+
+Effective only when Isotherm is enabled
+
+rw
+
+0
+
+»thermal_global_temperature_min
+
+Minimum temperature measured in the overall view
+
+float
+
+{"unit_name":"Celsius / °C"}
+
+r
+
+0
+
+»thermal_global_temperature_max
+
+Maximum temperature measured in the overall view
+
+float
+
+{"unit_name":"Celsius / °C"}
+
+r
+
+0
+
+track_id
+
+Track ID
+
+text
+
+{"length":"64"}
+
+r
+
+0
+
+position_state
+
+Satellite search state
+
+struct
+
+r
+
+0
+
+»is_fixed
+
+Whether is fixed
+
+enum_int
+
+{"0":"Not started","1":"Fixing","2":"Fixing successful","3":"Fixing failed"}
+
+0
+
+»quality
+
+Satellite acquisition mode
+
+enum_int
+
+{"1":"Gear 1","2":"Gear 2","3":"Gear 3","4":"Gear 4","5":"Gear 5","10":"RTK fixed"}
+
+0
+
+»gps_number
+
+Number of GPS satellites
+
+int
+
+0
+
+»rtk_number
+
+Number of RTK satellite acquisitions
+
+int
+
+0
+
+storage
+
+Storage capacity
+
+struct
+
+kb
+
+r
+
+0
+
+»total
+
+Total capacity
+
+int
+
+{"unit_name":"Kilobytes / KB"}
+
+0
+
+»used
+
+Used capacity
+
+int
+
+{"unit_name":"Kilobytes / KB"}
+
+0
+
+battery
+
+Aircraft battery information
+
+struct
+
+r
+
+0
+
+»capacity_percent
+
+Total remaining battery capacity
+
+int
+
+{"max":100,"min":0}
+
+0
+
+»remain_flight_time
+
+Remaining flight time
+
+int
+
+{"unit_name":"Seconds / s"}
+
+0
+
+»return_home_power
+
+Percentage of power required for return home
+
+int
+
+{"max":100,"min":0}
+
+0
+
+»landing_power
+
+Forced landing battery percentage
+
+int
+
+{"max":100,"min":0}
+
+0
+
+»batteries
+
+Battery details
+
+array
+
+{"size": -, "item_type": struct}
+
+0
+
+»»capacity_percent
+
+Remaining battery capacity
+
+int
+
+{"max":100,"min":0}
+
+0
+
+»»index
+
+Battery serial number
+
+int
+
+{"min":"0"}
+
+0
+
+»»sn
+
+Battery serial number (SN)
+
+text
+
+0
+
+»»type
+
+Battery type
+
+enum_int
+
+{}
+
+0
+
+»»sub_type
+
+Battery subtype
+
+enum_int
+
+{}
+
+0
+
+»»firmware_version
+
+Firmware version
+
+text
+
+0
+
+»»loop_times
+
+Battery cycle count
+
+int
+
+0
+
+»»voltage
+
+Voltage
+
+int
+
+{"unit_name":"Millivolts / mV"}
+
+0
+
+»»temperature
+
+Temperature
+
+float
+
+{"unit_name":"Celsius / °C"}
+
+Retain one decimal place
+
+0
+
+»»high_voltage_storage_days
+
+High voltage storage days
+
+int
+
+{"unit_name":"Days / day"}
+
+0
+
+total_flight_distance
+
+Accumulated total mileage of the aircraft
+
+float
+
+{"unit_name":"Meters / m"}
+
+r
+
+0
+
+total_flight_time
+
+Accumulated total flight time of the aircraft
+
+float
+
+{"unit_name":"Seconds / s"}
+
+r
+
+0
+
+serious_low_battery_warning_threshold
+
+Critical low battery warning
+
+int
+
+User-set battery critically low warning percentage
+
+r
+
+1
+
+low_battery_warning_threshold
+
+Low battery warning
+
+int
+
+User-set battery low battery warning percentage
+
+r
+
+1
+
+control_source
+
+Current control source
+
+text
+
+Can be a device or a browser. Devices use A/B to represent A control and B control, while browsers use a self-generated UUID as an identifier.
+
+r
+
+1
+
+wind_direction
+
+Current wind direction
+
+enum_int
+
+{"1":"True North","2":"Northeast","3":"East","4":"Southeast","5":"South","6":"Southwest","7":"West","8":"Northwest"}
+
+r
+
+0
+
+wind_speed
+
+Wind speed
+
+float
+
+{"unit_name":"0.1 Meters per second / m/s"}
+
+Estimated wind speed, calculated based on the aircraft's attitude with some margin of error. It is for reference only and should not be used as meteorological data.
+
+r
+
+0
+
+home_distance
+
+Distance from the Home point
+
+float
+
+r
+
+0
+
+home_latitude
+
+Home point latitude
+
+double
+
+r
+
+1
+
+home_longitude
+
+Home point longitude
+
+double
+
+r
+
+1
+
+attitude_head
+
+Yaw axis angle
+
+int
+
+Yaw axis angle with true north angle (longitude). Positive values from 0 to 6 o'clock direction, negative values from 6 to 12 o'clock direction.
+
+r
+
+0
+
+attitude_roll
+
+Roll axis angle
+
+float
+
+r
+
+0
+
+attitude_pitch
+
+Pitch axis angle
+
+float
+
+r
+
+0
+
+elevation
+
+Relative takeoff point altitude
+
+float
+
+r
+
+0
+
+height
+
+Absolute height
+
+double
+
+Relative to the Earth ellipsoid height. Calculation is height relative to takeoff point + ellipsoid height of takeoff point
+
+r
+
+0
+
+latitude
+
+Current latitude
+
+double
+
+{"max":"3.4028235E38","min":"-1.4E-45","step":"0.1"}
+
+r
+
+0
+
+longitude
+
+Longitude of the current position
+
+double
+
+{"max":"3.4028235E38","min":"-1.4E-45","step":"0.1"}
+
+r
+
+0
+
+vertical_speed
+
+Vertical speed
+
+float
+
+{"unit_name":"Meters per second / m/s"}
+
+r
+
+0
+
+horizontal_speed
+
+Horizontal speed
+
+float
+
+r
+
+0
+
+firmware_upgrade_status
+
+Firmware upgrade state
+
+enum_int
+
+{"0":"Not upgraded","1":"Upgrading"}
+
+r
+
+1
+
+compatible_status
+
+Firmware consistency
+
+enum_int
+
+{"0":"No consistency upgrade required","1":"Consistency upgrade required"}
+
+Consistent firmware update means a consistent firmware update is required when the firmware versions of some modules of the aircraft are inconsistent with the compatible version of the system. For example, the aircraft and RC have been updated to newest version, but the used batteries is not updated. Then the Consistent firmware update will be prompted. Normal firmware update means developers update all modules of aircraft to selected firmware version.
+
+r
+
+1
+
+firmware_version
+
+Firmware version
+
+text
+
+{"length":"64"}
+
+r
+
+1
+
+gear
+
+Gear
+
+enum_int
+
+{"0":"A","1":"P","2":"NAV","3":"FPV","4":"FARM","5":"S","6":"F","7":"M","8":"G","9":"T"}
+
+r
+
+0
+
+mode_code_reason
+
+The reason the aircraft entered the current state
+
+enum_int
+
+{"0":"No meaning","1":"Insufficient battery power (return, landing)","2":"Insufficient battery voltage (return, landing)","3":"Severely low voltage (return, landing)","4":"Requested by remote controller buttons (takeoff, return, landing)","5":"Requested by App (takeoff, return, landing)","6":"Loss of remote controller signal (return, landing, hover)","7":"Triggered by external devices such as navigation, SDK, etc. (takeoff, return, landing)","8":"Entered the dock GEO Zone (landing)","9":"Although a return was triggered, it was too close to the Home point (landing)","10":"Although a return was triggered, it was too far from the Home point (landing)","11":"Requested when executing waypoint missions (takeoff)","12":"Requested after reaching above the Home point in the return phase (landing)","13":"Continued descent after the aircraft's height dropped to 0.7m from the ground (second-stage descent limit) leading to (landing)","14":"Forced breakthrough of low altitude protection by devices like App, SDK (landing)","15":"Requested due to passing flights in the vicinity (returning, landing)","16":"Requested due to height control failure (return, landing)","17":"Entered after intelligent low battery return (landing)","18":"AP controls the flight mode (manual flight)","19":"Hardware abnormally (return, landing)","20":"End of anti-collision protection (landing)","21":"Return canceled (hover)","22":"Encountered obstacles during the return (landing)","23":"Triggered by strong winds in the dock scene (return)"}
+
+r
+
+1
+
+commander_flight_height
+
+Flyto task height
+
+float
+
+{"max":3000,"min":2,"step":0.1,"unit_name":"Meters / m"}
+
+Height relative to the (dock) takeoff point, relative high ALT
+
+rw
+
+1
+
+commander_flight_mode
+
+Setting value of the flyto task mode
+
+enum_int
+
+{"0":"Optimal height flight","1":"Preset height flight"}
+
+Setting value of the flyto task mode
+
+rw
+
+1
+
+commander_mode_lost_action
+
+Lost action of flyto task
+
+enum_int
+
+{"0":"Continue with the to-point flight mission","1":"Exit the to-point flight mission and perform normal loss of control behavior"}
+
+Loss of control during to-point flight, choose to continue and complete mission or perform normal loss of control behavior
+
+rw
+
+1
+
+camera_watermark_settings
+
+Camera watermark settings
+
+struct
+
+User configuration for watermarks on photos and video files taken by the camera. Currently, live stream watermarks are not supported.
+
+rw
+
+1
+
+»global_enable
+
+Watermark display global enable switch
+
+enum_int
+
+{"0":"Disable","1":"Enable"}
+
+Watermark display requires global enable switch
+
+rw
+
+1
+
+»drone_type_enable
+
+Aircraft model display switch
+
+enum_int
+
+{"0":"Disable","1":"Enable"}
+
+rw
+
+1
+
+»drone_sn_enable
+
+Aircraft serial number display switch
+
+enum_int
+
+{"0":"Disable","1":"Enable"}
+
+rw
+
+1
+
+»datetime_enable
+
+Date and time display switch
+
+enum_int
+
+{"0":"Disable","1":"Enable"}
+
+Time zone defaults to local time zone
+
+rw
+
+1
+
+»gps_enable
+
+Latitude, longitude and altitude display switch
+
+enum_int
+
+{"0":"Disable","1":"Enable"}
+
+rw
+
+1
+
+»user_custom_string_enable
+
+Custom text display switch
+
+enum_int
+
+{"0":"Disable","1":"Enable"}
+
+rw
+
+1
+
+»user_custom_string
+
+Custom text content
+
+text
+
+Up to 250 bytes can be displayed
+
+rw
+
+1
+
+»layout
+
+Position of the watermark in the frame
+
+enum_int
+
+{"0":"Top-left","1":"Bottom-left","2":"Top-right","3":"Bottom-right"}
+
+rw
+
+1
+
+mode_code
+
+Aircraft state
+
+enum_int
+
+{"0":"Standby","1":"Takeoff preparation","2":"Takeoff preparation completed","3":"Manual flight","4":"Automatic takeoff","5":"Wayline flight","6":"Panoramic photography","7":"Intelligent tracking","8":"ADS-B avoidance","9":"Auto returning to home","10":"Automatic landing","11":"Forced landing","12":"Three-blade landing","13":"Upgrading","14":"Not connected","15":"APAS","16":"Virtual stick state","17":"Live flight Controls","18":"Airborne RTK fixing mode","19":"Dock address selecting","20":"POI"}
+
+Dock address selection, indicating the aircraft hovers in the air for dock address selection and checking RTK signal quality
+
+r
+
+0
+
+distance_limit_status
+
+Aircraft distance limit state
+
+struct
+
+rw
+
+0
+
+»state
+
+Whether to enable the limit distance
+
+enum_int
+
+{"0":"Not set","1":"Already set"}
+
+0
+
+»distance_limit
+
+Limited distance
+
+int
+
+{"max":"8000","min":"15","step":"1","unit_name":"Meters / m"}
+
+0
+
+»is_near_distance_limit
+
+Whether approaching the set distance limit
+
+enum_int
+
+{"0":"Not reaching the set distance limit","1":"Approaching the set distance limit"}
+
+r
+
+0
+
+rth_altitude
+
+Return home altitude
+
+int
+
+{"max":500,"min":20,"unit_name":"Meters / m"}
+
+Return home altitude
+
+rw
+
+0
+
+psdk_ui_resource
+
+PSDK UI resource package
+
+array
+
+{"size": -, "item_type": struct}
+
+r
+
+1
+
+»psdk_index
+
+PSDK payload device index
+
+int
+
+{"min":0}
+
+r
+
+1
+
+»psdk_ready
+
+PSDK readiness state
+
+enum_int
+
+{"0":"Not ready","1":"Ready"}
+
+r
+
+1
+
+»object_key
+
+OSS object
+
+text
+
+r
+
+1
+
+psdk_widget_values
+
+PSDK payload device attribute values
+
+array
+
+{"size": -, "item_type": struct}
+
+r
+
+1
+
+»psdk_index
+
+PSDK payload device index
+
+int
+
+{"min":0}
+
+r
+
+1
+
+»psdk_name
+
+Device name
+
+text
+
+r
+
+1
+
+»psdk_sn
+
+Device serial number
+
+text
+
+r
+
+1
+
+»psdk_version
+
+Device firmware version
+
+text
+
+r
+
+1
+
+»psdk_lib_version
+
+PSDK lib version
+
+text
+
+r
+
+1
+
+»speaker
+
+Speaker state
+
+struct
+
+r
+
+1
+
+»»work_mode
+
+Speaker working mode
+
+enum_int
+
+{"0":"TTS payload mode","1":"Recording and speaking"}
+
+r
+
+1
+
+»»play_mode
+
+Speaker playback mode
+
+enum_int
+
+{"0":"Single play","1":"Loop play (single track)"}
+
+r
+
+1
+
+»»play_volume
+
+Speaker volume
+
+int
+
+{"max":100,"min":0,"step":1}
+
+r
+
+1
+
+»»system_state
+
+Speaker state
+
+enum_int
+
+{"0":"Idle","1":"Transmitting (from dock to aircraft)","2":"Playing","3":"Abnormal","4":"TTS text conversion in progress","99":"Downloading (from dock to cloud)"}
+
+r
+
+1
+
+»»play_file_name
+
+The file name of the last played file by the speaker
+
+text
+
+{"length":128,"unit_name":"Bytes / B"}
+
+r
+
+1
+
+»»play_file_md5
+
+MD5 checksum of the file recently played by the speaker
+
+text
+
+r
+
+1
+
+»values
+
+PSDK widget value list
+
+array
+
+{"size": -, "item_type": struct}
+
+r
+
+1
+
+»»index
+
+Control number
+
+int
+
+{"min":0,"step":1}
+
+r
+
+1
+
+»»value
+
+Widget value
+
+int
+
+{}
+
+r
+
+1
+
+remaining_power_for_return_home
+
+Return Reserve Battery
+
+int
+
+{"max":100,"min":0}
+
+Note:Setting the reserve battery level for RTH too low may cause the aircraft to not have enough power to complete the return. For DJI Dock 2, we recommend configuring this value in the 25%–50% range to provide a safer RTH power margin.
+
+rw
+
+1

@@ -8,7 +8,7 @@ type: project
 **Output directory**: `master-docs/` (only writable location for documentation output)
 **Source directories** (read-only reference): `Cloud-API-Doc/`, `DJI-Cloud-API-Demo/`, `DJI_Cloud/`, `dji_cloud_dock3/`
 
-**Hardware in scope**: DJI Dock 3, Matrice 4D (M4D), Matrice 4TD (M4TD), and the RC paired with the M4D (RC Plus Enterprise family).
+**Hardware in scope**: DJI Dock 3, Matrice 4D (M4D), Matrice 4TD (M4TD), and the RC paired with the M4D (specifically **RC Plus 2 Enterprise** running DJI Pilot 2 — distinct from the earlier RC Plus Enterprise).
 **Explicitly out of scope**: Dock 2 (deferred to later work).
 
 **Phase 1 goal**: Build a clean, concise, LLM-digestible documentation corpus in `master-docs/` covering the DJI Cloud API surface needed for the in-scope hardware.

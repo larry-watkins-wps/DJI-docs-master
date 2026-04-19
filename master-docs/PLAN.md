@@ -28,7 +28,7 @@ master-docs/
 ├── device-properties/      # master matrix + per-device files (Dock 3 / M4D / M4TD / RC)
 ├── workflows/              # sequenced choreography; links to transport catalogs
 ├── device-annexes/         # per-device deltas & quirks
-├── wmpl/                   # wayline file format reference
+├── wpml/                   # wayline file format reference (DJI WPML)
 ├── hms-codes/              # HMS event codes split by category
 ├── livestream-protocols/   # RTMP / GB28181 / WebRTC / Agora specifics
 └── error-codes/            # general API error code reference (not HMS)
@@ -67,10 +67,10 @@ Memory, CLAUDE.md, PLAN, TODO, SOURCES, README, `.gitignore`, `.gitattributes`, 
 `websocket/<family>/<message>.md` — push message catalog with payload schema and real examples.
 
 ### Phase 6 — Device properties
-`device-properties/README.md` (master support matrix of properties × devices) plus per-device files: `dock3.md`, `m4d.md`, `m4td.md`, `rc-m4d.md`. Properties drawn from `DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt`, `DJI_CloudAPI-Matrice4-DeviceProperties.txt`, `DJI_CloudAPI_Aircraft-Properties.txt`, `DJI_CloudAPI_RC-Plus-Enterprise-Properties.txt`, verified against `Cloud-API-Doc/`.
+`device-properties/README.md` (master support matrix of properties × devices) plus per-device files: `dock3.md`, `m4d.md`, `m4td.md`, `rc-plus-2.md`. Properties drawn from the `DJI_Cloud/` v1.15 device-properties and aircraft-properties catalogs (see [`SOURCES.md`](SOURCES.md) §3 for the full file inventory); older-device enum rows (M30/M30T, M3D/M3TD, Matrice 400, Mavic 3 Enterprise, RC Pro Enterprise, etc.) merged per user direction. Verified against `Cloud-API-Doc/` where v1.11 counterparts exist.
 
-### Phase 7 — WMPL (wayline file format)
-`wmpl/` — overview, template KML, waylines, common elements. Sourced from `DJI_Cloud/DJI_CloudAPI_WMPL-*.txt` and `Cloud-API-Doc/`.
+### Phase 7 — WPML (wayline file format)
+`wpml/` — overview, template KML, waylines, common elements. "WPML" is DJI's wayline planning markup language (format as used in the `.wpml` file extension and the official docs URL path). Sourced from `DJI_Cloud/DJI_CloudAPI_WPML-*.txt` and `Cloud-API-Doc/`.
 
 ### Phase 8 — HMS codes
 `hms-codes/` — codes split by category (categories TBD after inspecting `HMS.json` structure). Curated markdown must stay consistent with `HMS.json`. Sanity-check script optional future polish.

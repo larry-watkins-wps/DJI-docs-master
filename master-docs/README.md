@@ -5,7 +5,7 @@ Curated, LLM-digestible documentation of the **DJI Cloud API wire contract and w
 - **DJI Dock 3**
 - **Matrice 4D** (M4D)
 - **Matrice 4TD** (M4TD)
-- **RC paired with the M4D** (RC Plus Enterprise family)
+- **RC paired with the M4D** (specifically **RC Plus 2 Enterprise** running DJI Pilot 2)
 
 For repo-level scope, directives, and session-start instructions, see [`/CLAUDE.md`](../CLAUDE.md).
 
@@ -16,21 +16,21 @@ For repo-level scope, directives, and session-start instructions, see [`/CLAUDE.
 | [`PLAN.md`](PLAN.md) | Phased plan with review gates |
 | [`TODO.md`](TODO.md) | Cross-session fine-grained checklist |
 | [`SOURCES.md`](SOURCES.md) | Source directory authority ranking |
-| [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) | Standing gaps tracker *(created when first gap arises)* |
+| [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) | Standing gaps tracker |
 | [`_memory/MEMORY.md`](_memory/MEMORY.md) | In-repo Claude memory index |
 
 ## Corpus table of contents
 
-*Empty — Phase 1 not yet started. New docs are added to the table below as they land.*
+New docs are added to the table below as they land.
 
 | Area | Docs |
 |---|---|
-| `architecture/` | *(pending Phase 1)* |
+| `architecture/` | [`README.md`](architecture/README.md) — transports, device-edge-cloud model, thing model, topic taxonomy, in-scope topologies |
 | `http/` | *(pending Phase 2–3)* |
 | `mqtt/` | *(pending Phase 2 + 4)* |
 | `websocket/` | *(pending Phase 2 + 5)* |
 | `device-properties/` | *(pending Phase 6)* |
-| `wmpl/` | *(pending Phase 7)* |
+| `wpml/` | *(pending Phase 7)* |
 | `hms-codes/` | *(pending Phase 8)* |
 | `livestream-protocols/` | *(pending Phase 9)* |
 | `error-codes/` | *(pending Phase 10)* |

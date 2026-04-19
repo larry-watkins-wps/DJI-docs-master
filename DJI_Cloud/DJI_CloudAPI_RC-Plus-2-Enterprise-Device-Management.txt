@@ -1,0 +1,105 @@
+Device topology update
+
+# Event
+
+# Device topology update
+
+Topic: thing/product/{gateway_sn}/status
+
+Direction: up
+
+Method: update_topo
+
+Data:
+
+Column
+
+Name
+
+Type
+
+constraint
+
+Description
+
+type
+
+Gateway device product type
+
+int
+
+Refer to Supported Productsopen in new window.
+
+sub_type
+
+Gateway sub-device product subtype
+
+int
+
+Refer to Supported Productsopen in new window.
+
+device_secret
+
+Gateway device key
+
+text
+
+nonce
+
+nonce
+
+text
+
+thing_version
+
+Thing model version of gateway device
+
+text
+
+sub_devices
+
+Sub-device list
+
+array
+
+{"size": 1, "item_type": struct}
+
+»sn
+
+Sub-device serial number (SN)
+
+text
+
+»type
+
+Sub-device product type
+
+int
+
+Refer to Supported Productsopen in new window.
+
+»sub_type
+
+Sub-device product subtype
+
+int
+
+Refer to Supported Productsopen in new window.
+
+»device_secret
+
+Sub-device key
+
+text
+
+»nonce
+
+nonce
+
+text
+
+»thing_version
+
+Thing model version of sub-device
+
+text
