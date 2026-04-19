@@ -1,11 +1,20 @@
 # DJI Cloud Docs Corpus
 
-Curated, LLM-digestible documentation of the **DJI Cloud API wire contract and workflows** needed by:
+Curated, LLM-digestible documentation of the **DJI Cloud API wire contract and workflows** needed by two parallel device cohorts:
 
+**Current generation** (Dock 3 cohort):
 - **DJI Dock 3**
 - **Matrice 4D** (M4D)
 - **Matrice 4TD** (M4TD)
-- **RC paired with the M4D** (specifically **RC Plus 2 Enterprise** running DJI Pilot 2)
+- **RC Plus 2 Enterprise** running DJI Pilot 2 (the RC paired with the M4D)
+
+**Older generation** (Dock 2 cohort):
+- **DJI Dock 2**
+- **Matrice 3D** (M3D)
+- **Matrice 3TD** (M3TD)
+- **RC Pro Enterprise** running DJI Pilot 2 (the RC paired with the M3D / M3TD)
+
+Dock 1, M30 / M30T, M300 / M350 RTK, and Mavic 3 Enterprise families are out of scope.
 
 For repo-level scope, directives, and session-start instructions, see [`/CLAUDE.md`](../CLAUDE.md).
 

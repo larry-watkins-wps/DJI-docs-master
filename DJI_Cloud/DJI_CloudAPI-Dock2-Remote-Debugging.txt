@@ -1,0 +1,1222 @@
+#
+Event
+#
+Force Close Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: cover_force_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 6
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "method": "cover_force_close",
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+#
+Aircraft Power-On Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: drone_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: drone_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "drone_open",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+Shutdown Aircraft Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: drone_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+»»step_key Current step enum_string {"get_bid":"Get bid","check_ac_input_state":"Check AC power supply state","upgrading_prevent_reboot":"Check if the working mode is firmware update","check_work_mode":"Check if the working mode is remote debugging","check_task_state":"Check the task exclusion state in debugging mode","check_scram_state":"Check the emergency stop button status","close_drone":"Power off the aircraft"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 20,
+ "step_key": "check_work_mode"
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: drone_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "drone_close",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+Dock Reboot Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: device_reboot
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+»»step_key Current step enum_string {"get_bid":"Get bid","check_ac_input_state":"Check AC power supply state","upgrading_prevent_reboot":"Check if the working mode is firmware update","check_work_mode":"Check if the working mode is remote debugging","check_task_state":"Check the task exclusion state in debugging mode","write_reboot_param_file":"Write to the reboot flag"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 20,
+ "step_key": "write_reboot_param_file"
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: device_reboot
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "device_reboot",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+Close Cover Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: cover_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+»»step_key Current step enum_string {"get_bid":"Get bid","check_work_mode":"Check if the working mode is remote debugging","check_task_state":"Check the task exclusion state in debugging mode","check_scram_state":"Check the emergency stop button status","turn_on_drone":"Power on the aircraft","drone_paddle_forward":"The aircraft is slowly rotating the propellers","close_cover":"Close the dock cover","drone_paddle_reverse":"The aircraft is slowly rotating the propellers in reverse","drone_paddle_stop":"The aircraft stopped rotating the propellers"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 58,
+ "step_key": "drone_paddle_reverse"
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: cover_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "cover_close",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+Open Cover Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: cover_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+»»step_key Current step enum_string {"get_bid":"Get bid","check_work_mode":"Check if the working mode is remote debugging","check_task_state":"Check the task exclusion state in debugging mode","check_scram_state":"Check the emergency stop button status","open_cover":"Open the dock cover"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 70,
+ "step_key": "open_cover"
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: cover_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "cover_open",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+Start Charging Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: charge_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+»»step_key Current step enum_string {"get_bid":"Get bid","check_work_mode":"Check if the working mode is remote debugging","check_task_state":"Check the task exclusion state in debugging mode","check_scram_state":"Check the emergency stop button status","check_cover":"Check the dock cover status","start_charge":"Start charging"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 45,
+ "step_key": "start_charge"
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: charge_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "charge_open",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+Stop Charging Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: charge_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+»»step_key Current step enum_string {"get_bid":"Get bid","check_work_mode":"Check if the working mode is remote debugging","check_task_state":"Check the exclusion state of debugging mode tasks","stop_charge":"Stop charging"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 80,
+ "step_key": "stop_charge"
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: charge_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "charge_close",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+Aircraft Data Formatting Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: drone_format
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 80,
+ "step_key": "xxx"
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: drone_format
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "drone_format",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+Dock Data Formatting Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: device_format
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 80,
+ "step_key": "xxx"
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: device_format
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "device_format",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+eSIM Activation Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: esim_activate
+
+Data:
+
+Column Name Type constraint Description
+result Return code int
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 0
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "gateway": "dock_sn",
+ "method": "esim_activate",
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: esim_activate
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "esim_activate",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+eSIM Operator Switch Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: esim_operator_switch
+
+Data:
+
+Column Name Type constraint Description
+result Return code int
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 0
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "gateway": "dock_sn",
+ "method": "esim_operator_switch",
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/events_reply
+
+Direction: down
+
+Method: esim_operator_switch
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "method": "esim_operator_switch",
+ "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+ "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+ "timestamp": "1234567890123",
+ "data": {
+ "result": 0
+ }
+}
+
+#
+Service
+#
+Force Close
+
+If the value of the drone_in_dock field that is pushed by the device property is 0, and the aircraft is confirmed to be out of the dock through the dock camera, this command can be called to force the dock cover to close.Otherwise, the propellers of aircraft may be pinched.
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: cover_force_close
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: cover_force_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Debug Mode Opened
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: debug_mode_open
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: debug_mode_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Debug Mode Closed
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: debug_mode_close
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: debug_mode_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Turn On Supplementary Light
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: supplement_light_open
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: supplement_light_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Turn Off Supplementary Light
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: supplement_light_close
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: supplement_light_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Battery Maintenance State Switch
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: battery_maintenance_switch
+
+Data:
+
+Column Name Type constraint Description
+action Operation enum_int {"0":"Disable","1":"Enable"}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: battery_maintenance_switch
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Dock Air Conditioner Working Mode Switch
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: air_conditioner_mode_switch
+
+Data:
+
+Column Name Type constraint Description
+action Operation enum_int {"0":"Put the dock air conditioner into idle mode (turn off cooling, heating, or dehumidification).","1":"Put the dock air conditioner into cooling mode","2":"Activate the heating mode of the dock's air conditioning","3":"Put the dock air conditioner into dehumidification mode (dehumidification includes cooling dehumidification and heating dehumidification, automatically handled by the device based on its situation without user intervention)."}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: air_conditioner_mode_switch
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Dock Sound and Light Alarm State Switch
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: alarm_state_switch
+
+Data:
+
+Column Name Type constraint Description
+action Operation enum_int {"0":"Disable","1":"Enable"}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: alarm_state_switch
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Battery Operating Mode Switch
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: battery_store_mode_switch
+
+Data:
+
+Column Name Type constraint Description
+action Operation enum_int {"1":"Schedule mode","2":"Standby mode"}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: battery_store_mode_switch
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Dock Reboot
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: device_reboot
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: device_reboot
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Aircraft Power-On
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: drone_open
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: drone_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Shutdown Aircraft
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: drone_close
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: drone_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Dock Data Formatting
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: device_format
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: device_format
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Aircraft Data Formatting
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: drone_format
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: drone_format
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Open Cover
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: cover_open
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: cover_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Close Cover
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: cover_close
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: cover_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Start Charging
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: charge_open
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: charge_open
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Stop Charging
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: charge_close
+
+Data: null
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: charge_close
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Enhanced Image Transmission Switch
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: sdr_workmode_switch
+
+Data:
+
+Column Name Type constraint Description
+link_workmode Video transmission mode enum_int {"0":"SDR Only","1":"4G Enhanced Mode"} In 4G Enhanced Mode, both SDR and 4G will be used simultaneously
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: sdr_workmode_switch
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+#
+Activate eSIM
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: esim_activate
+
+Data:
+
+Column Name Type constraint Description
+imei dongle imei text Identify the Dongle to be operated
+device_type Target device type enum_string {"dock":"Set dock Dongle","drone":"Set aircraft Dongle"} Identify the target device to operate
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: esim_activate
+
+Data:
+
+Column Name Type constraint Description
+result Return code int
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+#
+Switch Between eSIM and SIM
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: sim_slot_switch
+
+Data:
+
+Column Name Type constraint Description
+imei dongle imei text Identify the Dongle to be operated
+device_type Target device type enum_string {"dock":"Set dock Dongle","drone":"Set aircraft Dongle"} Identify the target device to operate
+sim_slot Target slot for switching enum_int {"1":"Physical SIM card","2":"eSIM"} Switching between using a physical SIM card and using eSIM
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: sim_slot_switch
+
+Data:
+
+Column Name Type constraint Description
+result Return code int
+#
+Switch eSIM Operator
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: esim_operator_switch
+
+Data:
+
+Column Name Type constraint Description
+imei dongle imei text Identify the Dongle to be operated
+device_type Target device type enum_string {"dock":"Set dock Dongle","drone":"Set aircraft Dongle"} Identify the target device to operate
+esim_operator Target operator for switching enum_int {"1":"Mobile","2":"China Unicom","3":"Telecommunications"}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: esim_operator_switch
+
+Data:
+
+Column Name Type constraint Description
+result Return code int

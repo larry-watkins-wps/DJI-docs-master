@@ -1,0 +1,185 @@
+The custom flight area file must be named as geofence_{fileMD5}.json. The fileMD5 is a placeholder for the MD5 value of the file.
+
+Click to download the template file: Custom Flight Area File Template
+open in new window
+#
+Event
+#
+Sync state of custom flight area files
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: flight_areas_sync_progress
+
+Data:
+
+Column Name Type constraint Description
+status Synchronization state enum_string {"fail":"Failed","switch_fail":"Enable switch failed","synchronized":"Synchronized","synchronizing":"Synchronizing","wait_sync":"To be synchronized"}
+reason Return code int {"1":"Failed to parse file information returned from the cloud","2":"Failed to get file information on the aircraft side","3":"Failed to download file from the cloud","4":"Link flip failed","5":"File transfer failed","6":"Disable failed","7":"Failed to delete custom flight area","8":"Failed to load job area data on the aircraft side","9":"Enable failed","10":"Dock enhanced image transmission cannot be turned off, job area data synchronization failed","11":"Aircraft startup failed, unable to synchronize job area data","12":"Checksum verification failed","13":"Synchronization exception timeout"}
+file Custom flight area file struct
+»name Customized flight area file name text
+»checksum File signature digest text {} File SHA256 signature
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "file": {
+ "checksum": "sha256",
+ "name": "geofence_xxx.json"
+ },
+ "reason": 0,
+ "status": "synchronized"
+ },
+ "method": "flight_areas_sync_progress",
+ "need_reply": 1,
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 16540709686556
+}
+
+#
+Custom flight area alarm information push
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: flight_areas_drone_location
+
+Data:
+
+Column Name Type constraint Description
+drone_locations Aircraft custom flight area distance information struct
+»area_id Unique ID of the area string
+»area_distance Distance to flight boundary float
+»is_in_area Whether in the custom flight area bool
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "drone_locations": [
+ {
+ "area_distance": 100.11,
+ "area_id": "d275c4e1-d864-4736-8b5d-5f5882ee9bdd",
+ "is_in_area": true
+ }
+ ]
+ },
+ "method": "flight_areas_drone_location",
+ "need_reply": 0,
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 16540709686556
+}
+
+#
+Service
+#
+Instruction to update custom flight areas
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: flight_areas_update
+
+Data: null
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": null,
+ "method": "flight_areas_update",
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: flight_areas_update
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "result": 0
+ },
+ "method": "flight_areas_update",
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+#
+Requests
+#
+Retrieve custom flight area files
+
+Topic: thing/product/{gateway_sn}/requests
+
+Direction: up
+
+Method: flight_areas_get
+
+Data: null
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": null,
+ "method": "flight_areas_get",
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}
+
+Topic: thing/product/{gateway_sn}/requests_reply
+
+Direction: down
+
+Method: flight_areas_get
+
+Data:
+
+Column Name Type constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»files Custom flight area file list array {"size": -, "item_type": struct} Empty array if there is no custom flight area
+»»name File name text {}
+»»url File URL text {}
+»»checksum File signature digest text {} File SHA256 signature
+»»size File size int {}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "files": [
+ {
+ "checksum": "sha256",
+ "name": "geofence_xxx.json",
+ "size": 500,
+ "url": "https://xx.oss-cn-hangzhou.aliyuncs.com/xx.json?Expires=xx&OSSAccessKeyId=xxx&Signature=xxx"
+ }
+ ]
+ },
+ "result": 0
+ },
+ "method": "flight_areas_get",
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655
+}

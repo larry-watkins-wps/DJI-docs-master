@@ -61,11 +61,15 @@ Cross-session source of truth. Update checkboxes as work completes. Before endin
 
 ## Phase 6 — Device properties
 
-- [ ] `device-properties/README.md` — master matrix (property × device support)
+- [ ] `device-properties/README.md` — master matrix (property × device support, including out-of-scope rows for enum completeness)
+- [ ] `device-properties/dock2.md`
 - [ ] `device-properties/dock3.md`
+- [ ] `device-properties/m3d.md`
+- [ ] `device-properties/m3td.md`
 - [ ] `device-properties/m4d.md`
 - [ ] `device-properties/m4td.md`
-- [ ] `device-properties/rc-m4d.md`
+- [ ] `device-properties/rc-plus-2.md`
+- [ ] `device-properties/rc-pro.md`
 - [ ] Update corpus `README.md`
 - [ ] **Review gate**
 
@@ -104,7 +108,9 @@ Cross-session source of truth. Update checkboxes as work completes. Before endin
 
 ## Phase 11 — Workflows
 
-- [ ] `workflows/dock3-bootstrap-and-pairing.md`
+Workflows are written once per choreography and call out dock-generation-specific variations inline (not a separate doc per dock generation, unless the divergence is large enough to warrant it).
+
+- [ ] `workflows/dock-bootstrap-and-pairing.md` (Dock 2 + Dock 3 variants)
 - [ ] `workflows/device-binding.md`
 - [ ] `workflows/firmware-and-config-update.md`
 - [ ] `workflows/wayline-upload-and-execution.md`
@@ -114,16 +120,20 @@ Cross-session source of truth. Update checkboxes as work completes. Before endin
 - [ ] `workflows/flysafe-custom-flight-area-sync.md`
 - [ ] `workflows/airsense-events.md`
 - [ ] `workflows/media-upload-from-dock.md`
-- [ ] `workflows/remote-control-handoff.md`
+- [ ] `workflows/remote-control-handoff.md` (RC Plus 2 Enterprise and RC Pro Enterprise)
 - [ ] Update corpus `README.md`
 - [ ] **Review gate**
 
 ## Phase 12 — Device annexes
 
+- [ ] `device-annexes/dock2.md`
 - [ ] `device-annexes/dock3.md`
+- [ ] `device-annexes/m3d.md`
+- [ ] `device-annexes/m3td.md`
 - [ ] `device-annexes/m4d.md`
 - [ ] `device-annexes/m4td.md`
-- [ ] `device-annexes/rc-m4d.md`
+- [ ] `device-annexes/rc-plus-2.md`
+- [ ] `device-annexes/rc-pro.md`
 - [ ] Update corpus `README.md`
 - [ ] **Review gate**
 

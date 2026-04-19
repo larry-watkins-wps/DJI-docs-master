@@ -8,14 +8,21 @@ This document establishes shared vocabulary for the rest of the corpus. It links
 
 ## 1. In-scope devices
 
-This corpus covers the wire contract for these four devices:
+This corpus covers the wire contract for two parallel device cohorts:
 
+**Current generation (Dock 3 cohort)**
 - **DJI Dock 3**
 - **Matrice 4D** (M4D)
 - **Matrice 4TD** (M4TD)
-- **RC Plus 2 Enterprise paired with the M4D** (RC is a gateway device in that topology; RC Plus 2 Enterprise is distinct from the earlier RC Plus Enterprise — `DeviceEnum.java` in `dji_cloud_dock3/` carries both `RC_PLUS` and `RC_PLUS_2` as separate entries)
+- **RC Plus 2 Enterprise** running DJI Pilot 2 — the RC paired with the M4D. Distinct from the earlier RC Plus Enterprise; `DeviceEnum.java` in `dji_cloud_dock3/` carries both `RC_PLUS` and `RC_PLUS_2` as separate entries.
 
-Out of scope: Dock 2 and everything older, as well as all server-side implementation choices. See [`/CLAUDE.md`](../../CLAUDE.md) for the full scope contract.
+**Older generation (Dock 2 cohort)**
+- **DJI Dock 2**
+- **Matrice 3D** (M3D)
+- **Matrice 3TD** (M3TD)
+- **RC Pro Enterprise** running DJI Pilot 2 — the RC paired with the M3D / M3TD. `DeviceTypeEnum.RC_PRO` (type 144) in `dji_cloud_dock3/`.
+
+Out of scope: Dock 1, Matrice 30 / 30T, Matrice 300 / 350 RTK, Mavic 3 Enterprise, Matrice 400 — and all server-side implementation choices. See [`/CLAUDE.md`](../../CLAUDE.md) for the full scope contract.
 
 ## 2. Source coverage note
 
@@ -47,33 +54,54 @@ DJI's own proper-noun definitions for these and other terms used throughout the 
 
 ## 4. In-scope gateway topologies
 
+Four distinct gateway topologies — two autonomous (Dock 2 / Dock 3) and two manual (RC Pro / RC Plus 2).
+
 ```mermaid
 flowchart LR
-  subgraph auto["Autonomous Dock topology"]
+  subgraph auto3["Autonomous · Dock 3 cohort"]
     direction LR
-    A1["Matrice 4D / 4TD<br/>(aircraft · sub-device)"]
-    A2["DJI Dock 3<br/>(gateway)"]
-    A1 -->|DJI onboard link| A2
+    A3a["Matrice 4D / 4TD<br/>(aircraft · sub-device)"]
+    A3b["DJI Dock 3<br/>(gateway)"]
+    A3a -->|DJI onboard link| A3b
   end
-  subgraph manual["Manual RC topology"]
+  subgraph auto2["Autonomous · Dock 2 cohort"]
     direction LR
-    B1["Matrice 4D<br/>(aircraft · sub-device)"]
-    B2["RC Plus 2 Enterprise<br/>+ DJI Pilot 2<br/>(gateway)"]
-    B1 -->|DJI onboard link| B2
+    A2a["Matrice 3D / 3TD<br/>(aircraft · sub-device)"]
+    A2b["DJI Dock 2<br/>(gateway)"]
+    A2a -->|DJI onboard link| A2b
   end
-  A2 -->|MQTT 5.0| BROKER[("Cloud MQTT broker")]
-  B2 -->|MQTT 5.0| BROKER
-  A2 -->|HTTPS| API[("Cloud HTTPS API")]
-  B2 -->|HTTPS| API
+  subgraph manual3["Manual · M4D cohort"]
+    direction LR
+    M3a["Matrice 4D<br/>(aircraft · sub-device)"]
+    M3b["RC Plus 2 Enterprise<br/>+ DJI Pilot 2<br/>(gateway)"]
+    M3a -->|DJI onboard link| M3b
+  end
+  subgraph manual2["Manual · M3D / M3TD cohort"]
+    direction LR
+    M2a["Matrice 3D / 3TD<br/>(aircraft · sub-device)"]
+    M2b["RC Pro Enterprise<br/>+ DJI Pilot 2<br/>(gateway)"]
+    M2a -->|DJI onboard link| M2b
+  end
+  A3b -->|MQTT 5.0| BROKER[("Cloud MQTT broker")]
+  A2b -->|MQTT 5.0| BROKER
+  M3b -->|MQTT 5.0| BROKER
+  M2b -->|MQTT 5.0| BROKER
+  A3b -->|HTTPS| API[("Cloud HTTPS API")]
+  A2b -->|HTTPS| API
+  M3b -->|HTTPS| API
+  M2b -->|HTTPS| API
   API -.WebSocket push.-> WEB[("Pilot Webview · web clients")]
-  B2 -. Webview ↔ Pilot native<br/>(JSBridge, local) .- WEB
+  M3b -. Webview ↔ Pilot native<br/>(JSBridge, local) .- WEB
+  M2b -. Webview ↔ Pilot native<br/>(JSBridge, local) .- WEB
 ```
 
 Notes on this diagram:
 
-- The M4TD is only supported in the autonomous (Dock 3) topology in this corpus's scope. The RC-paired topology applies to the M4D only.
+- Autonomous topologies run without an RC in the loop — the Dock holds the cloud connection and the aircraft is its sub-device.
+- Manual topologies carry the aircraft as the sub-device but the gateway role shifts to the RC + Pilot 2 combo. JSBridge only applies to manual topologies (no Pilot in the autonomous Dock paths).
 - JSBridge is a **local** Webview ↔ Pilot-native bridge inside the RC, not a server-facing protocol. See §5.4.
 - Media transports (RTMP / GB28181 / WebRTC / Agora) are separate data-plane streams that run alongside the control plane shown here; see §5.5.
+- The two dock generations use **the same** MQTT envelope, topic taxonomy, HTTPS conventions, and WebSocket conventions — divergence between them is at the content level (different properties in OSD / state, different services, different events), not the transport level. See §7 and per-path MQTT catalogs (Phase 4).
 
 ## 5. Transports
 

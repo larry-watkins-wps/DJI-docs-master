@@ -4,7 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 
 ## What this repo is
 
-A long-running, multi-session project to build a curated **DJI Cloud API documentation corpus** for the **DJI Dock 3**, **Matrice 4D (M4D)**, **Matrice 4TD (M4TD)**, and the **RC paired with the M4D**. Dock 2 is explicitly out of scope.
+A long-running, multi-session project to build a curated **DJI Cloud API documentation corpus** for two parallel device cohorts:
+
+- **Current generation** — **DJI Dock 3**, **Matrice 4D (M4D)**, **Matrice 4TD (M4TD)**, and the RC paired with the M4D (**RC Plus 2 Enterprise**).
+- **Older generation** — **DJI Dock 2**, **Matrice 3D (M3D)**, **Matrice 3TD (M3TD)**, and the RC paired with the M3D / M3TD (**RC Pro Enterprise**).
+
+**Dock 1** (the original DJI Dock) and the Matrice 30 / 30T / 300 RTK / 350 RTK / Mavic 3 Enterprise families are **out of scope**, even though their material is present in `DJI_Cloud/` and `Cloud-API-Doc/` as a side-effect of how the docs are organized.
 
 Output lives in [`master-docs/`](master-docs/). All other top-level directories are **read-only source material** (see [`master-docs/SOURCES.md`](master-docs/SOURCES.md)).
 

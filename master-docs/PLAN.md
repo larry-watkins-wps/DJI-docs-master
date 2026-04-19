@@ -5,9 +5,12 @@
 
 ## Objective
 
-Produce a clean, concise, LLM-digestible documentation corpus in `master-docs/` that captures the **DJI Cloud API wire contract and workflows** needed by the **DJI Dock 3**, **Matrice 4D**, **Matrice 4TD**, and the **RC paired with the M4D** to function against a DJI-Cloud-compatible server.
+Produce a clean, concise, LLM-digestible documentation corpus in `master-docs/` that captures the **DJI Cloud API wire contract and workflows** needed by two parallel device cohorts to function against a DJI-Cloud-compatible server:
 
-Server-side implementation (databases, brokers, auth backends, business logic, framework code) is **not** in scope.
+- **Current gen**: DJI Dock 3, Matrice 4D, Matrice 4TD, RC Plus 2 Enterprise paired with M4D.
+- **Older gen**: DJI Dock 2, Matrice 3D, Matrice 3TD, RC Pro Enterprise paired with M3D / M3TD.
+
+Server-side implementation (databases, brokers, auth backends, business logic, framework code) is **not** in scope. Dock 1 and other DJI drone families (M30/M30T, M300/M350 RTK, Mavic 3 Enterprise) are also out of scope.
 
 See `/CLAUDE.md` at repo root for full scope + directives. See `SOURCES.md` for source authority.
 
@@ -67,7 +70,7 @@ Memory, CLAUDE.md, PLAN, TODO, SOURCES, README, `.gitignore`, `.gitattributes`, 
 `websocket/<family>/<message>.md` — push message catalog with payload schema and real examples.
 
 ### Phase 6 — Device properties
-`device-properties/README.md` (master support matrix of properties × devices) plus per-device files: `dock3.md`, `m4d.md`, `m4td.md`, `rc-plus-2.md`. Properties drawn from the `DJI_Cloud/` v1.15 device-properties and aircraft-properties catalogs (see [`SOURCES.md`](SOURCES.md) §3 for the full file inventory); older-device enum rows (M30/M30T, M3D/M3TD, Matrice 400, Mavic 3 Enterprise, RC Pro Enterprise, etc.) merged per user direction. Verified against `Cloud-API-Doc/` where v1.11 counterparts exist.
+`device-properties/README.md` (master support matrix of properties × devices) plus per-device files for all in-scope devices: `dock2.md`, `dock3.md`, `m3d.md`, `m3td.md`, `m4d.md`, `m4td.md`, `rc-plus-2.md`, `rc-pro.md`. Properties drawn from the `DJI_Cloud/` v1.15 device-properties and aircraft-properties catalogs (see [`SOURCES.md`](SOURCES.md) §3 for the full file inventory); out-of-scope device rows (Dock 1, M30/M30T, M400, Mavic 3 Enterprise, plain RC) included in the support matrix only for enum completeness per user direction. Verified against `Cloud-API-Doc/` where v1.11 counterparts exist.
 
 ### Phase 7 — WPML (wayline file format)
 `wpml/` — overview, template KML, waylines, common elements. "WPML" is DJI's wayline planning markup language (format as used in the `.wpml` file extension and the official docs URL path). Sourced from `DJI_Cloud/DJI_CloudAPI_WPML-*.txt` and `Cloud-API-Doc/`.
@@ -98,7 +101,7 @@ Memory, CLAUDE.md, PLAN, TODO, SOURCES, README, `.gitignore`, `.gitattributes`, 
 This phase depends on Phases 3–5 being complete so workflow steps can link to canonical transport catalog entries.
 
 ### Phase 12 — Device annexes
-`device-annexes/` — per-device deltas, quirks, and anything that differs meaningfully between Dock 3 / M4D / M4TD / paired RC. Informed by `dji_cloud_dock3/` (non-authoritative) and anything flagged during earlier phases.
+`device-annexes/` — per-device deltas, quirks, and anything that differs meaningfully across the in-scope devices (Dock 2, Dock 3, M3D, M3TD, M4D, M4TD, RC Plus 2 Enterprise, RC Pro Enterprise). Informed by `dji_cloud_dock3/` (non-authoritative, Dock-3-specific) and anything flagged during earlier phases.
 
 ### Phase 13 — Final review pass
 Consistency sweep: all cross-links resolve, README is up to date, `OPEN-QUESTIONS.md` either resolved or explicitly deferred, provenance citations spot-checked.
