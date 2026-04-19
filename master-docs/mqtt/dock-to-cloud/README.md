@@ -18,7 +18,7 @@ Phase 4 is being landed in feature-area sub-drops. This index grows as drops lan
 | 4d | LiveStream + Media-Management | **landed 2026-04-18** |
 | 4e-1 | Firmware-Upgrade + Remote-Log + Remote-Debugging | **landed 2026-04-19** |
 | 4e-2 | Remote-Control (DRC PSDK + AI identify + camera/speaker/light) | **landed 2026-04-19** |
-| 4f | FlySafe + Custom-Flight-Area + AirSense + HMS | pending |
+| 4f | FlySafe + Custom-Flight-Area + AirSense + HMS | **landed 2026-04-19** |
 | 4g | PSDK + PSDK-Interconnection + ESDK-Interconnection | pending |
 
 ## Current catalog
@@ -64,6 +64,10 @@ Topics under `thing/product/{gateway_sn}/events`. Device → cloud pushes.
 | `drone_close` | [`events/drone_close.md`](events/drone_close.md) | Aircraft power-off progress (7 safety-check steps). |
 | `drone_open` | [`events/drone_open.md`](events/drone_open.md) | Aircraft power-on state change (no progress percent / step_key). |
 | `rtk_calibration` | [`events/rtk_calibration.md`](events/rtk_calibration.md) | RTK manual-calibration result (Dock 3 only; `need_reply: 1`). |
+| `flight_areas_drone_location` | [`events/flight_areas_drone_location.md`](events/flight_areas_drone_location.md) | Aircraft distance/inside-state for every loaded custom flight area (`need_reply: 0`). |
+| `flight_areas_sync_progress` | [`events/flight_areas_sync_progress.md`](events/flight_areas_sync_progress.md) | Custom-flight-area file sync state + failure reason (`need_reply: 1`). |
+| `airsense_warning` | [`events/airsense_warning.md`](events/airsense_warning.md) | ADS-B proximity warning (five levels; `need_reply: 1`). |
+| `hms` | [`events/hms.md`](events/hms.md) | Health Management System warning push (batch up to 20 entries). |
 
 ### `services/`
 
@@ -148,6 +152,10 @@ Topics under `thing/product/{gateway_sn}/services`. Cloud → device commands.
 | `debug_mode_open` | [`services/debug_mode_open.md`](services/debug_mode_open.md) | Enter remote-debugging mode. |
 | `cover_force_close` | [`services/cover_force_close.md`](services/cover_force_close.md) | Force the dock cover closed (bypasses safety interlocks). |
 | `rtk_calibration` | [`services/rtk_calibration.md`](services/rtk_calibration.md) | Trigger manual RTK calibration (Dock 3 only). |
+| `unlock_license_switch` | [`services/unlock_license_switch.md`](services/unlock_license_switch.md) | Enable / disable a single FlySafe unlocking license. |
+| `unlock_license_update` | [`services/unlock_license_update.md`](services/unlock_license_update.md) | Push a refreshed FlySafe license file (or trigger online resync). |
+| `unlock_license_list` | [`services/unlock_license_list.md`](services/unlock_license_list.md) | Enumerate the unlocking licenses loaded on aircraft or dock. |
+| `flight_areas_update` | [`services/flight_areas_update.md`](services/flight_areas_update.md) | Tell the device to refresh its custom-flight-area set (no params). |
 
 ### `requests/`
 
@@ -162,6 +170,7 @@ Topics under `thing/product/{gateway_sn}/requests`. Device → cloud requests, c
 | `flighttask_progress_get` | [`requests/flighttask_progress_get.md`](requests/flighttask_progress_get.md) | In multi-dock tasks, query the other dock's latest progress. |
 | `flighttask_resource_get` | [`requests/flighttask_resource_get.md`](requests/flighttask_resource_get.md) | Fetch a fresh pre-signed URL for the KMZ wayline file. |
 | `storage_config_get` | [`requests/storage_config_get.md`](requests/storage_config_get.md) | Dock requests short-lived object-storage credentials for media upload. |
+| `flight_areas_get` | [`requests/flight_areas_get.md`](requests/flight_areas_get.md) | Dock pulls the cloud's current custom-flight-area file inventory. |
 
 ### `drc/`
 
@@ -281,6 +290,39 @@ AI identify:
 All methods whose name begins with `drc_` are filed in the `drc/` directory regardless of whether they ride `/drc/down` + `/drc/up`, `/events`, or (rarely, on Dock 2) `/services` + `/services_reply`. The per-doc topics table is the canonical source for the actual topic. This convention keeps the DRC family co-located so a reader can grep `drc/` and find every DRC method in one place — the alternative (splitting by topic) scattered related methods across three folders and broke the "grep for the method name" ergonomic.
 
 Cross-cohort topic divergence (Dock 3 `/events` vs Dock 2 `/drc/up`) is flagged prominently in each affected doc — [`drc_drone_state_push`](drc/drc_drone_state_push.md) and [`drc_camera_osd_info_push`](drc/drc_camera_osd_info_push.md) are the known cases.
+
+### Sub-phase 4f sub-areas
+
+9 methods covering FlySafe unlocking, custom flight areas (CFA), AirSense ADS-B warnings, and HMS. All identical across Dock 2 + Dock 3.
+
+**FlySafe unlocking (3 services, all in `services/`):**
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `unlock_license_switch` | [`services/unlock_license_switch.md`](services/unlock_license_switch.md) | Toggle a single unlocking license on or off by ID. |
+| `unlock_license_update` | [`services/unlock_license_update.md`](services/unlock_license_update.md) | Push a refreshed FlySafe license file (optional `file` → offline; absent → online resync). |
+| `unlock_license_list` | [`services/unlock_license_list.md`](services/unlock_license_list.md) | Enumerate the 7 license types loaded on aircraft or dock with `consistence` flag. |
+
+**Custom-Flight-Area (2 events + 1 service + 1 request):**
+
+| Method | Doc | Family | Purpose |
+|---|---|---|---|
+| `flight_areas_drone_location` | [`events/flight_areas_drone_location.md`](events/flight_areas_drone_location.md) | event | Aircraft per-area distance + inside-state (`need_reply: 0`). |
+| `flight_areas_sync_progress` | [`events/flight_areas_sync_progress.md`](events/flight_areas_sync_progress.md) | event | Sync state + 13-code failure-reason enum (`need_reply: 1`). |
+| `flight_areas_update` | [`services/flight_areas_update.md`](services/flight_areas_update.md) | service | Cloud asks device to resync (no params). |
+| `flight_areas_get` | [`requests/flight_areas_get.md`](requests/flight_areas_get.md) | request | Dock asks cloud for the file list with pre-signed URLs. |
+
+**AirSense (1 event):**
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `airsense_warning` | [`events/airsense_warning.md`](events/airsense_warning.md) | ADS-B crewed-airplane proximity warning array (5-level severity; `need_reply: 1`). |
+
+**HMS (1 event):**
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `hms` | [`events/hms.md`](events/hms.md) | Health warning batch (up to 20 entries). Code catalog belongs to Phase 8 (`hms-codes/`). |
 
 ### `property/set`, `osd/`, `state/`
 

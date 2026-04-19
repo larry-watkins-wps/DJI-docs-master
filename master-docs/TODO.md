@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 landed 2026-04-19 — Phase 4e is **complete**. Review gate pending before Phase 4f).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f landed 2026-04-19. Review gate pending before Phase 4g).
 
 ---
 
@@ -161,7 +161,15 @@ Source: `DJI_Cloud/DJI_CloudAPI-Dock3-Remote-Control.txt` (4611 lines) + `DJI_Cl
 
 ### Sub-phase 4f — FlySafe + Custom-Flight-Area + AirSense + HMS (dock-to-cloud)
 
-- [ ] Enumerate + draft (est. ~35 methods).
+Actual method count was **9** (not ~35). DJI's FlySafe surface is a 3-service tuple (license switch/update/list — no events, no requests); Custom-Flight-Area is 2 events + 1 service + 1 request; AirSense + HMS are 1 event each. The ~35 estimate from the 4e-2 handoff appeared to anticipate distinct per-license-type methods and HMS code-level methods that do not exist at the MQTT transport level (HMS codes are Phase 8 scope).
+
+- [x] Enumerate + draft 9 methods (4 events + 4 services + 1 request).
+  - Events: `flight_areas_drone_location` (`need_reply: 0`), `flight_areas_sync_progress` (`need_reply: 1`), `airsense_warning` (`need_reply: 1`), `hms` (no reply).
+  - Services: `unlock_license_switch`, `unlock_license_update`, `unlock_license_list`, `flight_areas_update`.
+  - Requests: `flight_areas_get`.
+- [x] Update `mqtt/dock-to-cloud/README.md` with 4f rows + sub-phase status (landed 2026-04-19) + per-sub-area tables (FlySafe / CFA / AirSense / HMS).
+- [x] Update `mqtt/README.md` + corpus `README.md` (method count 181).
+- [x] Append to `RESUME-NOTES.md` with a 4f close handoff entry.
 - [ ] **Review gate 4f**
 
 ### Sub-phase 4g — PSDK + PSDK-Interconnection + ESDK-Interconnection (dock-to-cloud)

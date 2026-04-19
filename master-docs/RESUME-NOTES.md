@@ -6,6 +6,77 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 4f close, ready for 4g
+
+### State of play
+
+- Phases 0, 1, 2, 3 complete and committed.
+- Phase 4 (MQTT topic catalog) — **sub-phases 4a, 4b, 4c, 4d, 4e-1, 4e-2, and 4f all landed**. **181 methods total** across the dock-to-cloud MQTT catalog.
+- **4g is next** — PSDK + PSDK-Interconnection + ESDK-Interconnection (dock-to-cloud). Est. ~40 methods (to be re-verified at enumeration).
+
+### What 4f produced
+
+- `mqtt/dock-to-cloud/events/` — 4 new docs: `flight_areas_drone_location` (`need_reply: 0`), `flight_areas_sync_progress` (`need_reply: 1`; 13-reason failure enum), `airsense_warning` (`need_reply: 1`; `data` is an **array**, not a struct — unusual for the corpus), `hms` (no reply; up to 20 warnings per batch).
+- `mqtt/dock-to-cloud/services/` — 4 new docs: `unlock_license_switch`, `unlock_license_update` (`file` struct optional — present = offline push, absent = online resync), `unlock_license_list` (7 license types — area / circle / country / height / polygon / power / RID — with `consistence` flag), `flight_areas_update` (`data: null`).
+- `mqtt/dock-to-cloud/requests/` — 1 new doc: `flight_areas_get` (dock pulls CFA file inventory + pre-signed URLs).
+- No new family directory — all 9 methods fit into existing `events/` + `services/` + `requests/`.
+- `mqtt/dock-to-cloud/README.md` — added FlySafe / CFA / AirSense / HMS rows across all three family tables, plus a new "Sub-phase 4f sub-areas" section with per-family grouping (FlySafe, Custom-Flight-Area, AirSense, HMS). Status table shows 4f landed.
+- `mqtt/README.md` + corpus `README.md` updated to 181-method total.
+- `TODO.md` — 4f section re-scoped (9 methods vs ~35 estimate) and checkboxes ticked; only the 4f review gate remains open.
+
+### Why the method count (9) is much lower than the ~35 estimate
+
+The 4e-2 handoff projected "~35 methods" covering all four feature areas. Actual counts by source:
+
+- **FlySafe**: 3 methods — all services (switch/update/list). No events, no requests. The ~10–15 estimate implied per-license-type methods; in reality all 7 unlock types are unified under a single `unlock_license_list` reply.
+- **Custom-Flight-Area**: 4 methods (2 events + 1 service + 1 request). As expected.
+- **AirSense**: 1 event. No services, no requests.
+- **HMS**: 1 event. DJI transports HMS warnings as a batched list of up to 20 entries; the code catalog itself is Phase 8 scope (`hms-codes/`), not Phase 4. There is no per-code MQTT method.
+
+Net effect: 4f was the smallest drop since 4a (5 methods). Context budget is wide open for 4g.
+
+### DJI-source inconsistencies flagged during 4f drafting
+
+Carry into Phase 9 workflow authoring:
+
+- **Pervasive 14-digit timestamps in 4f examples.** Every CFA + AirSense source example ships `"timestamp": 16540709686556` (14 digits) instead of 13-digit epoch-ms. Pattern repeats across v1.11 Dock 2, v1.15 Dock 2, and v1.15 Dock 3. Flagged inline in all affected docs; cloud implementations should emit/accept 13-digit ms.
+- **Dock 3 HMS `"timestamp:"` trailing-colon typo.** Matches the Remote-Debugging / Remote-Control pattern from 4e-1/4e-2. Dock 2 HMS uses the correct key.
+- **`unlock_license_list` `type` enum labels diverge cosmetically.** v1.11 + Dock 2 v1.15 use running-text lowercase ("Authorization zone unlocking"); Dock 3 v1.15 hand-authored source uses title-case past-tense ("Authorization Zone Unlocked"). Numeric `{0..6}` is stable. `rid_unlock.level` shows the same pattern.
+- **`airsense_warning` label rename.** v1.11 + Dock 2 v1.15 use "Alarm level"; Dock 3 v1.15 uses "Warning level". Semantics identical.
+- **HMS `module` enum label.** v1.11 + Dock 2 label `module: 3` as `"hms"` (lowercase); Dock 3 uses `"HMS"` (uppercase). Numeric stable.
+- **`flight_areas_drone_location` Dock 3 v1.15 schema omits `area_id`** but the example carries it. Dock 2 schema has the row. Treat as source-extraction bug; field is authoritative on the wire.
+- **`flight_areas_sync_progress.reason` in success example.** DJI's example sends `"reason": 0` alongside `"status": "synchronized"`; documented enum starts at `1`. Treat `0` as "no error" and rely on `status` for the authoritative outcome.
+- **`airsense_warning` has `data` as an array.** Unusual for this corpus — every other event in the dock-to-cloud tree nests content under a struct. The array shape is intentional (multi-intruder reporting).
+
+None of these rise to `OPEN-QUESTIONS.md` level — doc-level callouts are sufficient.
+
+### After 4f review gate (= kick-off of 4g)
+
+**4g scope — PSDK + PSDK-Interconnection + ESDK-Interconnection (dock-to-cloud).** Sources to enumerate (confirm filenames with `ls DJI_Cloud/ | grep -iE "(psdk|esdk)"`):
+
+1. `DJI_Cloud/DJI_CloudAPI-Dock3-PSDK.txt`
+2. `DJI_Cloud/DJI_CloudAPI-Dock3-PSDK-Interconnection.txt`
+3. `DJI_Cloud/DJI_CloudAPI-Dock3-ESDK-Interconnection.txt`
+4. Dock 2 counterparts.
+5. Cloud-API-Doc v1.11 Dock 2: `.../10.dock2/140.psdk.md`, `150.psdk-transmit-custom-data.md`, `160.esdk-transmit-custom-data.md`.
+
+Expected method count: ~40 (to be revised after enumeration). Expected families: mostly `services/` (command PSDK/ESDK payloads; request/reply transmission) + `events/` (payload state pushes) + `requests/` (file download / widget resource fetch). Note: a large swath of PSDK-widget / PSDK-speaker / PSDK-spotlight methods already landed under `drc/` in **4e-2** — 4g will not re-document those. Expected new content is the "transmit-custom-data" plumbing (cloud ↔ PSDK/ESDK passthrough) plus the payload state/event methods.
+
+### Known gotchas carried forward
+
+- PSDK-Interconnection and ESDK-Interconnection are DJI's passthrough channels for third-party payload vendors — the MQTT method typically wraps opaque bytes. Document the envelope, not the opaque content.
+- `bid` grouping applies to PSDK command → progress-event flows that mirror the Remote-Debugging pattern in 4e-1.
+- Review gate: user checkpoint before 4g starts. Don't push through.
+- 4f introduced no new open questions.
+
+### Remaining pilot-to-cloud work (4h + 4i)
+
+After 4g the remaining MQTT work is:
+- **4h** — pilot-to-cloud (RC Plus 2 Enterprise + RC Pro Enterprise), est. ~70 methods.
+- **4i** — property-family shells (`osd/`, `state/`, `property-set/`) that link to Phase 6 `device-properties/`.
+
+---
+
 ## 2026-04-19 — handoff at Phase 4e close (4e-2 landed), ready for 4f
 
 ### State of play
