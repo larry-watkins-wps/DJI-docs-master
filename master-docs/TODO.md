@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 5 closed 2026-04-19. Phase 6 (Device properties) is next.
+**Current phase**: Phase 6a landed 2026-04-19 (master matrix + Dock 2 + Dock 3). Phase 6b (aircraft) is next.
 
 ---
 
@@ -229,17 +229,49 @@ Enumerated 8 push messages across two families from the v1.15 extracts (`DJI_Clo
 
 ## Phase 6 — Device properties
 
-- [ ] `device-properties/README.md` — master matrix (property × device support, including out-of-scope rows for enum completeness)
-- [ ] `device-properties/dock2.md`
-- [ ] `device-properties/dock3.md`
-- [ ] `device-properties/m3d.md`
-- [ ] `device-properties/m3td.md`
-- [ ] `device-properties/m4d.md`
-- [ ] `device-properties/m4td.md`
-- [ ] `device-properties/rc-plus-2.md`
-- [ ] `device-properties/rc-pro.md`
-- [ ] Update corpus `README.md`
-- [ ] **Review gate**
+**Scope decision (2026-04-19):** Phase 6 is sub-phased because the combined property surface across 8 in-scope devices totals ~1,400 unique property rows (5,676 source lines). Sub-drops:
+- **6a** — Master matrix README + Dock 2 + Dock 3 (gateway-level, ~400 lines of output).
+- **6b** — Aircraft: M3D, M3TD, M4D, M4TD. Each aircraft doc has two sections — dock-path properties and pilot-path properties — because the same aircraft is reported by two different gateways (dock vs RC) with distinct property subsets. Shared aircraft properties extracted into `_aircraft-pilot-base.md`.
+- **6c** — RCs: RC Plus 2 Enterprise + RC Pro Enterprise. Gateway-level properties.
+
+Each sub-phase has its own review gate. Design decisions locked at 6a kickoff (2026-04-19):
+- Master matrix layout: property-per-row with device-support columns (✓ / ✓ rw / blank), grouped by semantic family, built incrementally as sub-drops land.
+- Per-device doc layout: three sections — OSD (pushMode=0), State (pushMode=1), Settable (accessMode=rw) — with nested struct fields preserved via DJI's `»` prefix.
+- v1.11 vs v1.15 drift: flag inline, prefer v1.15, escalate to [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) only when semantic (no 6a escalations; all dock drift is enum-extension or cosmetic).
+- Out-of-scope devices (Dock 1, M30/M30T, M300/M350, M400, Mavic 3E, plain RC): noted in enum tables where their values appear; no per-device doc.
+
+### Sub-phase 6a — Master matrix + Dock 2 + Dock 3 (gateway-level)
+
+- [x] Enumerate Dock 2 + Dock 3 gateway properties. Dock 2: 48 top-level (36 OSD + 12 state). Dock 3: 49 top-level (37 OSD + 12 state — adds `self_converge_coordinate`).
+- [x] Draft [`device-properties/README.md`](device-properties/README.md) — master matrix + narrative + dock-gateway coverage table.
+- [x] Draft [`device-properties/dock2.md`](device-properties/dock2.md) — full property catalog + 6 DJI-source inconsistencies + v1.11 → v1.15 drift table.
+- [x] Draft [`device-properties/dock3.md`](device-properties/dock3.md) — full property catalog + 5 DJI-source inconsistencies + drift-vs-Dock-2 table.
+- [x] Update 4i dock-to-cloud shells ([`mqtt/dock-to-cloud/osd/`](mqtt/dock-to-cloud/osd/README.md), [`state/`](mqtt/dock-to-cloud/state/README.md), [`property-set/`](mqtt/dock-to-cloud/property-set/README.md)) to link the real Phase 6 docs. Corrected the 4i property-set shell's speculative writable-property list — actual Dock 2/3 writable surface is just 3 properties (`silent_mode`, `user_experience_improvement`, `air_transfer_enable`), not the 7 the 4i shell guessed.
+- [x] Update corpus [`README.md`](README.md).
+- [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md) with a 6a close handoff.
+- [ ] **Review gate 6a**
+
+### Sub-phase 6b — Aircraft properties (M3D, M3TD, M4D, M4TD)
+
+- [ ] `device-properties/_aircraft-pilot-base.md` — shared pilot-path aircraft property catalog (from `DJI_CloudAPI_Aircraft-Properties.txt`, ~250 rows).
+- [ ] `device-properties/m3d.md` — dock-path (from `DJI_CloudAPI_M3D_M3DT_Properties.txt`) + pilot-path (inherits `_aircraft-pilot-base.md` + M3D-specific deltas).
+- [ ] `device-properties/m3td.md` — M3TD-specific deltas (shared source with M3D at dock-path).
+- [ ] `device-properties/m4d.md` — dock-path (from `DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`) + pilot-path (from `DJI_CloudAPI_Matrice4-Enterprise-Properties.txt`).
+- [ ] `device-properties/m4td.md` — shared source with M4D at dock-path; deltas only.
+- [ ] Extend master matrix README §4.2 (aircraft-level coverage table).
+- [ ] Update corpus `README.md`.
+- [ ] Append to `RESUME-NOTES.md`.
+- [ ] **Review gate 6b**
+
+### Sub-phase 6c — RC properties (RC Plus 2 Enterprise, RC Pro Enterprise)
+
+- [ ] `device-properties/rc-plus-2.md` (gateway-level, from `DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`, 625 lines).
+- [ ] `device-properties/rc-pro.md` (gateway-level, from `DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`, 68 lines).
+- [ ] Update 4i pilot-to-cloud shells to link the real Phase 6 docs.
+- [ ] Extend master matrix README §4.3 (RC-level coverage table).
+- [ ] Update corpus `README.md`.
+- [ ] Append to `RESUME-NOTES.md`.
+- [ ] **Final Phase 6 review gate** (closes the whole Phase 6).
 
 ## Phase 7 — Auxiliary specs (WPML + livestream protocols)
 

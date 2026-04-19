@@ -4,7 +4,7 @@ The state topic carries **on-change property push** — properties reported by t
 
 Part of the Phase 4 MQTT catalog. Shared conventions (envelope, request-reply pattern) live in [`../../README.md`](../../README.md).
 
-This file is a **shell** — the actual property catalog lives in Phase 6 [`device-properties/`](../../../device-properties/) (pending). The shell records the wire-level topic + push semantics + source files + forward pointer to Phase 6.
+This file is a **shell** — the actual property catalog lives in Phase 6 [`device-properties/`](../../../device-properties/). The shell records the wire-level topic + push semantics + source files + forward pointer to Phase 6.
 
 ---
 
@@ -20,14 +20,14 @@ This file is a **shell** — the actual property catalog lives in Phase 6 [`devi
 
 Same set as [`../osd/`](../osd/README.md#in-scope-devices-on-the-dock-to-cloud-path). Each property in the catalog carries a `pushMode` column; only `pushMode: 1` properties ride this topic.
 
-| Device | Property source | Phase 6 pointer (pending) |
+| Device | Property source | Phase 6 doc |
 |---|---|---|
-| **DJI Dock 2** | [`DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt) | `device-properties/dock2.md` |
-| **DJI Dock 3** | [`DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt) | `device-properties/dock3.md` |
-| **Matrice 3D (M3D)** | [`DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt) + shared aircraft | `device-properties/m3d.md` |
-| **Matrice 3TD (M3TD)** | same as M3D | `device-properties/m3td.md` |
-| **Matrice 4D (M4D)** | [`DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt) | `device-properties/m4d.md` |
-| **Matrice 4TD (M4TD)** | same as M4D | `device-properties/m4td.md` |
+| **DJI Dock 2** | [`DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt) | [`device-properties/dock2.md`](../../../device-properties/dock2.md) |
+| **DJI Dock 3** | [`DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt) | [`device-properties/dock3.md`](../../../device-properties/dock3.md) |
+| **Matrice 3D (M3D)** | [`DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt) + shared aircraft | `device-properties/m3d.md` *(pending 6b)* |
+| **Matrice 3TD (M3TD)** | same as M3D | `device-properties/m3td.md` *(pending 6b)* |
+| **Matrice 4D (M4D)** | [`DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt) | `device-properties/m4d.md` *(pending 6b)* |
+| **Matrice 4TD (M4TD)** | same as M4D | `device-properties/m4td.md` *(pending 6b)* |
 
 ## Representative envelope
 

@@ -4,7 +4,7 @@ The property-set topic carries **cloud-initiated writes** to writable device pro
 
 Part of the Phase 4 MQTT catalog. Shared conventions (envelope, request-reply pattern) live in [`../../README.md`](../../README.md).
 
-This file is a **shell** — the actual catalog of writable properties (which keys are writable, their enums, and per-property write semantics) lives in Phase 6 [`device-properties/`](../../../device-properties/) (pending). The shell records the wire-level topic + set/reply pattern + source files + forward pointer to Phase 6.
+This file is a **shell** — the actual catalog of writable properties (which keys are writable, their enums, and per-property write semantics) lives in Phase 6 [`device-properties/`](../../../device-properties/). The shell records the wire-level topic + set/reply pattern + source files + forward pointer to Phase 6.
 
 ---
 
@@ -19,14 +19,14 @@ This file is a **shell** — the actual catalog of writable properties (which ke
 
 ## In-scope devices on the dock-to-cloud path
 
-| Device | Representative writable properties (see Phase 6 for full list) |
-|---|---|
-| **DJI Dock 2** | `silent_mode`, `user_experience_improvement`, `air_transfer_enable`, `alarm_state_switch`, `battery_store_mode`, `night_lights_state`, `air_conditioner_mode`. Per [`DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt). |
-| **DJI Dock 3** | Superset of Dock 2 with additional platform-awareness / custom-flight-area fields. Per [`DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt). |
-| **Matrice 3D / 3TD** | Aircraft-side writable props: RTH height, payload enable flags, obstacle-sensing toggles, etc. Per [`DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt). |
-| **Matrice 4D / 4TD** | Superset — more payload-configuration and AI-identify writable props. Per [`DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt) + [`DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt). |
+| Device | Writable gateway properties | Phase 6 doc |
+|---|---|---|
+| **DJI Dock 2** | `silent_mode`, `user_experience_improvement`, `air_transfer_enable` (3 total). | [`device-properties/dock2.md`](../../../device-properties/dock2.md) §3 |
+| **DJI Dock 3** | Same 3 as Dock 2. No new gateway-level writable property added in Dock 3. | [`device-properties/dock3.md`](../../../device-properties/dock3.md) §3 |
+| **Matrice 3D / 3TD** | Aircraft-side writable props reported via dock `{gateway_sn}` — pending enumeration in 6b. | `device-properties/m3d.md` *(pending 6b)* |
+| **Matrice 4D / 4TD** | Aircraft-side writable props — pending 6b. | `device-properties/m4d.md` *(pending 6b)* |
 
-Phase 6 per-device docs will carry the full list of writable keys with their enums and constraints.
+Phase 6a confirmed that Dock-level writable surface is narrower than the 4i shell's initial speculation. Other dock controls that a cloud might expect to be writable (alarm, cover, supplement light, AC mode, battery store mode, night lights, RTK calibration) are exposed as **services** under [`../services/`](../services/) (Phase 4e-1 + 4e-2), not via property-set. Phase 9 workflows surface the service-vs-property-set decision per operation.
 
 ## Envelope — set request
 

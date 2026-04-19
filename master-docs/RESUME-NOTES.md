@@ -6,6 +6,93 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 6a close, ready for review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3, 4, 5 complete and committed.
+- Phase 6 (Device properties) started. **Sub-phase 6a landed** — master matrix README + Dock 2 + Dock 3 gateway properties. Phase 6a review gate is the only remaining 6a item.
+- Phase 6b (aircraft: M3D, M3TD, M4D, M4TD) is next.
+
+### What 6a produced
+
+- [`device-properties/README.md`](device-properties/README.md) — master matrix + narrative. §4.1 (gateway-level dock properties table) is populated for Dock 2 + Dock 3; §4.2 (aircraft) and §4.3 (RC) are stubbed out with pending-6b / pending-6c markers.
+- [`device-properties/dock2.md`](device-properties/dock2.md) — 48 top-level properties (36 OSD + 12 state), 3 writable. Full property table with nested struct fields preserved via DJI's `»` convention. 6 DJI-source inconsistencies flagged. v1.11 → v1.15 drift table.
+- [`device-properties/dock3.md`](device-properties/dock3.md) — 49 top-level properties (37 OSD + 12 state), 3 writable. Dock 3 is a property superset of Dock 2 (+ `self_converge_coordinate`). 5 DJI-source inconsistencies flagged. Drift-vs-Dock-2 table (enum extension on `home_position_is_valid`, widespread label refinement).
+- Updated 4i dock-to-cloud shells to link the real Phase 6 docs. Corrected the property-set shell's speculative writable-property list (was 7 entries including service methods and misidentified aircraft properties; actual Dock 2/3 writable surface is 3 properties).
+- Updated corpus [`README.md`](README.md) and [`TODO.md`](TODO.md) with Phase 6 sub-phase structure.
+
+### Design decisions locked at 6a kickoff
+
+Carried into 6b/6c:
+
+1. **Master matrix layout**: property-per-row with device-support columns (`✓`, `✓ rw`, blank), grouped by semantic family (Position / RTK, Comm, Livestream, Environment, Config, Battery, Maintenance, Mission, Metadata, Firmware, Storage, Media, Power, Dock physical, Topology, Safety, DRC). Built incrementally as sub-drops land.
+2. **Per-device doc structure**: §1 OSD (pushMode=0) + §2 State (pushMode=1) + §3 Settable (accessMode=rw) + §4 DJI-source inconsistencies + §5 drift table + §6 property-set envelope + §7 source provenance. Nested struct fields preserved with `»` prefix. Enum values inline as JSON blobs.
+3. **Aircraft docs in 6b**: single doc per aircraft with two sections — "Dock-path properties" and "Pilot-path properties". Same aircraft reports different subsets depending on which gateway is relaying.
+4. **Shared aircraft properties**: extract to `_aircraft-pilot-base.md` (~250 rows from `DJI_CloudAPI_Aircraft-Properties.txt`). Per-aircraft pilot-path sections cite this file and enumerate only the deltas. Avoids 4× duplication across M3D / M3TD / M4D / M4TD.
+5. **v1.11 vs v1.15 drift**: flag inline per-property. Policy is "prefer v1.15". Escalate to `OPEN-QUESTIONS.md` only if drift is **semantic** (enum values removed/renamed in a way that breaks existing cloud implementations, types changed, etc.). 6a drift is entirely cosmetic or additive — no escalations.
+6. **Out-of-scope devices**: preserved in enum value tables (e.g., `rtcm_device_type: {1: Dock}` is fine; `compatible_device_type` enums that reference M30 / M300 keep the M30 / M300 rows with an "out-of-scope" note). No per-device doc.
+
+### DJI-source inconsistencies noted during 6a
+
+Carry into Phase 9 workflow authoring; none rise to OQ level:
+
+- **`air_conditioner.air_conditioner_state` malformed enum** — both Dock 2 and Dock 3 v1.15 extracts have broken value-label encoding for values `10`–`15`. v1.11 Dock 2 has only `0`–`9`. Cloud should treat the `0`–`9` form as authoritative.
+- **`wireless_link.4g_link_state` + `sdr_link_state` ship Chinese labels in Dock 2 extract** — known extract defect; Dock 3 has correct English.
+- **`network_state.quality` label duplicate `"Poor" / "Poor"` in Dock 2 extract** — Dock 3 corrects to `"Very Poor" / "Poor"`.
+- **`flighttask_step_code` value `255` ships Chinese `飞行器异常` in Dock 2** — Dock 3 has `"Aircraft Error"`.
+- **`putter_state` in Dock 2 example but not in list** — undocumented field emitted by firmware.
+- **`drone_battery_maintenance_info` missing `accessMode` on Dock 2** — default to `r`.
+- **`sim_info.telecom_operator` vs `esim_infos.telecom_operator` enum labels disagree in Dock 3** — copy-paste lag; codes `{1, 2, 3}` map to China Mobile / China Unicom / China Telecom regardless of label.
+- **Dock 3 example contains `electric_supply_voltage`, `flighttask_prepare_capacity`, `air_conditioner_mode` scalar** not in list — either list-omission or deprecated.
+
+### After 6a review gate — kickoff for 6b
+
+**6b sources**:
+
+- `DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt` (1,124 lines) — shared pilot-path aircraft baseline.
+- `DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt` (2,373 lines — **biggest Phase 6 source**) — dock-path M3D + M3TD. The file contains both models co-documented; per-model cohort splits happen within the property table.
+- `DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt` (218 lines) — dock-path M4D + M4TD.
+- `DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt` (117 lines) — pilot-path M4D.
+- v1.11 canonical: `Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/10.aircraft/10.m3d-properties.md` (dock-path M3D) + `Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/10.m3-series/00.properties.md` (pilot-path M3-series) + `Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/30.others/10.aircraft/00.properties.md` (generic pilot-path aircraft).
+
+**Expected surface**: ~500 property rows for M3D (largest), ~80 for M4D dock-path, ~40 for M4D pilot-path, ~250 shared. Total after dedupe ~600 unique property names on aircraft side, most heavily clustered in the M3D/M3TD dock-path source (camera subsystem with long enum tables for shutter speeds, ISO values, etc.).
+
+**Expected output**: `_aircraft-pilot-base.md` (~400 lines extracted from shared source), `m3d.md` (~700 lines — both dock-path and pilot-path sections), `m3td.md` (~150 lines — deltas vs M3D), `m4d.md` (~400 lines), `m4td.md` (~150 lines — deltas vs M4D). Total 6b ~1,800 lines.
+
+**6b filing decisions to confirm at kickoff**:
+
+- Camera subsystem has very long enum tables (60+ values for shutter speeds, 30+ for exposure values). Inline as-is or truncate with "see expanded below"? Inline is simpler and preserves grep-ability, at the cost of wide tables. **Tentative: inline.**
+- M3D vs M3TD: the DJI source co-documents both. Filing pattern: m3d.md = full catalog; m3td.md = deltas only pointing at m3d.md for shared. Same for M4D/M4TD.
+- Dock-path vs pilot-path per aircraft: two sections in the same file, with clear subheaders.
+
+### Known gotchas carried into 6b / 6c
+
+- **Pilot-path aircraft OSD copy-paste bug ([`OQ-002`](OPEN-QUESTIONS.md))** — the pilot-to-cloud topic-definition file has an OSD struct example that shows dock content, not aircraft content. Don't cite that file for pilot-path OSD examples; use the per-aircraft property catalogs. 6b will need to resolve how to present pilot-path OSD content authoritatively.
+- **Aircraft examples show payload-index-keyed sub-objects** — e.g., `"52-0-0": { "measure_target_altitude": 0, ... }`. The aircraft emits per-payload property groups keyed by `{type-subtype-gimbalindex}`. Per-aircraft docs will need a section explaining this keying pattern.
+- **Shared aircraft properties (`Aircraft-Properties.txt`)** — 1,124 lines covers "generic" aircraft class, not any specific model. Extracting into `_aircraft-pilot-base.md` is the plan; may need to preserve the "aircraft class" framing in the file header.
+- **v1.11 aircraft coverage**: v1.11 has M3 series and generic aircraft, but no M4 counterpart. M4D/M4TD docs will have no v1.11 drift section (same as Dock 3).
+
+### Open questions potentially affecting 6b / 6c
+
+- [`OQ-001`](OPEN-QUESTIONS.md#oq-001--source-version-mismatch-between-cloud-api-doc-v1113-and-dji_cloud-v115) — version drift. 6a had no semantic escalations; 6b aircraft camera enums are the most likely place for semantic drift (shutter speed value additions, exposure value refinements). Evaluate per-property.
+- [`OQ-002`](OPEN-QUESTIONS.md#oq-002--pilot-to-cloud-osd-struct-example-appears-to-be-a-copy-paste-of-the-dock-osd-example) — pilot OSD copy-paste bug. 6b resolution: per-aircraft property files are the canonical source; the pilot topic-definition example is excluded.
+- [`OQ-003`](OPEN-QUESTIONS.md#oq-003--mqtt-qos-retain-and-clean-session-settings-are-not-specified-in-djis-published-documentation) — QoS / retain. Not affected by Phase 6.
+
+### Remaining Phase 6 work
+
+- **6b** — aircraft (M3D, M3TD, M4D, M4TD) + shared pilot-path base. Review gate after.
+- **6c** — RCs (RC Plus 2, RC Pro Enterprise). Final Phase 6 review gate after 6c.
+
+### Remaining phases after Phase 6
+
+- Phase 7 — WPML + livestream protocols.
+- Phase 8 — HMS codes + error codes.
+- Phase 9 — Workflows.
+- Phase 10 — Device annexes + final review.
+
+---
+
 ## 2026-04-19 — handoff at Phase 5 close, ready for review gate
 
 ### State of play

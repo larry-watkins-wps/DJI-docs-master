@@ -4,7 +4,7 @@ The OSD topic carries **high-frequency property push** — stable-frequency prop
 
 Part of the Phase 4 MQTT catalog. Shared conventions (envelope, request-reply pattern, QoS/retain gap per OQ-003) live in [`../../README.md`](../../README.md).
 
-This file is a **shell** — the actual property catalog (field names, types, units, enums, v1.11 vs v1.15 drift) lives in Phase 6 [`device-properties/`](../../../device-properties/) (pending). The shell records the wire-level topic + push semantics + source files + forward pointer to Phase 6.
+This file is a **shell** — the actual property catalog (field names, types, units, enums, v1.11 vs v1.15 drift) lives in Phase 6 [`device-properties/`](../../../device-properties/). The shell records the wire-level topic + push semantics + source files + forward pointer to Phase 6.
 
 ---
 
@@ -18,14 +18,14 @@ This file is a **shell** — the actual property catalog (field names, types, un
 
 ## In-scope devices on the dock-to-cloud path
 
-| Device | `device_sn` role | Property source | Phase 6 pointer (pending) |
+| Device | `device_sn` role | Property source | Phase 6 doc |
 |---|---|---|---|
-| **DJI Dock 2** | Dock serial | [`DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt) · v1.11 [`Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/00.properties.md`](../../../../Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/00.properties.md) | `device-properties/dock2.md` |
-| **DJI Dock 3** | Dock serial | [`DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt) | `device-properties/dock3.md` |
-| **Matrice 3D (M3D)** | Aircraft serial | [`DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt) · [`DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt) (shared aircraft props) | `device-properties/m3d.md` |
-| **Matrice 3TD (M3TD)** | Aircraft serial | [`DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt) · [`DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt) | `device-properties/m3td.md` |
-| **Matrice 4D (M4D)** | Aircraft serial | [`DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt) · [`DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt) · [`DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt) | `device-properties/m4d.md` |
-| **Matrice 4TD (M4TD)** | Aircraft serial | same as M4D | `device-properties/m4td.md` |
+| **DJI Dock 2** | Dock serial | [`DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt) · v1.11 [`Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/00.properties.md`](../../../../Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/00.properties.md) | [`device-properties/dock2.md`](../../../device-properties/dock2.md) |
+| **DJI Dock 3** | Dock serial | [`DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt) | [`device-properties/dock3.md`](../../../device-properties/dock3.md) |
+| **Matrice 3D (M3D)** | Aircraft serial | [`DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt) · [`DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt) (shared aircraft props) | `device-properties/m3d.md` *(pending 6b)* |
+| **Matrice 3TD (M3TD)** | Aircraft serial | [`DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt) · [`DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt) | `device-properties/m3td.md` *(pending 6b)* |
+| **Matrice 4D (M4D)** | Aircraft serial | [`DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt) · [`DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt) · [`DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt) | `device-properties/m4d.md` *(pending 6b)* |
+| **Matrice 4TD (M4TD)** | Aircraft serial | same as M4D | `device-properties/m4td.md` *(pending 6b)* |
 
 ## Filtering OSD from state
 
