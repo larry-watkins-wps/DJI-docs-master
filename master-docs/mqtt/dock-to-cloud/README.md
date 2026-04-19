@@ -17,7 +17,7 @@ Phase 4 is being landed in feature-area sub-drops. This index grows as drops lan
 | 4c | Live-Flight-Controls — DRC, camera/gimbal/IR control, authority grab | **landed 2026-04-18** |
 | 4d | LiveStream + Media-Management | **landed 2026-04-18** |
 | 4e-1 | Firmware-Upgrade + Remote-Log + Remote-Debugging | **landed 2026-04-19** |
-| 4e-2 | Remote-Control (DRC PSDK + AI identify + camera/speaker/light) | pending |
+| 4e-2 | Remote-Control (DRC PSDK + AI identify + camera/speaker/light) | **landed 2026-04-19** |
 | 4f | FlySafe + Custom-Flight-Area + AirSense + HMS | pending |
 | 4g | PSDK + PSDK-Interconnection + ESDK-Interconnection | pending |
 
@@ -176,6 +176,111 @@ Topics under `thing/product/{gateway_sn}/drc/down` (cloud → device) and `/drc/
 | `hsi_info_push` | [`drc/hsi_info_push.md`](drc/hsi_info_push.md) | Obstacle-sensing state + 360° distance ring. |
 | `delay_info_push` | [`drc/delay_info_push.md`](drc/delay_info_push.md) | Image-transmission + per-stream latency. |
 | `osd_info_push` | [`drc/osd_info_push.md`](drc/osd_info_push.md) | High-frequency OSD (attitude, position, velocity, gimbal). |
+
+#### Remote-Control events (4e-2)
+
+All `drc_*` methods are filed under `drc/` per the filing-convention decision of 4e-2 (see section [Filing convention](#filing-convention-for-drc-methods) below). Several of these events ride `/events` or `/drc/up` depending on cohort — the doc's topics table captures the per-cohort topic.
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `drc_psdk_floating_window_text` | [`drc/drc_psdk_floating_window_text.md`](drc/drc_psdk_floating_window_text.md) | PSDK floating-window text push (Dock 3 only, `/events`). |
+| `drc_speaker_play_progress` | [`drc/drc_speaker_play_progress.md`](drc/drc_speaker_play_progress.md) | PSDK speaker playback progress (Dock 3 only, `/drc/up`). |
+| `drc_psdk_state_info` | [`drc/drc_psdk_state_info.md`](drc/drc_psdk_state_info.md) | PSDK payload state snapshot (speaker + spotlight + widgets; Dock 3 only). |
+| `drc_psdk_ui_resource` | [`drc/drc_psdk_ui_resource.md`](drc/drc_psdk_ui_resource.md) | PSDK widget UI-resource tarball ready (Dock 3 only). |
+| `drc_drone_state_push` | [`drc/drc_drone_state_push.md`](drc/drc_drone_state_push.md) | Aircraft state push (mode code + lights). **Topic diverges by cohort.** |
+| `drc_camera_state_push` | [`drc/drc_camera_state_push.md`](drc/drc_camera_state_push.md) | Camera state push. Dock 3 adds night-mode sub-struct. |
+| `drc_camera_osd_info_push` | [`drc/drc_camera_osd_info_push.md`](drc/drc_camera_osd_info_push.md) | Camera OSD (exposure / zoom / IR / liveview FOV). **Topic diverges by cohort.** |
+| `drc_ai_info_push` | [`drc/drc_ai_info_push.md`](drc/drc_ai_info_push.md) | AI identify / tracking state (Dock 3 only). |
+| `drc_camera_photo_info_push` | [`drc/drc_camera_photo_info_push.md`](drc/drc_camera_photo_info_push.md) | Panorama-capture progress (Dock 2 only; Dock 3 uses [`camera_photo_take_progress`](events/camera_photo_take_progress.md)). |
+
+#### Remote-Control DRC services — Dock 2 + Dock 3 (4e-2)
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `drc_force_landing` | [`drc/drc_force_landing.md`](drc/drc_force_landing.md) | Land ignoring obstacles (cancellable via `drone_emergency_stop`). |
+| `drc_emergency_landing` | [`drc/drc_emergency_landing.md`](drc/drc_emergency_landing.md) | Land, pausing on obstacles. |
+| `drc_initial_state_subscribe` | [`drc/drc_initial_state_subscribe.md`](drc/drc_initial_state_subscribe.md) | Re-push all DRC-relevant state values (prime cloud after entering DRC mode). |
+| `drc_night_lights_state_set` | [`drc/drc_night_lights_state_set.md`](drc/drc_night_lights_state_set.md) | Enable / disable beacon (night-flight) lights. |
+| `drc_stealth_state_set` | [`drc/drc_stealth_state_set.md`](drc/drc_stealth_state_set.md) | Enable / disable stealth mode (all lights off). |
+| `drc_camera_aperture_value_set` | [`drc/drc_camera_aperture_value_set.md`](drc/drc_camera_aperture_value_set.md) | Set camera aperture. |
+| `drc_camera_shutter_set` | [`drc/drc_camera_shutter_set.md`](drc/drc_camera_shutter_set.md) | Set camera shutter speed. |
+| `drc_camera_iso_set` | [`drc/drc_camera_iso_set.md`](drc/drc_camera_iso_set.md) | Set camera ISO. |
+| `drc_camera_mechanical_shutter_set` | [`drc/drc_camera_mechanical_shutter_set.md`](drc/drc_camera_mechanical_shutter_set.md) | Enable / disable mechanical shutter (wide-angle). |
+| `drc_camera_dewarping_set` | [`drc/drc_camera_dewarping_set.md`](drc/drc_camera_dewarping_set.md) | Enable / disable lens dewarp. |
+
+#### Remote-Control DRC services — Dock 2 legacy (4e-2)
+
+Superseded on Dock 3 by non-DRC equivalents (in `services/`); kept here for Dock 2 support.
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `drc_camera_mode_switch` | [`drc/drc_camera_mode_switch.md`](drc/drc_camera_mode_switch.md) | Switch camera mode (Dock 2; Dock 3 uses [`camera_mode_switch`](services/camera_mode_switch.md)). |
+| `drc_linkage_zoom_set` | [`drc/drc_linkage_zoom_set.md`](drc/drc_linkage_zoom_set.md) | Enable / disable Link Zoom (Dock 2 M3TD only). |
+| `drc_video_resolution_set` | [`drc/drc_video_resolution_set.md`](drc/drc_video_resolution_set.md) | Set video resolution (Dock 2 only). |
+| `drc_video_storage_set` | [`drc/drc_video_storage_set.md`](drc/drc_video_storage_set.md) | Video storage routing (Dock 2; Dock 3 uses [`video_storage_set`](services/video_storage_set.md)). |
+| `drc_photo_storage_set` | [`drc/drc_photo_storage_set.md`](drc/drc_photo_storage_set.md) | Photo storage routing (Dock 2; Dock 3 uses [`photo_storage_set`](services/photo_storage_set.md)). |
+| `drc_interval_photo_set` | [`drc/drc_interval_photo_set.md`](drc/drc_interval_photo_set.md) | Set timed-shot interval (Dock 2 only). |
+
+#### Remote-Control DRC services — Dock 3 only (4e-2)
+
+Camera / lens:
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `drc_camera_night_mode_set` | [`drc/drc_camera_night_mode_set.md`](drc/drc_camera_night_mode_set.md) | Set M4D / M4TD night mode. |
+| `drc_camera_denoise_level_set` | [`drc/drc_camera_denoise_level_set.md`](drc/drc_camera_denoise_level_set.md) | Set noise-reduction level (manual night mode only). |
+| `drc_camera_night_vision_enable` | [`drc/drc_camera_night_vision_enable.md`](drc/drc_camera_night_vision_enable.md) | Enable / disable night vision (M4TD, zoom ≥ 7×). |
+| `drc_infrared_fill_light_enable` | [`drc/drc_infrared_fill_light_enable.md`](drc/drc_infrared_fill_light_enable.md) | Enable / disable near-infrared fill light (M4TD, zoom ≥ 7×). |
+| `drc_camera_photo_format_set` | [`drc/drc_camera_photo_format_set.md`](drc/drc_camera_photo_format_set.md) | Set infrared photo format (RJPEG / DLT664). |
+
+PSDK spotlight:
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `drc_light_brightness_set` | [`drc/drc_light_brightness_set.md`](drc/drc_light_brightness_set.md) | Set PSDK spotlight brightness. |
+| `drc_light_mode_set` | [`drc/drc_light_mode_set.md`](drc/drc_light_mode_set.md) | Set PSDK spotlight operating mode. |
+| `drc_light_fine_tuning_set` | [`drc/drc_light_fine_tuning_set.md`](drc/drc_light_fine_tuning_set.md) | Fine-tune per-side brightness (with `saved` persistence flag). |
+| `drc_light_calibration` | [`drc/drc_light_calibration.md`](drc/drc_light_calibration.md) | Trigger PSDK spotlight gimbal calibration. |
+
+PSDK speaker:
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `drc_speaker_play_mode_set` | [`drc/drc_speaker_play_mode_set.md`](drc/drc_speaker_play_mode_set.md) | Set speaker playback mode (single / loop). |
+| `drc_speaker_tts_set` | [`drc/drc_speaker_tts_set.md`](drc/drc_speaker_tts_set.md) | Configure TTS voice params (volume / gender / language / rate). |
+| `drc_speaker_play_volume_set` | [`drc/drc_speaker_play_volume_set.md`](drc/drc_speaker_play_volume_set.md) | Set playback volume. |
+| `drc_speaker_play_stop` | [`drc/drc_speaker_play_stop.md`](drc/drc_speaker_play_stop.md) | Stop speaker playback. |
+| `drc_speaker_replay` | [`drc/drc_speaker_replay.md`](drc/drc_speaker_replay.md) | Replay most recent audio. |
+| `drc_speaker_tts_play_start` | [`drc/drc_speaker_tts_play_start.md`](drc/drc_speaker_tts_play_start.md) | Send TTS text + begin playback (MD5 correlation). |
+
+PSDK widgets:
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `drc_psdk_input_box_text_set` | [`drc/drc_psdk_input_box_text_set.md`](drc/drc_psdk_input_box_text_set.md) | Set widget input-box text. |
+| `drc_psdk_widget_value_set` | [`drc/drc_psdk_widget_value_set.md`](drc/drc_psdk_widget_value_set.md) | Set generic widget value (switch / slider / etc.). |
+
+AI identify:
+
+| Method | Doc | Purpose |
+|---|---|---|
+| `drc_ai_model_select` | [`drc/drc_ai_model_select.md`](drc/drc_ai_model_select.md) | Select which AI model to use. |
+| `drc_ai_identify_set` | [`drc/drc_ai_identify_set.md`](drc/drc_ai_identify_set.md) | Enable / disable AI recognition globally. |
+| `drc_ai_spotlight_zoom_set` | [`drc/drc_ai_spotlight_zoom_set.md`](drc/drc_ai_spotlight_zoom_set.md) | Enable / disable AI tracking. |
+| `drc_ai_spotlight_zoom_track` | [`drc/drc_ai_spotlight_zoom_track.md`](drc/drc_ai_spotlight_zoom_track.md) | Track a specific recognized target by `target_index`. |
+| `drc_ai_spotlight_zoom_select` | [`drc/drc_ai_spotlight_zoom_select.md`](drc/drc_ai_spotlight_zoom_select.md) | Box-select a target region on the liveview. |
+| `drc_ai_spotlight_zoom_confirm` | [`drc/drc_ai_spotlight_zoom_confirm.md`](drc/drc_ai_spotlight_zoom_confirm.md) | Confirm the box-selected target. |
+| `drc_ai_spotlight_zoom_stop` | [`drc/drc_ai_spotlight_zoom_stop.md`](drc/drc_ai_spotlight_zoom_stop.md) | Stop AI tracking. |
+| `drc_ai_identify_score_mode_set` | [`drc/drc_ai_identify_score_mode_set.md`](drc/drc_ai_identify_score_mode_set.md) | Set AI recognition confidence mode. |
+| `drc_ai_identify_score_set` | [`drc/drc_ai_identify_score_set.md`](drc/drc_ai_identify_score_set.md) | Set custom AI confidence threshold (`0`–`100`). |
+| `drc_ai_identify_score_reset` | [`drc/drc_ai_identify_score_reset.md`](drc/drc_ai_identify_score_reset.md) | Reset AI confidence to default. |
+| `drc_ai_identify_filter_set` | [`drc/drc_ai_identify_filter_set.md`](drc/drc_ai_identify_filter_set.md) | Set AI label-filter list (third-party offset `+128`). |
+
+### Filing convention for `drc_*` methods
+
+All methods whose name begins with `drc_` are filed in the `drc/` directory regardless of whether they ride `/drc/down` + `/drc/up`, `/events`, or (rarely, on Dock 2) `/services` + `/services_reply`. The per-doc topics table is the canonical source for the actual topic. This convention keeps the DRC family co-located so a reader can grep `drc/` and find every DRC method in one place — the alternative (splitting by topic) scattered related methods across three folders and broke the "grep for the method name" ergonomic.
+
+Cross-cohort topic divergence (Dock 3 `/events` vs Dock 2 `/drc/up`) is flagged prominently in each affected doc — [`drc_drone_state_push`](drc/drc_drone_state_push.md) and [`drc_camera_osd_info_push`](drc/drc_camera_osd_info_push.md) are the known cases.
 
 ### `property/set`, `osd/`, `state/`
 

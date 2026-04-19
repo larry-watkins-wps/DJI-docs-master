@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phase 4e-1 landed 2026-04-19, review gate pending before 4e-2).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 landed 2026-04-19 — Phase 4e is **complete**. Review gate pending before Phase 4f).
 
 ---
 
@@ -148,11 +148,16 @@ Source: `DJI_Cloud/DJI_CloudAPI-Dock3-Remote-Control.txt` (4611 lines) + `DJI_Cl
 1. Several Dock 3 `drc_*` events land on `/events` (standard envelope) while the matching Dock 2 events land on `/drc/up` (lightweight envelope). The method name is identical; only the topic differs. Should these docs live in `events/` or `drc/`? Proposal: file in `drc/` with a prominent topic-divergence note, since the method-name convention (`drc_*` prefix) matches the DRC family rather than the topic.
 2. A few Dock 2 services (`drc_camera_mode_switch`) reply on `services_reply` instead of `drc/up`. Filing under `drc/` with the anomaly noted is the simplest option.
 
-- [ ] Enumerate + draft 53 methods.
-- [ ] Update `mqtt/dock-to-cloud/README.md` with 4e-2 rows.
-- [ ] Update `mqtt/README.md` + corpus `README.md`.
-- [ ] Append to `RESUME-NOTES.md`.
-- [ ] **Review gate 4e** (closes the whole 4e sub-phase, not just 4e-2).
+- [x] Enumerate + draft 53 methods (9 events + 10 shared services + 6 Dock-2-only services + 28 Dock-3-only services).
+  - Events in `drc/`: `drc_psdk_floating_window_text`, `drc_speaker_play_progress`, `drc_psdk_state_info`, `drc_psdk_ui_resource`, `drc_drone_state_push`, `drc_camera_state_push`, `drc_camera_osd_info_push`, `drc_ai_info_push`, `drc_camera_photo_info_push`.
+  - Shared DRC services (Dock 2 + Dock 3): `drc_force_landing`, `drc_emergency_landing`, `drc_initial_state_subscribe`, `drc_night_lights_state_set`, `drc_stealth_state_set`, `drc_camera_aperture_value_set`, `drc_camera_shutter_set`, `drc_camera_iso_set`, `drc_camera_mechanical_shutter_set`, `drc_camera_dewarping_set`.
+  - Dock-2-only services: `drc_camera_mode_switch`, `drc_linkage_zoom_set`, `drc_video_resolution_set`, `drc_video_storage_set`, `drc_photo_storage_set`, `drc_interval_photo_set`.
+  - Dock-3-only services: camera (5) + light (4) + speaker (6) + PSDK widgets (2) + AI identify (11). Full list in [`mqtt/dock-to-cloud/README.md`](mqtt/dock-to-cloud/README.md).
+  - `drone_emergency_stop` already in 4c — cross-cited, not re-documented.
+- [x] Update `mqtt/dock-to-cloud/README.md` with 4e-2 rows (grouped by sub-area) and the filing-convention note.
+- [x] Update `mqtt/README.md` + corpus `README.md` (method count 172).
+- [x] Append to `RESUME-NOTES.md` with a 4e-2 / Phase 4e close handoff entry.
+- [ ] **Review gate 4e** (closes the whole 4e sub-phase).
 
 ### Sub-phase 4f — FlySafe + Custom-Flight-Area + AirSense + HMS (dock-to-cloud)
 

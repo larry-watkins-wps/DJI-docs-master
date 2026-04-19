@@ -6,6 +6,88 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 4e close (4e-2 landed), ready for 4f
+
+### State of play
+
+- Phases 0, 1, 2, 3 complete and committed.
+- Phase 4 (MQTT topic catalog) — **sub-phases 4a, 4b, 4c, 4d, 4e-1, and 4e-2 all landed**. Phase 4e is complete. **172 methods total** across the dock-to-cloud MQTT catalog.
+- **4f is next** — FlySafe + Custom-Flight-Area + AirSense + HMS (dock-to-cloud). Est. ~35 methods.
+
+### What 4e-2 produced
+
+- `mqtt/dock-to-cloud/drc/` — 53 new docs. All `drc_*` methods filed under `drc/` per the filing-convention decision (explained in [`mqtt/dock-to-cloud/README.md` §Filing convention](mqtt/dock-to-cloud/README.md#filing-convention-for-drc-methods)).
+  - 9 events (mix of `/events`, `/drc/up` topics; two of them are cross-cohort topic-divergent — `drc_drone_state_push`, `drc_camera_osd_info_push`).
+  - 10 shared DRC services (Dock 2 + Dock 3 both).
+  - 6 Dock-2-only legacy services (several superseded on Dock 3 by non-DRC equivalents already in 4c).
+  - 28 Dock-3-only DRC services — 5 camera/lens, 4 PSDK spotlight, 6 PSDK speaker, 2 PSDK widgets, 11 AI identify / AI spotlight-zoom.
+- `drone_emergency_stop` was already covered in 4c under `drc/`; **not re-documented**, just cross-cited from [`drc_force_landing`](mqtt/dock-to-cloud/drc/drc_force_landing.md) and [`drc_emergency_landing`](mqtt/dock-to-cloud/drc/drc_emergency_landing.md).
+- `mqtt/dock-to-cloud/README.md` heavily expanded — sub-phase status table shows 4e-2 landed, new sub-sections under `drc/` for Remote-Control events + Dock 2+3 shared services + Dock-2-only legacy + Dock-3-only (grouped by camera / light / speaker / widgets / AI), plus the filing-convention explainer.
+- `mqtt/README.md` + corpus `README.md` updated to 172-method total.
+- `TODO.md` 4e-2 checkboxes ticked; only the 4e review gate remains open.
+
+### Filing-convention decision (worth keeping in mind for 4h)
+
+**All `drc_*` methods live in `drc/`** regardless of topic (`/drc/down|up`, `/events`, or `/services` + `/services_reply`). Per-doc topics table is the canonical source for the actual wire topic. Rationale: DRC methods cluster naturally by name prefix; splitting by topic would scatter related methods across three folders and break the grep-by-method-name ergonomic.
+
+Two known cross-cohort topic divergences, flagged prominently in the affected docs:
+- [`drc_drone_state_push`](mqtt/dock-to-cloud/drc/drc_drone_state_push.md) — Dock 3 uses `/events`; Dock 2 + v1.11 use `/drc/up`.
+- [`drc_camera_osd_info_push`](mqtt/dock-to-cloud/drc/drc_camera_osd_info_push.md) — same split.
+
+One Dock-2-specific anomaly: [`drc_camera_mode_switch`](mqtt/dock-to-cloud/drc/drc_camera_mode_switch.md) replies on `/services_reply` instead of `/drc/up` despite the `drc_` method name. Flagged in the doc. Dock 3 deprecates the method entirely (replaced by [`camera_mode_switch`](mqtt/dock-to-cloud/services/camera_mode_switch.md) in 4c).
+
+### DJI-source inconsistencies flagged during 4e-2 drafting
+
+Carry into Phase 9 workflow authoring:
+
+- **Dock 3 topic downgrade for `drc_drone_state_push` / `drc_camera_osd_info_push`.** Same method name, different topic family per cohort. DJI doesn't explain the change. A cloud supporting both must subscribe on both topics.
+- **`drc_camera_night_mode_set` enum typo.** Dock 3 schema says `{"0":"Enabled","1":"Enabled","2":"Auto"}` — two keys both labeled "Enabled". `0` should clearly read "Disabled". Flagged inline; treat as source typo.
+- **`drc_camera_shutter_set` Auto-value enum key diverges.** Dock 2 + v1.11 use `65534` = Auto; Dock 3 uses `60` = Auto. Cohort-dependent.
+- **`drc_camera_aperture_value_set` enum label syntax diverges.** Dock 2 + v1.11 use dot-labels (`"F2.2"`); Dock 3 uses underscore-labels (`"F2_2"`). Integer keys stable.
+- **`drc_camera_denoise_level_set` can't write the full `denoise_level` range** — the setter accepts `{2, 3}`, but [`drc_camera_state_push`](mqtt/dock-to-cloud/drc/drc_camera_state_push.md) reports `{0, 1, 2, 3}`. Operators can only select the two higher-noise levels; the device sets `0` / `1` autonomously.
+- **Multiple wrong-method-name reply examples in Dock 3 source.** `drc_light_brightness_set`'s reply example shows `method: drc_night_lights_state_set`; `drc_initial_state_subscribe` Dock 2 v1.11 reply example shows `method: drone_emergency_stop`; `drc_camera_shutter_set` Dock 2 down example shows `method: drc_camera_aperture_value_set`. All inline-flagged as copy-paste errors in DJI source.
+- **`drc_ai_spotlight_zoom_select` example uses literal arithmetic expressions** (`center_x: 0.0*10000`) that are not valid JSON. DJI intends the wire value to be the integer product. Flagged inline as instructional notation.
+- **`drc_ai_spotlight_zoom_select` field labels copy-pasted from IR metering.** The `center_x` schema description reads "Coordinate x of the left and upper corner of the temperature measurement area" — copied from the IR metering service and incorrect for AI box-select. Flagged inline.
+- **`drc_speaker_tts_set` constraint JSONs are malformed.** Keys have numbers embedded in them (`"min"0:""` etc.). Correct bounds inferred as `max=100, min=0`.
+- **`drc_ai_info_push` `ai_wayline_state` sub-struct in example but not in schema.** Fields `sequence_shot`, `wait_control`, `record`, `normal_shot`, `count_down_time`, `alert_uuid` present in example only. Semantics undocumented.
+- **`drc_ai_info_push` `state_reason` enum** mixes in-tracking reasons (0–15) with exit reasons (160–168) in the same enum without splitting into separate fields.
+- **`drc_light_brightness_set` `brightness` field missing from schema**, present in example. Schema incomplete.
+- **`drc_camera_mechanical_shutter_set` v1.11 schema column named `dewarping_state`** (copy-paste from the neighbouring dewarp service). Example field name `mechanical_shutter_state` is authoritative.
+
+### After 4e review gate (= kick-off of 4f)
+
+**4f scope — FlySafe + Custom-Flight-Area + AirSense + HMS (dock-to-cloud).** Sources to enumerate (confirm filenames with `ls DJI_Cloud/ | grep -iE "(flysafe|custom|airsense|hms)"`):
+
+1. `DJI_Cloud/DJI_CloudAPI-Dock3-FlySafe.txt` (or similar)
+2. `DJI_Cloud/DJI_CloudAPI-Dock3-Custom-Flight-Area.txt`
+3. `DJI_Cloud/DJI_CloudAPI-Dock3-AirSense.txt`
+4. `DJI_Cloud/DJI_CloudAPI-Dock3-HMS.txt`
+5. Dock 2 counterparts.
+6. Cloud-API-Doc v1.11 Dock 2: `.../10.dock2/170.flysafe.md`, `130.custom-flight-area.md`, `120.airsense.md`, `60.hms.md`.
+
+Estimated method count ~35 (to be revised after enumeration). Expected families: mostly events (FlySafe rule push, Custom-Flight-Area sync, AirSense aircraft-spotted events, HMS fault codes) + a few requests (list sync) + a few services (push updated area set).
+
+### Known gotchas carried forward
+
+- HMS codes are enumerated in `DJI_Cloud/HMS.json` (a separate artifact scheduled for Phase 8 — `hms-codes/` catalog). Phase 4f will document the HMS **event / push method** (how fault codes are transported over MQTT), not the code catalog itself. Avoid duplicating.
+- AirSense material may include ADS-B-aircraft enumerations — these are transport events, the aircraft-state codes themselves are Phase 8 scope.
+- Phase 4 has been running as sub-drop-per-feature-area. 4f is smaller than 4e and will likely land as a single drop.
+- Review gate: user checkpoint before 4f starts. Don't push through.
+
+### Open questions potentially affecting 4f
+
+- [`OQ-003`](OPEN-QUESTIONS.md) — QoS / retain / clean-session values still unspecified. FlySafe / Custom-Flight-Area may warrant higher QoS (consistency matters for geofence enforcement). Cite the gap, don't invent.
+
+### Remaining pilot-to-cloud work (4h + 4i)
+
+After 4g (PSDK / interconnection) the remaining MQTT work is:
+- **4h** — pilot-to-cloud (RC Plus 2 Enterprise + RC Pro Enterprise), est. ~70 methods.
+- **4i** — property-family shells (`osd/`, `state/`, `property-set/`) that link to Phase 6 `device-properties/`.
+
+Phase 4h can reuse the filing-convention decision from 4e-2 (all `drc_*` in `drc/`; all `*_progress` events in `events/`; etc.).
+
+---
+
 ## 2026-04-19 — handoff at Phase 4e-1 close, ready for 4e-2
 
 ### State of play
