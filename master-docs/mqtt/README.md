@@ -3,8 +3,10 @@
 Conventions for every MQTT interaction between the in-scope gateway devices (Dock 2, Dock 3, RC Plus 2 Enterprise, RC Pro Enterprise) and a DJI-Cloud-compatible broker. This document is the canonical home for the MQTT envelope, the topic taxonomy, the full topic list, and per-family envelope specifics.
 
 Per-topic catalog is Phase 4, split by path:
-- [`dock-to-cloud/`](dock-to-cloud/README.md) — Dock 2 and Dock 3 method content. **Phase 4a through 4g landed** (197 methods total: DeviceManagement + Organization + Configuration + WaylineManagement + Live-Flight-Controls incl. DRC + LiveStream + Media-Management + Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control DRC / PSDK / AI + FlySafe + Custom-Flight-Area + AirSense + HMS + PSDK speaker / widgets + PSDK / ESDK Interconnection). See the path-level index for sub-phase status.
-- [`pilot-to-cloud/`](pilot-to-cloud/README.md) — RC Plus 2 Enterprise and RC Pro Enterprise method content. **Phase 4h landed** — 29 pilot-specific docs (2 new events, 5 new services, 20 DRC variants, `update_topo`, catalog README) plus cross-reference tables covering ~64 methods whose wire payload is identical to the dock-to-cloud equivalents. Total pilot-to-cloud method surface: **94 methods** across the two RC cohorts. See the [path-level index](pilot-to-cloud/README.md) for details.
+- [`dock-to-cloud/`](dock-to-cloud/README.md) — Dock 2 and Dock 3 method content. **Phase 4a through 4g + 4i shells landed** (197 methods total across method families + 3 property-family shells under `osd/` / `state/` / `property-set/`). See the path-level index for sub-phase status.
+- [`pilot-to-cloud/`](pilot-to-cloud/README.md) — RC Plus 2 Enterprise and RC Pro Enterprise method content. **Phase 4h + 4i shells landed** — 29 pilot-specific method docs + cross-reference tables covering ~64 dock-to-cloud parallels (94-method surface total across the two RC cohorts) + 3 property-family shells. See the [path-level index](pilot-to-cloud/README.md) for details.
+
+**Phase 4i property shells** are intentionally thin — they record wire-level topic + push semantics + source files + forward pointer to Phase 6 `device-properties/`. The full per-device property catalog is Phase 6 scope.
 
 Divergence between the two paths is at the `method` / event / property **content** level — not at the envelope or topic level, which is why Phase 2 is a single shared document.
 

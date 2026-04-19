@@ -17,7 +17,8 @@ Per-method files are named verbatim after the DJI `method` string (e.g., `poi_mo
 
 | Sub-phase | Feature area | Status |
 |---|---|---|
-| 4h | Pilot-to-cloud — RC Plus 2 Enterprise + RC Pro Enterprise | **landing 2026-04-19** |
+| 4h | Pilot-to-cloud — RC Plus 2 Enterprise + RC Pro Enterprise | **landed 2026-04-19** |
+| 4i | Property-family shells (`osd/`, `state/`, `property-set/`) | **landed 2026-04-19** (shells only; full property catalog is Phase 6) |
 
 ## Cohort conventions
 
@@ -176,11 +177,35 @@ Same DRC-envelope payload as the cited dock-to-cloud doc. RC Plus 2 and/or RC Pr
 | `drc_emergency_landing` | [`../dock-to-cloud/drc/drc_emergency_landing.md`](../dock-to-cloud/drc/drc_emergency_landing.md) | RC Plus 2 |
 | `drc_force_landing` | [`../dock-to-cloud/drc/drc_force_landing.md`](../dock-to-cloud/drc/drc_force_landing.md) | RC Plus 2 |
 
+### `osd/`
+
+Topics under `thing/product/{device_sn}/osd`. High-frequency property push (~0.5 Hz). `{device_sn}` is the RC for RC-side properties or the aircraft for aircraft-side properties. Aircraft OSD payloads are gateway-agnostic — see [`../dock-to-cloud/osd/README.md`](../dock-to-cloud/osd/README.md) for the shared aircraft-OSD detail.
+
+| Shell | Purpose |
+|---|---|
+| [`osd/README.md`](osd/README.md) | RC Plus 2 + RC Pro + paired-aircraft OSD shell. Includes the OQ-002 pilot-OSD copy-paste callout. |
+
+### `state/`
+
+Topics under `thing/product/{device_sn}/state`. On-change property push.
+
+| Shell | Purpose |
+|---|---|
+| [`state/README.md`](state/README.md) | RC Plus 2 + RC Pro + paired-aircraft state shell. |
+
+### `property-set/`
+
+Topics under `thing/product/{gateway_sn}/property/set` and `/property/set_reply`. Cloud-initiated writes; `{gateway_sn}` = RC serial.
+
+| Shell | Purpose |
+|---|---|
+| [`property-set/README.md`](property-set/README.md) | RC Plus 2 + RC Pro writable-property shell. |
+
 ---
 
-## Property families (`osd/`, `state/`, `property/set`)
+## Property catalog (Phase 6)
 
-Deferred to **Phase 4i** — property-family shells per device that link to the Phase 6 `device-properties/` catalog. RC Plus 2 + RC Pro property tables live at `DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt` + `DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`.
+The property shells above are thin — they record wire semantics and source files, not the per-property field catalog. Phase 6 [`device-properties/`](../../device-properties/) (pending) will hold the full per-device property tables (name, type, units, enums, v1.11-vs-v1.15 drift per [`OQ-001`](../../OPEN-QUESTIONS.md)). RC Plus 2 + RC Pro property tables live at [`DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`](../../../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt) + [`DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`](../../../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt).
 
 ## DJI-source inconsistencies flagged during 4h drafting
 

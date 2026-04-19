@@ -20,6 +20,7 @@ Phase 4 is being landed in feature-area sub-drops. This index grows as drops lan
 | 4e-2 | Remote-Control (DRC PSDK + AI identify + camera/speaker/light) | **landed 2026-04-19** |
 | 4f | FlySafe + Custom-Flight-Area + AirSense + HMS | **landed 2026-04-19** |
 | 4g | PSDK + PSDK-Interconnection + ESDK-Interconnection | **landed 2026-04-19** |
+| 4i | Property-family shells (`osd/`, `state/`, `property-set/`) | **landed 2026-04-19** (shells only; full property catalog is Phase 6) |
 
 ## Current catalog
 
@@ -386,9 +387,29 @@ The 4g PSDK speaker + widget methods (`speaker_*` / `psdk_*`) live in `events/` 
 
 The PSDK-Interconnection + ESDK-Interconnection `custom_data_transmission_*` passthrough methods are not DRC-related and have no `drc_*` siblings.
 
-### `property/set`, `osd/`, `state/`
+### `osd/`
 
-Pending in later sub-phases.
+Topics under `thing/product/{device_sn}/osd`. High-frequency property push (~0.5 Hz). Full property content is Phase 6 scope; this shell records the topic, push semantics, in-scope devices, and forward pointer.
+
+| Shell | Purpose |
+|---|---|
+| [`osd/README.md`](osd/README.md) | Dock 2, Dock 3, M3D, M3TD, M4D, M4TD OSD shell — topic + per-device source files + pointer to Phase 6. |
+
+### `state/`
+
+Topics under `thing/product/{device_sn}/state`. On-change property push. Full property content is Phase 6 scope.
+
+| Shell | Purpose |
+|---|---|
+| [`state/README.md`](state/README.md) | Dock 2, Dock 3, M3D, M3TD, M4D, M4TD state shell. |
+
+### `property-set/`
+
+Topics under `thing/product/{gateway_sn}/property/set` and `/property/set_reply`. Cloud-initiated writes to writable (`accessMode: rw`) properties. Full catalog of writable keys is Phase 6 scope.
+
+| Shell | Purpose |
+|---|---|
+| [`property-set/README.md`](property-set/README.md) | Dock 2, Dock 3, M3D, M3TD, M4D, M4TD writable-property shell — topic + envelope + per-device representative writable props + pointer to Phase 6. |
 
 ## Cohort coverage
 

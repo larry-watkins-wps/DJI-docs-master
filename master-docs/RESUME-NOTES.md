@@ -6,6 +6,72 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 4i close, ready for final Phase 4 review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3 complete and committed.
+- Phase 4 (MQTT topic catalog) — **sub-phases 4a, 4b, 4c, 4d, 4e-1, 4e-2, 4f, 4g, 4h, and 4i all landed**. Phase 4 is content-complete.
+- Dock-to-cloud catalog: 197 methods. Pilot-to-cloud catalog: 94 methods. Property-family shells: 6 (dock + pilot × osd/state/property-set).
+- **Final Phase 4 review gate is the only remaining Phase 4 item.** Phase 5 (WebSocket message catalog) is next.
+
+### What 4i produced
+
+- 6 thin shell READMEs, one per (path × property-family) combination:
+  - `mqtt/dock-to-cloud/osd/README.md` — Dock 2 + Dock 3 + M3D + M3TD + M4D + M4TD OSD shell.
+  - `mqtt/dock-to-cloud/state/README.md` — same device coverage, on-change push.
+  - `mqtt/dock-to-cloud/property-set/README.md` — writable-property shell with envelope + per-property result-code enum.
+  - `mqtt/pilot-to-cloud/osd/README.md` — RC Plus 2 + RC Pro + paired-aircraft OSD shell. Carries the OQ-002 pilot-OSD-copy-paste callout.
+  - `mqtt/pilot-to-cloud/state/README.md` — parallel to dock-to-cloud state shell.
+  - `mqtt/pilot-to-cloud/property-set/README.md` — parallel to dock-to-cloud property-set shell, plus a "services vs property-set" filing note.
+- Each shell is ~30–70 lines: topic + push semantics + in-scope devices table + per-device source files + Phase 6 forward pointer + representative envelope example.
+- `mqtt/dock-to-cloud/README.md` + `mqtt/pilot-to-cloud/README.md` updated with new `osd/`, `state/`, `property-set/` sections linking the shells.
+- `mqtt/README.md` + corpus `README.md` updated with the 4i landing.
+- `TODO.md` 4i checkboxes ticked; only the final Phase 4 review gate remains.
+
+### Filing decision for 4i
+
+**Per-family READMEs, not per-device shells.** The TODO language said "thin shells per device" but in practice the property wire-level surface (topic, push mode, envelope) is identical across devices on the same path — the per-device difference is the property *content*, which is Phase 6 scope. One README per (path × family) covers every in-scope device via a table and avoids writing 16+ near-identical per-device stubs. Consistent with the 4h cross-reference-table approach.
+
+If the user wants per-device shell files at review, they're trivial to mass-generate from the READMEs.
+
+### Why 4i is very small
+
+- No new method content — property shells are wire-level pointers, not method docs.
+- Property catalog is Phase 6. 4i only confirms "yes, this topic exists on this device for this push mode" and cites the source file the Phase 6 doc will consume.
+- Total new content: 6 files × ~50 lines = ~300 lines. Plus 4 index updates and the TODO/RESUME-NOTES updates.
+
+### DJI-source inconsistencies noted during 4i
+
+Nothing new. 4i re-cites:
+
+- [`OQ-001`](OPEN-QUESTIONS.md) — v1.11 vs v1.15 property enum drift. Cited on every shell; resolution is Phase 6.
+- [`OQ-002`](OPEN-QUESTIONS.md) — pilot-to-cloud OSD example copy-paste bug. Prominently cited on [`mqtt/pilot-to-cloud/osd/README.md`](mqtt/pilot-to-cloud/osd/README.md) so Phase 6 authors don't rely on DJI's OSD example.
+- [`OQ-003`](OPEN-QUESTIONS.md) — QoS / retain / clean-session unspecified. Cited on all 6 shells.
+
+### After final Phase 4 review gate
+
+Phase 5 — WebSocket message catalog — is next. Source: `DJI_Cloud/DJI_CloudAPI_Pilot-WebSocket-*.txt` (two files: Map-Elements-Push-Message and Situation-Awareness-Push-Message) + v1.11 Cloud-API-Doc `Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.websocket/` (the WebSocket is pilot-to-cloud only).
+
+Phase 5 structure (from PLAN.md):
+- One `.md` per push message type.
+- Estimated surface: 8 biz_code values across two families (map-elements and situation-awareness) per Phase 2 enumeration. Phase 5 may uncover additional biz_codes during message-level drafting.
+- Precedent from Phase 4: feature-area sub-drops with review gates. Phase 5 is small enough to likely land as a single drop.
+
+### Known gotchas carried forward to Phase 5 and Phase 6
+
+- Phase 6 (`device-properties/`) must be authored before these 4i shells are "complete" — right now every pointer to `device-properties/<device>.md` is a forward reference to a file that doesn't exist. This is intentional per the phased plan, but worth explicit flag at the review gate.
+- Phase 9 workflows will reference both the method catalog (Phase 4) and the property shells (4i) plus the property catalog (Phase 6). 4i is designed to support that stitching.
+- Phase 5 is entirely pilot-to-cloud; no dock-to-cloud WebSocket equivalent exists per Phase 2's enumeration.
+
+### Open questions carried forward
+
+- [`OQ-001`](OPEN-QUESTIONS.md) — resolve per-property during Phase 6.
+- [`OQ-002`](OPEN-QUESTIONS.md) — called out in the pilot OSD shell; resolution is a Phase 6 decision (which source to treat as canonical for pilot-path aircraft OSD).
+- [`OQ-003`](OPEN-QUESTIONS.md) — QoS / retain gap may finally get attention at Phase 5 if the WebSocket push families have different delivery guarantees. Otherwise defer to Phase 9 workflows.
+
+---
+
 ## 2026-04-19 — handoff at Phase 4h close, ready for 4i
 
 ### State of play

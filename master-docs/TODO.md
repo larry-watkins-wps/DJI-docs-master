@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f + 4g + 4h landed 2026-04-19. Review gate 4h closed; Phase 4i in progress).
+**Current phase**: Phase 4 — MQTT topic catalog (final sub-phase landing; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f + 4g + 4h + 4i landed 2026-04-19. Review gates 4a–4h closed; final Phase 4 review gate (4i) open).
 
 ---
 
@@ -205,7 +205,13 @@ Actual method count is **94 unique methods** across the two RC cohorts (est. was
 
 ### Sub-phase 4i — Property-family shells (dock-to-cloud + pilot-to-cloud)
 
-- [ ] Write thin `osd/`, `state/`, `property-set/` shells per device that link to Phase 6.
+Thin shells per family (not per device). One README per (path × family) — 6 READMEs total. Each shell records wire-level topic + push semantics + in-scope devices + property source files + forward pointer to Phase 6 `device-properties/` (pending). Full per-property catalog deferred to Phase 6.
+
+- [x] Write `mqtt/dock-to-cloud/osd/README.md`, `mqtt/dock-to-cloud/state/README.md`, `mqtt/dock-to-cloud/property-set/README.md` — Dock 2 + Dock 3 + M3D + M3TD + M4D + M4TD coverage.
+- [x] Write `mqtt/pilot-to-cloud/osd/README.md`, `mqtt/pilot-to-cloud/state/README.md`, `mqtt/pilot-to-cloud/property-set/README.md` — RC Plus 2 + RC Pro coverage. Pilot OSD shell carries the OQ-002 copy-paste-bug callout.
+- [x] Update `mqtt/dock-to-cloud/README.md` + `mqtt/pilot-to-cloud/README.md` to link the new shells.
+- [x] Update `mqtt/README.md` + corpus `README.md` to cite the 4i landing.
+- [x] Append to `RESUME-NOTES.md` with a 4i close handoff entry.
 - [ ] **Final Phase 4 review gate**
 
 ## Phase 5 — WebSocket message catalog
