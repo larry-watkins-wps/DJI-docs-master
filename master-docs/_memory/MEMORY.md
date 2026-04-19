@@ -6,3 +6,4 @@
 - [Real payloads only, no fabrication](feedback_real_payloads_only.md) — all wire examples must be verbatim from DJI source; invented content silently breaks both audits and implementations
 - [Single source of truth, no duplication](feedback_single_source_of_truth.md) — every fact lives in exactly one canonical location; other docs link; no summaries that can drift
 - [Mermaid for all diagrams](feedback_mermaid_for_diagrams.md) — chosen for plaintext grep/audit/render portability; use sequence/flowchart/state variants
+- [Phase 4 is sub-phased with RESUME-NOTES.md handoffs](project_phase_4_resume_pattern.md) — large phases split into 4a–4i sub-drops; cross-session continuity lives in `master-docs/RESUME-NOTES.md`

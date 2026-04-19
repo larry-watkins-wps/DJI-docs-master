@@ -3,7 +3,7 @@
 Conventions for every MQTT interaction between the in-scope gateway devices (Dock 2, Dock 3, RC Plus 2 Enterprise, RC Pro Enterprise) and a DJI-Cloud-compatible broker. This document is the canonical home for the MQTT envelope, the topic taxonomy, the full topic list, and per-family envelope specifics.
 
 Per-topic catalog is Phase 4, split by path:
-- [`dock-to-cloud/`](dock-to-cloud/README.md) — Dock 2 and Dock 3 method content. **Phase 4a landed 2026-04-18** (DeviceManagement + Organization + Configuration — 5 methods: `update_topo`, `config`, `airport_bind_status`, `airport_organization_get`, `airport_organization_bind`). See the path-level index for sub-phase status.
+- [`dock-to-cloud/`](dock-to-cloud/README.md) — Dock 2 and Dock 3 method content. **Phase 4a + 4b landed** (26 methods total: DeviceManagement + Organization + Configuration + WaylineManagement). See the path-level index for sub-phase status.
 - `pilot-to-cloud/` — RC Plus 2 Enterprise, RC Pro Enterprise, and Pilot-attached aircraft content. *pending*
 
 Divergence between the two paths is at the `method` / event / property **content** level — not at the envelope or topic level, which is why Phase 2 is a single shared document.

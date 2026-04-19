@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phase 4a landed 2026-04-18, review gate pending before 4b).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b landed 2026-04-18, review gate pending before 4c).
 
 ---
 
@@ -73,43 +73,67 @@ Also adds an 8th family directory, `status/`, for the `sys/product/{gateway_sn}/
 - [x] Write `mqtt/dock-to-cloud/README.md` as path-level index with sub-phase status table.
 - [x] Update `mqtt/README.md` to link the new dock-to-cloud index.
 - [x] Update corpus `README.md`.
-- [ ] **Review gate 4a**
+- [x] **Review gate 4a** closed 2026-04-18. Landing commit `8059992` (5 method docs + dock-to-cloud path index).
 
-### Sub-phase 4b — WaylineManagement + Live-Flight-Controls (dock-to-cloud)
+### Sub-phase 4b — WaylineManagement (dock-to-cloud)
 
-- [ ] Enumerate methods across `DJI_CloudAPI-Dock3-WaylineManagement.txt`, `DJI_CloudAPI-Dock3-Live-Flight-Controls.txt`, Dock 2 counterparts.
-- [ ] Draft per-method docs (est. ~45 methods covering flight-task lifecycle, DRC, AI identify for Dock 3).
-- [ ] Update dock-to-cloud index.
+Re-scoped 2026-04-18 to cover WaylineManagement only (the original 4b-plus-Live-Flight-Controls plan was 63 methods — split into 4b and 4c).
+
+- [x] Enumerate across `DJI_CloudAPI-Dock3-WaylineManagement.txt`, `DJI_CloudAPI-Dock2-Wayline-Management.txt`, v1.11 `50.wayline.md`. 21 methods.
+- [x] Draft 5 event docs: `return_home_info`, `flighttask_ready`, `flighttask_progress`, `device_exit_homing_notify`, `in_flight_wayline_progress`.
+- [x] Draft 14 service docs: `flighttask_prepare`, `flighttask_execute`, `flighttask_pause`, `flighttask_recovery`, `flighttask_stop`, `flighttask_undo`, `flighttask_create` (deprecated), `return_home`, `return_home_cancel`, `return_specific_home`, `in_flight_wayline_deliver`, `in_flight_wayline_stop`, `in_flight_wayline_recover`, `in_flight_wayline_cancel`.
+- [x] Draft 2 request docs: `flighttask_progress_get`, `flighttask_resource_get`.
+- [x] Update `mqtt/dock-to-cloud/README.md` with events/services/requests sections.
+- [x] Update `mqtt/README.md` and corpus `README.md`.
 - [ ] **Review gate 4b**
 
-### Sub-phase 4c — LiveStream + Media-Management (dock-to-cloud)
+### Sub-phase 4c — Live-Flight-Controls (dock-to-cloud)
 
-- [ ] Enumerate + draft (est. ~20 methods).
+**Resume from**: [`RESUME-NOTES.md`](RESUME-NOTES.md) — contains full 4c kick-off context (sources, method inventory, doc template, and handoff gotchas). A fresh session starting with "Continue at 4c" should read RESUME-NOTES first, then [`mqtt/dock-to-cloud/README.md`](mqtt/dock-to-cloud/README.md), then sample docs like [`mqtt/dock-to-cloud/services/flighttask_prepare.md`](mqtt/dock-to-cloud/services/flighttask_prepare.md) before drafting.
+
+**Sources**: `DJI_Cloud/DJI_CloudAPI-Dock3-Live-Flight-Controls.txt` (4277 lines) + `DJI_CloudAPI-Dock2-Live-Flight-Controls.txt` (2189 lines) + `Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/110.drc.md` for v1.11 DRC reference.
+
+**42 methods** split across three families:
+- `events/` (5): `fly_to_point_progress`, `takeoff_to_point_progress`, `drc_status_notify`, `joystick_invalid_notify`, `camera_photo_take_progress`.
+- `services/` (~30): `flight_authority_grab`, `payload_authority_grab`, `drc_mode_enter`, `drc_mode_exit`, `takeoff_to_point`, `fly_to_point`, `fly_to_point_stop`, `fly_to_point_update`, and ~22 camera/gimbal/IR setters.
+- `drc/` (7): `stick_control`, `drone_control`, `drone_emergency_stop`, `heart_beat`, `hsi_info_push`, `delay_info_push`, `osd_info_push`.
+
+Estimated 3500–4200 lines of doc output — at the edge of a single-drop budget. If context pressure is high, consider splitting into `4c-1` (authority + DRC mode + flight commands + events, ~15 methods) and `4c-2` (camera/gimbal/IR + drc-family, ~27 methods).
+
+- [ ] Enumerate + draft 42 methods.
+- [ ] Update `mqtt/dock-to-cloud/README.md` with events/services/drc sections.
+- [ ] Update `mqtt/README.md` + corpus `README.md`.
+- [ ] Append to `RESUME-NOTES.md` with a 4c-close handoff entry.
 - [ ] **Review gate 4c**
 
-### Sub-phase 4d — Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control (dock-to-cloud)
+### Sub-phase 4d — LiveStream + Media-Management (dock-to-cloud)
 
-- [ ] Enumerate + draft (est. ~30 methods).
+- [ ] Enumerate + draft (est. ~20 methods).
 - [ ] **Review gate 4d**
 
-### Sub-phase 4e — FlySafe + Custom-Flight-Area + AirSense + HMS (dock-to-cloud)
+### Sub-phase 4e — Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control (dock-to-cloud)
 
-- [ ] Enumerate + draft (est. ~35 methods).
+- [ ] Enumerate + draft (est. ~30 methods).
 - [ ] **Review gate 4e**
 
-### Sub-phase 4f — PSDK + PSDK-Interconnection + ESDK-Interconnection (dock-to-cloud)
+### Sub-phase 4f — FlySafe + Custom-Flight-Area + AirSense + HMS (dock-to-cloud)
 
-- [ ] Enumerate + draft (est. ~40 methods).
+- [ ] Enumerate + draft (est. ~35 methods).
 - [ ] **Review gate 4f**
 
-### Sub-phase 4g — Pilot-to-Cloud (RC Plus 2 Enterprise + RC Pro Enterprise)
+### Sub-phase 4g — PSDK + PSDK-Interconnection + ESDK-Interconnection (dock-to-cloud)
+
+- [ ] Enumerate + draft (est. ~40 methods).
+- [ ] **Review gate 4g**
+
+### Sub-phase 4h — Pilot-to-Cloud (RC Plus 2 Enterprise + RC Pro Enterprise)
 
 - [ ] Enumerate methods across RC Plus 2 + RC Pro feature files (est. ~70 methods).
 - [ ] Create `mqtt/pilot-to-cloud/` subtree with same family structure.
 - [ ] Write path-level index.
-- [ ] **Review gate 4g**
+- [ ] **Review gate 4h**
 
-### Sub-phase 4h — Property-family shells (dock-to-cloud + pilot-to-cloud)
+### Sub-phase 4i — Property-family shells (dock-to-cloud + pilot-to-cloud)
 
 - [ ] Write thin `osd/`, `state/`, `property-set/` shells per device that link to Phase 6.
 - [ ] **Final Phase 4 review gate**
