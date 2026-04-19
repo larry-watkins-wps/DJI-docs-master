@@ -1,0 +1,66 @@
+#
+Report Waypoints Upload Result
+
+POST /wayline/api/v1/workspaces/{workspace_id}/upload-callback
+
+Parameters
+Name In Type Required Description
+workspace_id path string true workspace id
+x-auth-token header string true access token
+body body wayline.UploadCallbackInput true body param
+Responses
+Status Meaning Description Schema
+200 OK
+open in new window
+ OK wayline.BaseResponse
+
+Example responses
+
+{
+ "code":0
+ "data": {},
+ "message": "success"
+}
+
+#
+Schemas
+wayline.UploadCallbackInput
+
+{
+ "metadata": {
+ "drone_model_key": "string",
+ "payload_model_keys": [
+ "string"
+ ],
+ "template_types": [
+ 0
+ ]
+ },
+ "name": "string",
+ "object_key": "string",
+}
+
+Properties
+
+Name Type Required Restrictions Description
+metadata wayline.Metadata false none waypoints file metadata
+name string false none waypoints file name
+object_key string true none object key
+wayline.Metadata
+
+{
+ "drone_model_key": "string",
+ "payload_model_keys": [
+ "string"
+ ],
+ "template_types": [
+ 0
+ ]
+}
+
+Properties
+
+Name Type Required Restrictions Description
+drone_model_key string false none device product enum
+payload_model_keys [string] false none payload product enum
+template_types [integer] false none waypoints template collection

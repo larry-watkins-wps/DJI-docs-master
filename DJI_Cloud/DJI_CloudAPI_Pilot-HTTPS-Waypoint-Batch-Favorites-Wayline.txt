@@ -1,0 +1,44 @@
+#
+Batch Favorites Waypoints
+
+POST /wayline/api/v1/workspaces/{workspace_id}/favorites
+
+Parameters
+Name In Type Required Description
+workspace_id path string true workspace id
+x-auth-token header string true access token
+id path Array true wayline file ID
+Responses
+Status Meaning Description Schema
+200 OK
+open in new window
+ OK wayline_service.CreateFavoriteOutput
+
+Example responses
+
+{
+ "code":0,
+ "data":{},
+ "message": "success"
+}
+
+#
+Schemas
+wayline_service.CreateFavoriteOutput
+
+{
+ "code": 0,
+ "data": {
+ "id": [
+ "string"
+ ]
+ },
+ "message": "string"
+}
+
+Properties
+
+Name Type Required Restrictions Description
+code integer false none error code
+data wayline_service.CreateFavoriteInput false none none
+message string false none description

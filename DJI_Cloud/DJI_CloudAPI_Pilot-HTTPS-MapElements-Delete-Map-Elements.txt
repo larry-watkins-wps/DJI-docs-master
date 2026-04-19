@@ -1,0 +1,52 @@
+#
+Delete Map Elements
+
+DELETE /map/api/v1/workspaces/{workspace_id}/elements/{id}
+
+Parameters
+Name In Type Required Description
+id path integer true element id
+workspace_id path string true workspace id
+x-auth-token header string true access token
+Responses
+Status Meaning Description Schema
+200 OK
+open in new window
+ OK map.SwagUUIDResp
+
+Example responses
+
+{
+ "code":0
+ "data":{
+ "id":"94c51c50-f111-45e8-ac8c-4f96c93ced44"
+ },
+ "message": "success"
+}
+
+#
+Schemas
+map.SwagUUIDResp
+{
+ "code": 0,
+ "data": {
+ "id": "string"
+ },
+ "message": "string"
+}
+
+Properties
+
+Name Type Required Restrictions Description
+code integer true none error code
+data map.UUIDResp true none none
+message string true none error description
+map.UUIDResp
+{
+ "id": "string"
+}
+
+Properties
+
+Name Type Required Restrictions Description
+id string true none element id

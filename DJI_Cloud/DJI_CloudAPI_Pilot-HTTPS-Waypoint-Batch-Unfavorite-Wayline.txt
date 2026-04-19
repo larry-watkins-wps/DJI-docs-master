@@ -1,0 +1,40 @@
+#
+Batch Unfavorites Waypoints
+
+DELETE /wayline/api/v1/workspaces/{workspace_id}/favorites
+
+Parameters
+Name In Type Required Description
+workspace_id path string true workspace id
+id query array[string] false waypoints file id collection
+x-auth-token header string true access token
+Responses
+Status Meaning Description Schema
+200 OK
+open in new window
+ OK wayline.BaseResponse
+
+Example responses
+
+{
+ "code":0
+ "data":{},
+ "message": "success"
+}
+
+#
+Schemas
+wayline.BaseResponse
+
+{
+ "code": 0,
+ "data": null,
+ "message": "string"
+}
+
+Properties
+
+Name Type Required Restrictions Description
+code integer false none error code
+data any false none none
+message string false none description

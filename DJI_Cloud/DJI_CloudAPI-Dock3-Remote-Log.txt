@@ -1,0 +1,328 @@
+#
+Event
+#
+File Upload Progress Notification
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: fileupload_progress
+
+Data:
+
+Column Name Type Constraint Description
+result Return code int {"max":"","min":"","step":"","unit_name":null}
+output Output struct
+»ext Extended content struct
+»»files File list array {"size": -, "item_type": struct}
+»»»module Device type enum_int {"0":"Aircraft","3":"Dock"}
+»»»size File size int byte
+»»»device_sn Device serial number (SN) text
+»»»key Key in the object storage bucket text
+»»»fingerprint File fingerprint text
+»»»progress Progress information struct
+»»»»prgress Progress value int
+»»»»finish_time Upload finish time int
+»»»»upload_rate Upload rate int
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "ext": {
+ "files": [
+ {
+ "device_sn": "drone_sn",
+ "fingerprint": "4f65b891f3bc09bdb6d4c36a996b532d",
+ "key": "4bf0039f-6434-44a8-b891-8d7b6b7ff138/drone_sn/video_20220621_110830.log",
+ "module": "0",
+ "progress": {
+ "current_step": 19,
+ "finish_time": 1655781395926,
+ "progress": 100,
+ "result": 0,
+ "status": "ok",
+ "upload_rate": 0
+ },
+ "size": 155232
+ },
+ {
+ "device_sn": "dock_sn",
+ "fingerprint": "4f65b891f3bc09bdb6d4c36a996b532d",
+ "key": "4bf0039f-6434-44a8-b891-8d7b6b7ff138/dock_sn/video_20220621_110830.log",
+ "module": "3",
+ "progress": {
+ "current_step": 19,
+ "finish_time": 1655781395926,
+ "progress": 100,
+ "result": 0,
+ "status": "ok",
+ "total_step": 30,
+ "upload_rate": 0
+ },
+ "size": 155232
+ }
+ ]
+ },
+ "status": "ok"
+ }
+ },
+ "gateway": "dock_sn",
+ "need_reply": 0,
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1655781395926,
+ "method": "fileupload_progress"
+}
+
+#
+Service
+#
+Upload Status Update
+
+Once the device receives the command issued by the server, it will directly return the execution result status.
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: fileupload_update
+
+Data:
+
+Column Name Type Constraint Description
+status Upload Status enum_string {"cancel": "Cancel"}
+module_list List of modules to which the logs belong array {"size": -, "item_type": }
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "module_list": [
+ "0",
+ "3"
+ ],
+ "status": "cancel"
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "method": "fileupload_update"
+}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: fileupload_update
+
+Data:
+
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "result": 0
+ },
+ "gateway": "",
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1655781392412,
+ "method": "fileupload_update"
+}
+
+#
+Initiate Log File Upload
+
+Once the device receives the command issued by the server, it will directly return the execution result status.
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: fileupload_start
+
+Data:
+
+Column Name Type Constraint Description
+bucket Object storage bucket name text
+region Region where the data center is located text
+credentials Credential information struct
+»access_key_id Access key ID text
+»access_key_secret Secret access key text
+»expire Access key expiration time int {"step":"1","unit_name":"Seconds / s"}
+»security_token Session token text
+endpoint Access domain for external services text
+provider Cloud provider enumeration values enum_string {"ali":"Alibaba Cloud","aws":"Amazon Cloud","minio":"MinIO"}
+params struct
+»files array {"size": -, "item_type": struct}
+»»object_key Key of the file in the object storage bucket text
+»»module Module to which the log belong text
+»»list Log list array {"size": -, "item_type": struct}
+»»»boot_index Log index int
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "bucket": "stg-dji-service-hz-ksd7",
+ "credentials": {
+ "access_key_id": "STS.access_key_id",
+ "access_key_secret": "access_key_secret",
+ "expire": 1659432522000,
+ "security_token": "security_token"
+ },
+ "endpoint": "https://oss-cn-hangzhou.aliyuncs.com",
+ "params": {
+ "files": [
+ {
+ "list": [
+ {
+ "boot_index": 321
+ },
+ {
+ "boot_index": 322
+ }
+ ],
+ "module": "3",
+ "object_key": "object_key"
+ }
+ ]
+ },
+ "provider": "ali",
+ "region": "hz"
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1659429523120,
+ "method": "fileupload_start"
+}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: fileupload_start
+
+Data:
+
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "result": 0
+ },
+ "gateway": "",
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1655781392412,
+ "method": "fileupload_start"
+}
+
+#
+Get List of Files Available for Upload from Device
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: fileupload_list
+
+Data:
+
+Column Name Type Constraint Description
+module_list File ownership filter list array {"size": -,"item_type": enum_int}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "module_list": [
+ "0",
+ "3"
+ ]
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655,
+ "method": "fileupload_list"
+}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: fileupload_list
+
+Data:
+
+Column Name Type Constraint Description
+files array {"size": 2, "item_type": struct}
+»device_sn Device serial number (SN) text
+»result Return code int Non-zero represents an error
+»module Device type enum_int {"0":"Aircraft","3":"Dock"}
+»list File index list array {"size": -, "item_type": struct}
+»»boot_index File index int
+»»start_time Log start time int {"unit_name":"Milliseconds / ms"}
+»»end_time Log end time int {"unit_name":"Milliseconds / ms"}
+»»size Log file size int byte
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "files": [
+ {
+ "device_sn": "xxxxxxxxx",
+ "list": [
+ {
+ "boot_index": 1111,
+ "end_time": 1659427398806,
+ "size": 33789,
+ "start_time": 1654070968655
+ },
+ {
+ "boot_index": 22222,
+ "end_ime": 1659427398806,
+ "size": 33789,
+ "start_time": 1659427398806
+ }
+ ],
+ "module": "0",
+ "result": 0
+ },
+ {
+ "device_sn": "device_sn",
+ "list": [
+ {
+ "boot_index": 11111,
+ "end_time": 1659427398806,
+ "size": 36772,
+ "start_time": 1659427398806
+ },
+ {
+ "boot_index": 22222,
+ "end_ime": 1659427398806,
+ "size": 33789,
+ "start_time": 1659427398806
+ }
+ ],
+ "module": "3",
+ "result": 0
+ }
+ ],
+ "result": 0
+ },
+ "gateway": "",
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655,
+ "method": "fileupload_list"
+}

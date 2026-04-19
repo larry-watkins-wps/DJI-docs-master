@@ -1,0 +1,117 @@
+#
+Event
+#
+Firmware Update Progress
+
+Topic: thing/product/{gateway_sn}/events
+
+Direction: up
+
+Method: ota_progress
+
+Data:
+
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+»progress Progress struct
+»»percent Progress percentage int {"max":"100","min":"0","step":"1","unit_name":"Percentage / %"}
+»»current_step Current step enum_string {"download_firmware":"Download firmware","upgrade_firmware":"Update firmware"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "progress": {
+ "percent": 10,
+ "current_step": "download_firmware"
+ },
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655,
+ "method": "ota_progress"
+}
+
+#
+Service
+#
+Firmware Update
+
+Topic: thing/product/{gateway_sn}/services
+
+Direction: down
+
+Method: ota_create
+
+Data:
+
+Column Name Type Constraint Description
+devices Firmware update device list array {"size": 2, "item_type": struct}
+»sn Device serial number (SN) text {"length":"10240"}
+»product_version Firmware version text {"length":"10240"}
+»file_url Download link for the firmware file text {"length":"10240"}
+»md5 MD5 hash of firmware file text {"length":"10240"}
+»file_size Firmware file size int
+»file_name Firmware file name text
+»firmware_upgrade_type Firmware update type enum_int {"2":"Consistency update","3":"Standard update", "4":"psdk update"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "devices": [
+ {
+ "file_name": "wm245_1.00.223.zip",
+ "file_size": 653467234,
+ "file_url": "https://s3.com/xxx.zip",
+ "firmware_upgrade_type": 2,
+ "md5": "abcdefabcdefabcdef",
+ "product_version": "1.00.223",
+ "sn": "drone_sn"
+ },
+ {
+ "firmware_upgrade_type": 3,
+ "product_version": "1.00.223",
+ "sn": "dock_sn"
+ }
+ ]
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655,
+ "method": "ota_create"
+}
+
+Topic: thing/product/{gateway_sn}/services_reply
+
+Direction: up
+
+Method: ota_create
+
+Data:
+
+Column Name Type Constraint Description
+result Return code int Non-zero represents an error
+output Output struct
+»status Task state enum_string {"canceled":"Cancelled or terminated","failed":"Failed","in_progress":"Executing","ok":"Executed successfully","paused":"Paused","rejected":"Rejected","sent":"Issued","timeout":"Timeout"}
+
+Example:
+
+{
+ "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "data": {
+ "output": {
+ "status": "in_progress"
+ },
+ "result": 0
+ },
+ "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+ "timestamp": 1654070968655,
+ "method": "ota_create"
+}

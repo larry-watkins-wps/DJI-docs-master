@@ -1,0 +1,42 @@
+#
+Get Duplicated Waypoints Name
+
+GET /wayline/api/v1/workspaces/:workspace_id/waylines/duplicate-names
+
+Parameters
+Name In Type Required Description
+workspace_id path string true workspace id
+name query array[string] true waypoints file name collection
+x-auth-token header string true access token
+Responses
+Status Meaning Description Schema
+200 OK
+open in new window
+ OK wayline.GetDuplicateNamesOutput
+
+Example
+
+{
+ "code": 0,
+ "message": "string",
+ "data": ["name1", "name2"]
+}
+
+#
+Schemas
+wayline.GetDuplicateNamesOutput
+
+{
+ "code": 0,
+ "data": [
+ "string"
+ ],
+ "message": "string"
+}
+
+Properties
+
+Name Type Required Restrictions Description
+code integer false none error code
+data array[string] false none duplicate file name collection
+message string false none description
