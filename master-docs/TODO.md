@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c landed 2026-04-18, review gate pending before 4d).
+**Current phase**: Phase 4 — MQTT topic catalog (in progress; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, review gate pending before 4e).
 
 ---
 
@@ -104,11 +104,17 @@ Estimated 3500–4200 lines of doc output — at the edge of a single-drop budge
 - [x] Update `mqtt/dock-to-cloud/README.md` with events/services/drc sections.
 - [x] Update `mqtt/README.md` + corpus `README.md`.
 - [x] Append to `RESUME-NOTES.md` with a 4c-close handoff entry.
-- [ ] **Review gate 4c**
+- [x] **Review gate 4c** closed 2026-04-18 (implicit — user instructed "Continue at 4d").
 
 ### Sub-phase 4d — LiveStream + Media-Management (dock-to-cloud)
 
-- [ ] Enumerate + draft (est. ~20 methods).
+- [x] Enumerate + draft 9 methods (2 events + 6 services + 1 request). Actual count was smaller than the ~20 estimate because Dock 3 dropped Agora from `live_start_push` and the v1.15 tables collapsed several Dock 2 v1.11 flight-task progress counters into `file_upload_callback`'s optional `flight_task` struct.
+  - Events: `highest_priority_upload_flighttask_media`, `file_upload_callback`.
+  - Services: `live_start_push`, `live_stop_push`, `live_set_quality`, `live_camera_change`, `live_lens_change`, `upload_flighttask_media_prioritize`.
+  - Requests: `storage_config_get`.
+- [x] Update `mqtt/dock-to-cloud/README.md` with 4d-sourced entries under events/services/requests and mark 4d landed in the sub-phase status table.
+- [x] Update `mqtt/README.md` + corpus `README.md` with the new method count (77 total).
+- [x] Append to `RESUME-NOTES.md` with a 4d-close handoff entry.
 - [ ] **Review gate 4d**
 
 ### Sub-phase 4e — Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control (dock-to-cloud)

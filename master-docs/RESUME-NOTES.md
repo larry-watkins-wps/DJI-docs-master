@@ -6,6 +6,75 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-18 — handoff at Phase 4d close, ready for 4e
+
+### State of play
+
+- Phases 0, 1, 2, 3 complete and committed.
+- Phase 4 (MQTT topic catalog) is in progress. Sub-drops landed to date: **4a** (commit `8059992`, 5 methods), **4b** (commit `7742419`, 21 methods), **4c** (commit `663ae85`, 42 methods), **4d** (this commit, 9 methods). **77 methods total** across Phase 4 so far.
+- **4e is next** — Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control (dock-to-cloud).
+
+### What 4d produced
+
+- `mqtt/dock-to-cloud/events/` — 2 new docs: `highest_priority_upload_flighttask_media`, `file_upload_callback` (both `need_reply: 1`).
+- `mqtt/dock-to-cloud/services/` — 6 new docs: the five LiveStream services (`live_start_push`, `live_stop_push`, `live_set_quality`, `live_camera_change`, `live_lens_change`) plus the Media-Management command `upload_flighttask_media_prioritize`.
+- `mqtt/dock-to-cloud/requests/` — 1 new doc: `storage_config_get` (OSS / S3 / MinIO temporary credentials for dock-initiated media upload).
+- No new family directory — LiveStream + Media-Management fit entirely into the existing `events/` + `services/` + `requests/` structure.
+- `mqtt/dock-to-cloud/README.md`, `mqtt/README.md`, and corpus `README.md` all updated to cite 77-method count + 4d landed.
+
+### Why the method count (9) is lower than the ~20 estimate
+
+The 4c handoff projected ~20 methods for LiveStream + Media-Management. The actual count is 9:
+
+- **LiveStream source** has only five services (switch FPV camera, switch lens, set quality, start, stop). No events and no requests in the v1.15 LiveStream files. The earlier estimate appears to have assumed event/request families existed.
+- **Media-Management source** has two events, one service, and one request — four methods total. No additional service family for stream-state notifications.
+- The RTMP / GB28181 / WebRTC / Agora protocol-specific wire details (handshake, transport packet format, etc.) live in `livestream-protocols/` (Phase 7), not here — so there are no per-protocol methods in 4d.
+
+Net effect: 4d was a comparatively small drop and left room in the context budget. 4e can therefore be a larger drop if the estimate holds (~30 methods for Firmware + Remote-Log + Remote-Debugging + Remote-Control).
+
+### DJI-source inconsistencies flagged during 4d drafting
+
+Carry into Phase 9 workflow authoring:
+
+- **`live_start_push` Dock 3 example**: uses `url_type: 0` while the Dock 3 enum is `{1, 3, 4}` — DJI left the example un-edited when Agora was removed from Dock 3 support. Dock 2 still supports Agora (`url_type: 0`). Flagged in the doc.
+- **`live_start_push` quality bitrates diverge across three sources**: v1.11 Dock 2 says Smooth = 512 Kbps, v1.15 Dock 2 says 1 Mbps, v1.15 Dock 3 says 512 Kbps. UHD on Dock 2 v1.15 says 8 Mbps but the sibling `live_set_quality` doc on Dock 3 says 8 Mbps while `live_start_push` on Dock 3 says 3 Mbps. Treat bitrate as run-time-negotiated, not authoritative.
+- **`live_lens_change` v1.11 parameter regression**: v1.11 Dock 2 documents both `video_id` and `video_type`; v1.15 (Dock 2 and Dock 3) drops `video_id`. Unexplained by DJI — potentially implies "switch the lens of the currently active stream", but DJI does not say so explicitly.
+- **`live_lens_change` reply**: every source declares `Data: null` but the example still carries `data.result`. Standard reply shape; example is authoritative.
+- **`file_upload_callback` v1.11-only `flight_task` counters**: v1.11 Dock 2 documents `uploaded_file_count / expected_file_count / flight_type` as a sibling struct of `file`; v1.15 tables drop it. Plausibly still sent by older dock firmware.
+- **`file_upload_callback` cloud_to_cloud_id**: v1.11 documents it in the data table; v1.15 tables don't list it but both Dock 2 + Dock 3 v1.15 examples carry it. Treat as present in v1.15 on the wire.
+- **Timestamp-key typo**: Dock 3 Live-Flight-Controls examples used `"timestamp:"` (trailing colon); the Media-Management Dock 3 file does not — so the typo is not uniform across Dock 3 sources.
+- **`storage_config_get` `provider` enum capitalization**: v1.11 says `"MinIO"` (camel-caps), v1.15 Dock 2 says `"minio"` (lowercase). Minor; lowercase is current.
+
+None of these rise to `OPEN-QUESTIONS.md` level — doc-level callouts are sufficient for any reader.
+
+### After 4d review gate (= kick-off of 4e)
+
+**4e scope — Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control (dock-to-cloud).** Sources (confirm filenames with `ls DJI_Cloud/ | grep -iE "(firmware|log|debug|remote)"` in a fresh session):
+
+1. `DJI_Cloud/DJI_CloudAPI-Dock3-Firmware-Upgrade.txt` (or similar)
+2. `DJI_Cloud/DJI_CloudAPI-Dock3-Remote-Log.txt`
+3. `DJI_Cloud/DJI_CloudAPI-Dock3-Remote-Debugging.txt`
+4. `DJI_Cloud/DJI_CloudAPI-Dock3-Remote-Control.txt`
+5. Dock 2 counterparts.
+6. Cloud-API-Doc v1.11 Dock 2: `.../10.dock2/80.firmware.md`, `.../10.dock2/90.log.md`, `.../10.dock2/180.remote-control.md` (the v1.11 Dock 2 set does not appear to include a Remote-Debugging file — verify during enumeration, and if absent note that 4e's Remote-Debugging section is v1.15-only).
+
+Expected method count: ~30. Expected families: services (deliver firmware to device, start/stop remote control, begin/end debugging session, request log bundle), events (upgrade progress, log-upload progress, debugging events), requests (firmware list fetch, log file slot fetch).
+
+Template is unchanged from 4a–4d. Same cohort pattern and source-provenance table.
+
+### Known gotchas carried forward from 4b + 4c + 4d
+
+- DRC envelope is lighter (no `tid`/`bid`/`timestamp`, just `method` + `seq` + `data`). Only the `drc/` family uses this. 4e is unlikely to add a new family directory.
+- Multi-step flows (prepare → execute → progress) use `bid` grouping — watch for that pattern in firmware-upgrade staging.
+- `file_upload_callback` uses `need_reply: 1` with the cloud returning `{"result": 0}` on `events_reply`. Other events that need reliability (likely firmware-upgrade progress reports, log-upload results) will use the same pattern.
+- Review gate: user checkpoint before 4e starts. Don't push through.
+
+### Open questions potentially affecting 4e
+
+- [`OQ-003`](OPEN-QUESTIONS.md) — QoS / retain / clean-session values unspecified. Firmware upgrade is an obvious place where a higher QoS might be warranted; cite the gap if it becomes relevant, don't invent.
+
+---
+
 ## 2026-04-18 — handoff at Phase 4c close, ready for 4d
 
 ### State of play

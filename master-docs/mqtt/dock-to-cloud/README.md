@@ -15,7 +15,7 @@ Phase 4 is being landed in feature-area sub-drops. This index grows as drops lan
 | 4a | DeviceManagement + Organization + Configuration — binding, topology, config | **landed 2026-04-18** |
 | 4b | WaylineManagement — flight-task lifecycle + Virtual Cockpit routes | **landed 2026-04-18** |
 | 4c | Live-Flight-Controls — DRC, camera/gimbal/IR control, authority grab | **landed 2026-04-18** |
-| 4d | LiveStream + Media-Management | pending |
+| 4d | LiveStream + Media-Management | **landed 2026-04-18** |
 | 4e | Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control | pending |
 | 4f | FlySafe + Custom-Flight-Area + AirSense + HMS | pending |
 | 4g | PSDK + PSDK-Interconnection + ESDK-Interconnection | pending |
@@ -46,6 +46,8 @@ Topics under `thing/product/{gateway_sn}/events`. Device → cloud pushes.
 | `drc_status_notify` | [`events/drc_status_notify.md`](events/drc_status_notify.md) | *(Abandoned.)* DRC link state (connected / connecting / not connected). |
 | `joystick_invalid_notify` | [`events/joystick_invalid_notify.md`](events/joystick_invalid_notify.md) | DRC flight control became invalid (RC-lost, low battery, takeover). |
 | `camera_photo_take_progress` | [`events/camera_photo_take_progress.md`](events/camera_photo_take_progress.md) | Persistent photo-capture progress (currently panorama). |
+| `highest_priority_upload_flighttask_media` | [`events/highest_priority_upload_flighttask_media.md`](events/highest_priority_upload_flighttask_media.md) | Dock announces the flight task whose media will be uploaded first. |
+| `file_upload_callback` | [`events/file_upload_callback.md`](events/file_upload_callback.md) | Single media file has been uploaded; carries file descriptor + metadata. |
 
 ### `services/`
 
@@ -97,6 +99,12 @@ Topics under `thing/product/{gateway_sn}/services`. Cloud → device commands.
 | `ir_metering_mode_set` | [`services/ir_metering_mode_set.md`](services/ir_metering_mode_set.md) | Set IR temperature-measurement mode (off / point / area). |
 | `ir_metering_point_set` | [`services/ir_metering_point_set.md`](services/ir_metering_point_set.md) | Set IR point-measurement coordinate. |
 | `ir_metering_area_set` | [`services/ir_metering_area_set.md`](services/ir_metering_area_set.md) | Set IR area-measurement region. |
+| `live_start_push` | [`services/live_start_push.md`](services/live_start_push.md) | Start a live stream on one of RTMP / GB28181 / WebRTC / Agora (Dock 2). |
+| `live_stop_push` | [`services/live_stop_push.md`](services/live_stop_push.md) | Stop an in-progress live stream. |
+| `live_set_quality` | [`services/live_set_quality.md`](services/live_set_quality.md) | Change quality (resolution/bitrate) of an in-progress stream. |
+| `live_camera_change` | [`services/live_camera_change.md`](services/live_camera_change.md) | Switch FPV camera between inside-the-dock and outside-the-dock. |
+| `live_lens_change` | [`services/live_lens_change.md`](services/live_lens_change.md) | Switch aircraft lens (IR / Normal / Wide / Zoom) on an active stream. |
+| `upload_flighttask_media_prioritize` | [`services/upload_flighttask_media_prioritize.md`](services/upload_flighttask_media_prioritize.md) | Cloud bumps a flight task to the top of the media-upload queue. |
 
 ### `requests/`
 
@@ -110,6 +118,7 @@ Topics under `thing/product/{gateway_sn}/requests`. Device → cloud requests, c
 | `airport_organization_bind` | [`requests/airport_organization_bind.md`](requests/airport_organization_bind.md) | Gateway binds a device set to an organization. |
 | `flighttask_progress_get` | [`requests/flighttask_progress_get.md`](requests/flighttask_progress_get.md) | In multi-dock tasks, query the other dock's latest progress. |
 | `flighttask_resource_get` | [`requests/flighttask_resource_get.md`](requests/flighttask_resource_get.md) | Fetch a fresh pre-signed URL for the KMZ wayline file. |
+| `storage_config_get` | [`requests/storage_config_get.md`](requests/storage_config_get.md) | Dock requests short-lived object-storage credentials for media upload. |
 
 ### `drc/`
 
