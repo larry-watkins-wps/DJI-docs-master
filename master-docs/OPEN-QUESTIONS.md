@@ -28,4 +28,23 @@ The v1.11 markdown set has zero matches for `Dock 3`, `Dock3`, `Matrice 4`, `M4D
 3. When a statement is drawn from the v1.15 extract and has no counterpart in `Cloud-API-Doc/`, cite the `DJI_Cloud/*.txt` file explicitly. When the two sets agree on generic architecture, citing `Cloud-API-Doc/` is sufficient.
 4. If a conflict is found between v1.11 and v1.15 (not just silence), log it as a new `OQ-###` entry and ask.
 
-**Remaining open thread.** As of 2026-04-18 the `DJI_Cloud/` extraction covers the entire `/api-reference/` section of the live site (67 files — see `SOURCES.md` §3). Pages outside `/api-reference/` — overview, product-support, release-notes, tutorials, quick-start, feature-set, debug — are **not** in the extraction set. If a later phase needs one of those, fetch from the live site (or extend `scrape_api_reference.py`'s URL inventory). No action required now.
+**Remaining open thread.** As of 2026-04-18 the `DJI_Cloud/` extraction covers the entire `/api-reference/` section of the live site (87 files after the Dock 2 cohort scope expansion — see `SOURCES.md` §3). Pages outside `/api-reference/` — overview, product-support, release-notes, tutorials, quick-start, feature-set, debug — are **not** in the extraction set. If a later phase needs one of those, fetch from the live site (or extend `scrape_api_reference.py`'s URL inventory). No action required now.
+
+---
+
+## OQ-002 — Pilot-to-Cloud OSD struct example appears to be a copy-paste of the Dock OSD example
+
+**Status**: open — DJI-side documentation bug; affects how we can cite the pilot-to-cloud topic definition for OSD content.
+
+**Raised**: 2026-04-18, during Phase 2 design work (direct comparison of the two topic-definition files).
+
+**Question.** `DJI_Cloud/DJI_CloudAPI-PilotToCloud-Topic-Definition.txt` has an OSD struct example that is byte-identical (after whitespace normalization) to the OSD struct example in `DJI_Cloud/DJI_CloudAPI-TopicDefinitions.txt` (the dock-to-cloud page). Both show a payload with `"gateway": "dock_sn"`, a `sub_device` block, `drone_in_dock`, `cover_state`, `emergency_stop_state`, dock environmental sensors, `alternate_land_point`, etc. — that is **Dock OSD content**, not Pilot OSD content. DJI appears to have copy-pasted the example between the two topic-definition pages.
+
+**Why it matters.** Phase 4 `mqtt/pilot-to-cloud/osd.md` cannot cite the pilot-to-cloud topic definition file for the canonical Pilot-path OSD payload — the example there does not represent what a Pilot-attached aircraft actually publishes. If we cited it uncritically we'd mislead anyone auditing or implementing the Pilot path.
+
+**Where to get the real Pilot OSD payload.** The per-aircraft property catalogs — e.g. `DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt`, `DJI_CloudAPI_Mavic3-Enterprise_Properties.txt`, `DJI_CloudAPI_M3D_M3DT_Properties.txt` — list the actual property set a Pilot-attached aircraft reports. These are primary for OSD content. The pilot-to-cloud topic definition file can only be cited for the envelope shape (tid / bid / timestamp / gateway / data), not for the OSD payload content.
+
+**How to handle**:
+1. Phase 2 `mqtt/README.md` — cite the pilot-to-cloud topic definition file only for the envelope and the topic list. Add a footnote flagging the OSD copy-paste bug.
+2. Phase 4 `mqtt/pilot-to-cloud/osd.md` — use per-aircraft property catalogs as the canonical content source. Cite this `OQ-002` entry for traceability.
+3. Re-verify against the live site periodically — if DJI fixes the copy-paste, re-scrape the topic definition file and close this entry with a resolved note.

@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 1 — Architecture overview (awaiting user review)
+**Current phase**: Phase 2 — Transport protocol references (Phase 1 reviewed and closed 2026-04-18).
 
 ---
 
@@ -20,20 +20,27 @@ Cross-session source of truth. Update checkboxes as work completes. Before endin
 - [ ] **Review gate**: user confirms final plan + layout
 - [ ] Initial commit (snapshot of source dirs + setup files)
 
-## Phase 1 — Architecture overview
+## Phase 1 — Architecture overview *(complete)*
 
 - [x] Draft `architecture/README.md` — transports, connection model, device relationships, auth model high-level
 - [x] Cross-check with `Cloud-API-Doc/` overview pages and `DJI_Cloud/` v1.15 extract
 - [x] Update corpus `README.md`
 - [x] Record v1.11 vs v1.15 source-version mismatch (`OPEN-QUESTIONS.md` OQ-001) and revise `SOURCES.md` authority ranking
-- [ ] **Review gate**
+- [x] **Review gate** closed 2026-04-18. Landing commits: `b732963` (architecture doc), `ff6d2bc` (session-principle memory), `ca8e259` (Dock 2 cohort scope expansion).
 
-## Phase 2 — Transport protocol references
+## Phase 2 — Transport protocol references *(current)*
 
-- [ ] `http/README.md` — base URL conventions, auth, error envelope, pagination, common headers
-- [ ] `mqtt/README.md` — topic taxonomy, message envelope (method/tid/bid/timestamp/data), QoS, retain, request-reply conventions
-- [ ] `websocket/README.md` — handshake, session lifecycle, push message envelope
-- [ ] Update corpus `README.md`
+**Design decisions locked this session** (see `PLAN.md` Phase 2 for rationale):
+- Each transport gets a single shared-conventions doc — no path split at Phase 2 level. The dock-to-cloud and pilot-to-cloud MQTT paths were verified envelope-identical by direct file comparison; path-specific divergence is Phase 4 content, not Phase 2.
+- WebSocket is Pilot-to-Cloud only.
+- HTTP is not path-split in DJI's material.
+- Path-split subtrees land in Phase 4 (`mqtt/dock-to-cloud/` and `mqtt/pilot-to-cloud/`).
+
+Checklist:
+- [ ] `http/README.md` — URI form, `X-Auth-Token`, error envelope, pagination, common headers. Cite `[Cloud-API-Doc/docs/en/10.overview/40.basic-concept/40.https.md]` for the v1.11 canonical; cross-check against `DJI_Cloud/DJI_CloudAPI_Pilot-HTTPS-*.txt` for v1.15 endpoint conventions.
+- [ ] `mqtt/README.md` — topic taxonomy (`sys/` + `thing/`), message envelope (tid / bid / timestamp / gateway / data / method), `{device_sn}` vs `{gateway_sn}`, QoS, retain, request-reply, status lifecycle. Cite `[Cloud-API-Doc/docs/en/10.overview/40.basic-concept/20.mqtt.md]` + `DJI_Cloud/DJI_CloudAPI-TopicDefinitions.txt` + `DJI_CloudAPI-PilotToCloud-Topic-Definition.txt`.
+- [ ] `websocket/README.md` — handshake / session lifecycle / push message envelope. Cite `[Cloud-API-Doc/docs/en/10.overview/40.basic-concept/50.websocket.md]` + `DJI_Cloud/DJI_CloudAPI_Pilot-WebSocket-*.txt`.
+- [ ] Update corpus `README.md` TOC.
 - [ ] **Review gate**
 
 ## Phase 3 — HTTP endpoint catalog

@@ -54,17 +54,26 @@ Each phase ends at a **user review gate** before the next begins. Phases may be 
 ### Phase 0 — Setup *(complete)*
 Memory, CLAUDE.md, PLAN, TODO, SOURCES, README, `.gitignore`, `.gitattributes`, `git init`. Initial commit snapshots the source material.
 
-### Phase 1 — Architecture overview
-`architecture/` — one short doc explaining the shape of DJI Cloud: which transports exist, what each is used for, how devices connect, how Dock/aircraft/RC relate, authentication model at a glance. Establishes shared vocabulary for later phases.
+### Phase 1 — Architecture overview *(complete)*
+`architecture/README.md` landed in commit `b732963`; review-gate principles captured as memory in commit `ff6d2bc`; scope expanded to Dock 2 cohort in `ca8e259`.
 
-### Phase 2 — Transport protocol references
-`http/README.md`, `mqtt/README.md`, `websocket/README.md` — per-transport conventions: base URLs/auth/error envelope/pagination (HTTP); topic taxonomy/message envelope/QoS/request-reply conventions (MQTT); handshake/session lifecycle/message envelope (WebSocket). No catalog entries yet, just the protocol rules.
+### Phase 2 — Transport protocol references *(current)*
+Three shared-conventions docs, one per transport:
+- `http/README.md` — base URL conventions, `X-Auth-Token`, error envelope, pagination, common headers. Single doc — the HTTP surface is not path-split in DJI's material (the Pilot-HTTPS endpoints live in a dedicated section but share the same envelope conventions with other HTTP traffic).
+- `mqtt/README.md` — topic taxonomy, message envelope (tid / bid / timestamp / gateway / data / method), `{device_sn}` vs `{gateway_sn}` parameterization, QoS, retain, request-reply pattern, status lifecycle. **Single doc** — the dock-to-cloud and pilot-to-cloud paths are envelope-identical at the transport level. Verified by direct file comparison of `DJI_Cloud/DJI_CloudAPI-TopicDefinitions.txt` (dock-to-cloud) and `DJI_CloudAPI-PilotToCloud-Topic-Definition.txt` (pilot-to-cloud) — same 13 topics, same shapes, same common-fields table, same example envelopes. Divergence between the two paths is at the method / event / property content level, which is Phase 4 territory.
+- `websocket/README.md` — handshake, session lifecycle, push message envelope (biz_code / version / timestamp / data). Pilot-to-Cloud only; the Dock path does not use WebSocket.
+
+No catalog entries in Phase 2 — just the protocol rules.
 
 ### Phase 3 — HTTP endpoint catalog
-`http/<resource>/<endpoint>.md` — one doc per endpoint with method, path, request schema, response schema, error responses, real examples. Grouped by resource (device, workspace, wayline, media, livestream, map, user, auth).
+`http/<resource>/<endpoint>.md` — one doc per endpoint with method, path, request schema, response schema, error responses, real examples. Grouped by resource (device, workspace, wayline, media, livestream, map, user, auth). Pilot-HTTPS endpoints (17 captured in `DJI_Cloud/DJI_CloudAPI_Pilot-HTTPS-*.txt`) are part of this catalog — under their appropriate resource groups, not a separate Pilot subtree, since the HTTP conventions are shared.
 
 ### Phase 4 — MQTT topic catalog
-`mqtt/<family>/<topic>.md` — one doc per topic with payload schema, direction, real examples. Families: OSD / state / services / events / property-set / requests / DRC.
+Per-path subtrees because topic content diverges between paths even though envelopes are shared:
+- `mqtt/dock-to-cloud/<family>/<topic-or-method>.md` — Dock 2 and Dock 3 services / events / requests / DRC content.
+- `mqtt/pilot-to-cloud/<family>/<topic-or-method>.md` — RC Plus 2 Enterprise, RC Pro Enterprise, and sub-device aircraft content.
+
+Each subtree is organized by topic family: `osd/`, `state/`, `services/`, `events/`, `property-set/`, `requests/`, `drc/`. Shared conventions (envelope, QoS, retain) live in `mqtt/README.md` (Phase 2) and are not restated in the subtrees.
 
 ### Phase 5 — WebSocket message catalog
 `websocket/<family>/<message>.md` — push message catalog with payload schema and real examples.
