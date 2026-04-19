@@ -48,3 +48,29 @@ The v1.11 markdown set has zero matches for `Dock 3`, `Dock3`, `Matrice 4`, `M4D
 1. Phase 2 `mqtt/README.md` — cite the pilot-to-cloud topic definition file only for the envelope and the topic list. Add a footnote flagging the OSD copy-paste bug.
 2. Phase 4 `mqtt/pilot-to-cloud/osd.md` — use per-aircraft property catalogs as the canonical content source. Cite this `OQ-002` entry for traceability.
 3. Re-verify against the live site periodically — if DJI fixes the copy-paste, re-scrape the topic definition file and close this entry with a resolved note.
+
+---
+
+## OQ-003 — MQTT QoS, retain, and clean-session settings are not specified in DJI's published documentation
+
+**Status**: open — gap to close before Phase 4 per-topic catalog entries claim specific QoS values.
+
+**Raised**: 2026-04-18, during Phase 2 MQTT-conventions drafting.
+
+**Question.** The canonical MQTT concept page (`[Cloud-API-Doc/docs/en/10.overview/40.basic-concept/20.mqtt.md]`) describes the three MQTT 5.0 QoS levels generically (0, 1, 2) but does not state which QoS DJI uses per topic family. The topic-definition files (`[DJI_Cloud/DJI_CloudAPI-TopicDefinitions.txt]`, `[DJI_Cloud/DJI_CloudAPI-PilotToCloud-Topic-Definition.txt]`) also do not pin QoS or the `retain` flag for any topic. No per-feature page in `DJI_Cloud/*.txt` surveyed during Phase 2 design mentions QoS either.
+
+**Why it matters.** A cloud implementation must choose QoS values for the subscriptions it establishes and for the messages it publishes. Wrong choices have real consequences:
+- QoS 0 on a services/services_reply pair allows dropped commands silently.
+- QoS 2 on the high-frequency `osd` topic is excessive and drives broker CPU up.
+- `retain=true` on `status` preserves last-known topology across broker restarts — DJI's behavior on this flag affects cold-start correctness for third-party implementations.
+
+**Where the evidence likely lives.**
+1. `[DJI-Cloud-API-Demo/]` (deprecated, v1.10) — the Java/Spring client code explicitly passes QoS to the MQTT library when subscribing and publishing. Scanning `cloud-sdk/` and `sample/` for `MqttQoS`, `.qos(`, `setQos(`, `setRetained(` will expose DJI's own defaults.
+2. Live packet capture against a real Dock or RC — out of scope for the corpus phase.
+
+**Proposed resolution.**
+- Phase 4 per-topic catalog entries must not cite QoS or `retain` values unless they can cite a specific source. When captured from the demo, cite as e.g. `[DJI-Cloud-API-Demo/cloud-sdk/.../FooHandler.java:42]`.
+- If no demo evidence supports a topic's QoS, the Phase 4 entry states "not specified by DJI" and links back to this OQ.
+- Do not attempt to reverse-engineer values; either cite or omit.
+
+**Remaining open thread.** When Phase 4 starts, scan `DJI-Cloud-API-Demo/` for `MqttQoS` / `.qos(` / `setQos(` / `setRetained(` and compile a table of observed QoS per topic. Update this entry with findings and close if the coverage is complete for the in-scope topics.

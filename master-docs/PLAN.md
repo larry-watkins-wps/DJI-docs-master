@@ -1,6 +1,6 @@
 # DJI Cloud Docs Corpus — Plan
 
-**Status**: Setup complete. Ready for Phase 1 pending initial commit.
+**Status**: Phase 1 closed 2026-04-18. Phase 2 (transport protocol references) is current.
 **Last updated**: 2026-04-18.
 
 ## Objective
@@ -81,19 +81,19 @@ Each subtree is organized by topic family: `osd/`, `state/`, `services/`, `event
 ### Phase 6 — Device properties
 `device-properties/README.md` (master support matrix of properties × devices) plus per-device files for all in-scope devices: `dock2.md`, `dock3.md`, `m3d.md`, `m3td.md`, `m4d.md`, `m4td.md`, `rc-plus-2.md`, `rc-pro.md`. Properties drawn from the `DJI_Cloud/` v1.15 device-properties and aircraft-properties catalogs (see [`SOURCES.md`](SOURCES.md) §3 for the full file inventory); out-of-scope device rows (Dock 1, M30/M30T, M400, Mavic 3 Enterprise, plain RC) included in the support matrix only for enum completeness per user direction. Verified against `Cloud-API-Doc/` where v1.11 counterparts exist.
 
-### Phase 7 — WPML (wayline file format)
-`wpml/` — overview, template KML, waylines, common elements. "WPML" is DJI's wayline planning markup language (format as used in the `.wpml` file extension and the official docs URL path). Sourced from `DJI_Cloud/DJI_CloudAPI_WPML-*.txt` and `Cloud-API-Doc/`.
+### Phase 7 — Auxiliary specs (WPML + livestream protocols)
+Two self-contained spec references with no cross-dependency on the transport catalogs, merged into one phase:
 
-### Phase 8 — HMS codes
-`hms-codes/` — codes split by category (categories TBD after inspecting `HMS.json` structure). Curated markdown must stay consistent with `HMS.json`. Sanity-check script optional future polish.
+- `wpml/` — overview, template KML, waylines, common elements. "WPML" is DJI's wayline planning markup language (format as used in the `.wpml` file extension and the official docs URL path). Sourced from `DJI_Cloud/DJI_CloudAPI_WPML-*.txt` and `Cloud-API-Doc/`.
+- `livestream-protocols/` — per-protocol specifics for RTMP, GB28181, WebRTC, Agora. Focused on what the Dock/aircraft sends over the wire and what the cloud must terminate or relay. Pure media-transport layer, separate from the HTTP/MQTT signaling that starts a stream (which lives in `workflows/`).
 
-### Phase 9 — Livestream protocols
-`livestream-protocols/` — per-protocol specifics for RTMP, GB28181, WebRTC, Agora. Focused on what the Dock/aircraft sends over the wire and what the cloud must terminate or relay. Pure media-transport layer, separate from the HTTP/MQTT signaling that starts a stream (which lives in `workflows/`).
+### Phase 8 — Codes (HMS + error codes)
+Two tabular code references with identical authoring shape, merged into one phase:
 
-### Phase 10 — Error codes
-`error-codes/` — general API error code reference distinct from HMS. Sourced from DJI demo error definitions and official docs.
+- `hms-codes/` — codes split by category (categories TBD after inspecting `HMS.json` structure). Curated markdown must stay consistent with `HMS.json`. Sanity-check script optional future polish.
+- `error-codes/` — general API error code reference distinct from HMS. Sourced from DJI demo error definitions and official docs.
 
-### Phase 11 — Workflows
+### Phase 9 — Workflows
 `workflows/<workflow>.md` — choreography docs. Each uses the format in the directives above. Expected workflows (subject to refinement during earlier phases):
 - Dock 3 bootstrap & pairing
 - Device binding (Dock + aircraft + RC to workspace)
@@ -109,11 +109,10 @@ Each subtree is organized by topic family: `osd/`, `state/`, `services/`, `event
 
 This phase depends on Phases 3–5 being complete so workflow steps can link to canonical transport catalog entries.
 
-### Phase 12 — Device annexes
+### Phase 10 — Device annexes + final review
 `device-annexes/` — per-device deltas, quirks, and anything that differs meaningfully across the in-scope devices (Dock 2, Dock 3, M3D, M3TD, M4D, M4TD, RC Plus 2 Enterprise, RC Pro Enterprise). Informed by `dji_cloud_dock3/` (non-authoritative, Dock-3-specific) and anything flagged during earlier phases.
 
-### Phase 13 — Final review pass
-Consistency sweep: all cross-links resolve, README is up to date, `OPEN-QUESTIONS.md` either resolved or explicitly deferred, provenance citations spot-checked.
+Final review pass (rolled in as the closing gate for the corpus): consistency sweep — all cross-links resolve, README is up to date, `OPEN-QUESTIONS.md` either resolved or explicitly deferred, provenance citations spot-checked.
 
 ## Standing items (throughout)
 

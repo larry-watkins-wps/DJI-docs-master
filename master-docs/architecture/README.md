@@ -143,11 +143,11 @@ JSBridge is the two-way communication mechanism between a DJI Pilot 2 Webview an
 >
 > — `[Cloud-API-Doc/docs/en/10.overview/40.basic-concept/60.jsbridge.md]`
 
-It appears in the RC-paired topology because that is where Pilot 2 runs. It does not apply to the Dock 3 topology (no Pilot, no Webview). DJI publishes a JSBridge API spec — captured verbatim as `[DJI_Cloud/DJI_CloudAPI_Pilot-JSBridge.txt]` — describing the Webview-to-native calls available inside Pilot 2. Those calls do not themselves cross the network to the cloud; they configure or extract state the Pilot then uses to talk to the cloud over MQTT/HTTPS/WebSocket. See [`device-annexes/rc-m4d.md`](../device-annexes/) (Phase 12) for the RC-specific JSBridge interface surface. No canonical JSBridge catalog will live under a transport directory — the catalog belongs with the RC annex.
+It appears in the RC-paired topology because that is where Pilot 2 runs. It does not apply to the Dock 3 topology (no Pilot, no Webview). DJI publishes a JSBridge API spec — captured verbatim as `[DJI_Cloud/DJI_CloudAPI_Pilot-JSBridge.txt]` — describing the Webview-to-native calls available inside Pilot 2. Those calls do not themselves cross the network to the cloud; they configure or extract state the Pilot then uses to talk to the cloud over MQTT/HTTPS/WebSocket. See [`device-annexes/rc-m4d.md`](../device-annexes/) (Phase 10) for the RC-specific JSBridge interface surface. No canonical JSBridge catalog will live under a transport directory — the catalog belongs with the RC annex.
 
 ### 5.5 Media transports
 
-Live video from the Dock or aircraft is not carried over MQTT. It flows over a separate media transport negotiated at stream start. The in-scope transports are **RTMP**, **GB28181**, **WebRTC**, and **Agora**. The control signaling that starts and stops these streams lives in the MQTT services catalog and the HTTPS livestream endpoints; the media-plane protocol specifics live in [`livestream-protocols/`](../livestream-protocols/) (Phase 9).
+Live video from the Dock or aircraft is not carried over MQTT. It flows over a separate media transport negotiated at stream start. The in-scope transports are **RTMP**, **GB28181**, **WebRTC**, and **Agora**. The control signaling that starts and stops these streams lives in the MQTT services catalog and the HTTPS livestream endpoints; the media-plane protocol specifics live in [`livestream-protocols/`](../livestream-protocols/) (Phase 7).
 
 ## 6. Thing model
 
@@ -185,7 +185,7 @@ A cloud implementation therefore has to know, for every device it sees, which ga
 
 Two mechanisms operate together:
 
-1. **License-backed device binding to an organization.** Dock 3 and Pilot both verify a DJI-issued License before being allowed to bind to a third-party cloud's organization. The binding is driven by MQTT `method` calls on `thing/product/{gateway_sn}/requests` — specifically `config` (License parameters), `airport_bind_status`, `airport_organization_get`, and `airport_organization_bind`. The canonical sequence for the Dock case is `[Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/10.dock-access-to-cloud.md]`; the v1.15 Dock 3-specific counterpart is `[DJI_Cloud/DJI_CloudAPI-Dock3-DeviceManagement.txt]`. The corpus workflow is [`workflows/device-binding.md`](../workflows/) (Phase 11).
+1. **License-backed device binding to an organization.** Dock 3 and Pilot both verify a DJI-issued License before being allowed to bind to a third-party cloud's organization. The binding is driven by MQTT `method` calls on `thing/product/{gateway_sn}/requests` — specifically `config` (License parameters), `airport_bind_status`, `airport_organization_get`, and `airport_organization_bind`. The canonical sequence for the Dock case is `[Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/10.dock-access-to-cloud.md]`; the v1.15 Dock 3-specific counterpart is `[DJI_Cloud/DJI_CloudAPI-Dock3-DeviceManagement.txt]`. The corpus workflow is [`workflows/device-binding.md`](../workflows/) (Phase 9).
 2. **Per-request HTTPS auth.** After the Pilot Webview login, the cloud returns a token that Pilot carries on every subsequent HTTPS request as the `X-Auth-Token` header. Same header convention applies to any Dock-originated HTTPS call. Canonical header list: `[Cloud-API-Doc/docs/en/10.overview/40.basic-concept/40.https.md]`.
 
 TLS terms apply to both MQTT and HTTPS links:
@@ -208,7 +208,7 @@ State transitions are published on `sys/product/{gateway_sn}/status` (topology +
 
 - Not a schema reference. Envelopes, topic payloads, HTTP request/response bodies, and WebSocket message bodies are defined in the transport catalogs (Phase 2–5). Never duplicate them here.
 - Not a device catalog. Device `type`/`sub_type` enums for in-scope and older devices are canonical in [`device-properties/README.md`](../device-properties/) (Phase 6). Never list enums here.
-- Not a workflow reference. Binding, wayline execution, livestream, HMS, firmware, DRC, and other choreographies live in [`workflows/`](../workflows/) (Phase 11).
+- Not a workflow reference. Binding, wayline execution, livestream, HMS, firmware, DRC, and other choreographies live in [`workflows/`](../workflows/) (Phase 9).
 - Not a runtime behavior reference. State transitions, retry behavior, and error semantics attach to specific topics and endpoints and live in their respective catalog entries.
 
 ## 11. Source provenance summary

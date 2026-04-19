@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 2 — Transport protocol references (Phase 1 reviewed and closed 2026-04-18).
+**Current phase**: Phase 2 — Transport protocol references (three docs drafted 2026-04-18; review gate pending).
 
 ---
 
@@ -37,10 +37,11 @@ Cross-session source of truth. Update checkboxes as work completes. Before endin
 - Path-split subtrees land in Phase 4 (`mqtt/dock-to-cloud/` and `mqtt/pilot-to-cloud/`).
 
 Checklist:
-- [ ] `http/README.md` — URI form, `X-Auth-Token`, error envelope, pagination, common headers. Cite `[Cloud-API-Doc/docs/en/10.overview/40.basic-concept/40.https.md]` for the v1.11 canonical; cross-check against `DJI_Cloud/DJI_CloudAPI_Pilot-HTTPS-*.txt` for v1.15 endpoint conventions.
-- [ ] `mqtt/README.md` — topic taxonomy (`sys/` + `thing/`), message envelope (tid / bid / timestamp / gateway / data / method), `{device_sn}` vs `{gateway_sn}`, QoS, retain, request-reply, status lifecycle. Cite `[Cloud-API-Doc/docs/en/10.overview/40.basic-concept/20.mqtt.md]` + `DJI_Cloud/DJI_CloudAPI-TopicDefinitions.txt` + `DJI_CloudAPI-PilotToCloud-Topic-Definition.txt`.
-- [ ] `websocket/README.md` — handshake / session lifecycle / push message envelope. Cite `[Cloud-API-Doc/docs/en/10.overview/40.basic-concept/50.websocket.md]` + `DJI_Cloud/DJI_CloudAPI_Pilot-WebSocket-*.txt`.
-- [ ] Update corpus `README.md` TOC.
+- [x] `http/README.md` — URI form, `X-Auth-Token`, response envelope, pagination, status-code-to-Pilot behavior mapping. Cites `[Cloud-API-Doc/.../40.https.md]` canonical + `[DJI_Cloud/DJI_CloudAPI_Pilot-HTTPS-Waypoint-Obtain-Wayline-List.txt]` live v1.15 example.
+- [x] `mqtt/README.md` — topic taxonomy, `{device_sn}` vs `{gateway_sn}`, 13-topic list (verified identical across dock/pilot paths), envelope, per-family payload examples, request-reply, status lifecycle. Flags QoS/retain gap as OQ-003 and the pilot OSD copy-paste as OQ-002.
+- [x] `websocket/README.md` — Pilot-to-Cloud only; session lifecycle, envelope, 8 observed `biz_code` values in two families (map-elements, situation-awareness), push-and-fetch coordination pattern.
+- [x] Update corpus `README.md` TOC.
+- [x] Log OQ-003 (MQTT QoS / retain / clean-session not specified by DJI) in `OPEN-QUESTIONS.md`.
 - [ ] **Review gate**
 
 ## Phase 3 — HTTP endpoint catalog
@@ -80,40 +81,38 @@ Checklist:
 - [ ] Update corpus `README.md`
 - [ ] **Review gate**
 
-## Phase 7 — WPML
+## Phase 7 — Auxiliary specs (WPML + livestream protocols)
 
+WPML:
 - [ ] `wpml/overview.md`
 - [ ] `wpml/template-kml.md`
 - [ ] `wpml/waylines.md`
 - [ ] `wpml/common-elements.md`
-- [ ] Update corpus `README.md`
-- [ ] **Review gate**
 
-## Phase 8 — HMS codes
-
-- [ ] Inspect `DJI_Cloud/HMS.json` to determine natural category partition
-- [ ] Propose categories to user
-- [ ] Generate one `hms-codes/<category>.md` per category
-- [ ] Update corpus `README.md`
-- [ ] **Review gate**
-
-## Phase 9 — Livestream protocols
-
+Livestream protocols:
 - [ ] `livestream-protocols/rtmp.md`
 - [ ] `livestream-protocols/gb28181.md`
 - [ ] `livestream-protocols/webrtc.md`
 - [ ] `livestream-protocols/agora.md`
+
 - [ ] Update corpus `README.md`
 - [ ] **Review gate**
 
-## Phase 10 — Error codes
+## Phase 8 — Codes (HMS + error codes)
 
+HMS codes:
+- [ ] Inspect `DJI_Cloud/HMS.json` to determine natural category partition
+- [ ] Propose categories to user
+- [ ] Generate one `hms-codes/<category>.md` per category
+
+Error codes:
 - [ ] Catalog error codes from `DJI-Cloud-API-Demo/` error definitions + `Cloud-API-Doc/`
 - [ ] `error-codes/README.md` with grouped table
+
 - [ ] Update corpus `README.md`
 - [ ] **Review gate**
 
-## Phase 11 — Workflows
+## Phase 9 — Workflows
 
 Workflows are written once per choreography and call out dock-generation-specific variations inline (not a separate doc per dock generation, unless the divergence is large enough to warrant it).
 
@@ -131,8 +130,9 @@ Workflows are written once per choreography and call out dock-generation-specifi
 - [ ] Update corpus `README.md`
 - [ ] **Review gate**
 
-## Phase 12 — Device annexes
+## Phase 10 — Device annexes + final review
 
+Device annexes:
 - [ ] `device-annexes/dock2.md`
 - [ ] `device-annexes/dock3.md`
 - [ ] `device-annexes/m3d.md`
@@ -142,10 +142,8 @@ Workflows are written once per choreography and call out dock-generation-specifi
 - [ ] `device-annexes/rc-plus-2.md`
 - [ ] `device-annexes/rc-pro.md`
 - [ ] Update corpus `README.md`
-- [ ] **Review gate**
 
-## Phase 13 — Final review
-
+Final review pass (closing gate for the corpus):
 - [ ] Cross-link validation (every link resolves)
 - [ ] `README.md` up to date with every doc
 - [ ] `OPEN-QUESTIONS.md` — each entry either resolved or explicitly deferred

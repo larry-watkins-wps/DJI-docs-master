@@ -35,16 +35,16 @@ New docs are added to the table below as they land.
 | Area | Docs |
 |---|---|
 | `architecture/` | [`README.md`](architecture/README.md) — transports, device-edge-cloud model, thing model, topic taxonomy, in-scope topologies |
-| `http/` | *(pending Phase 2–3)* |
-| `mqtt/` | *(pending Phase 2 + 4)* |
-| `websocket/` | *(pending Phase 2 + 5)* |
+| `http/` | [`README.md`](http/README.md) — URI form, `X-Auth-Token`, response envelope, status-code behavior · *per-endpoint catalog pending Phase 3* |
+| `mqtt/` | [`README.md`](mqtt/README.md) — topic taxonomy, 13-topic list, envelope, per-family payloads, QoS gap (OQ-003) · *per-topic catalog pending Phase 4* |
+| `websocket/` | [`README.md`](websocket/README.md) — session lifecycle, envelope, v1.15 message families, push-and-fetch pattern · *per-message catalog pending Phase 5* |
 | `device-properties/` | *(pending Phase 6)* |
 | `wpml/` | *(pending Phase 7)* |
+| `livestream-protocols/` | *(pending Phase 7)* |
 | `hms-codes/` | *(pending Phase 8)* |
-| `livestream-protocols/` | *(pending Phase 9)* |
-| `error-codes/` | *(pending Phase 10)* |
-| `workflows/` | *(pending Phase 11)* |
-| `device-annexes/` | *(pending Phase 12)* |
+| `error-codes/` | *(pending Phase 8)* |
+| `workflows/` | *(pending Phase 9)* |
+| `device-annexes/` | *(pending Phase 10)* |
 
 ## Authoring rules (quick reference)
 
