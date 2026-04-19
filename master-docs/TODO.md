@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 4 — MQTT topic catalog (final sub-phase landing; sub-phases 4a + 4b + 4c + 4d landed 2026-04-18, sub-phases 4e-1 + 4e-2 + 4f + 4g + 4h + 4i landed 2026-04-19. Review gates 4a–4h closed; final Phase 4 review gate (4i) open).
+**Current phase**: Phase 5 — WebSocket message catalog (in progress; Phase 4 closed 2026-04-19).
 
 ---
 
@@ -212,7 +212,7 @@ Thin shells per family (not per device). One README per (path × family) — 6 R
 - [x] Update `mqtt/dock-to-cloud/README.md` + `mqtt/pilot-to-cloud/README.md` to link the new shells.
 - [x] Update `mqtt/README.md` + corpus `README.md` to cite the 4i landing.
 - [x] Append to `RESUME-NOTES.md` with a 4i close handoff entry.
-- [ ] **Final Phase 4 review gate**
+- [x] **Final Phase 4 review gate** closed 2026-04-19. Phase 4 content-complete.
 
 ## Phase 5 — WebSocket message catalog
 
