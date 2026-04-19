@@ -4,3 +4,5 @@
 - [Working style: methodical phased work](feedback_working_style.md) — phased execution, persistent TODO file, avoid context/quota exhaustion
 - [User scope boundary](user_scope_boundary.md) — user's professional role is not to influence scope of this work
 - [Real payloads only, no fabrication](feedback_real_payloads_only.md) — all wire examples must be verbatim from DJI source; invented content silently breaks both audits and implementations
+- [Single source of truth, no duplication](feedback_single_source_of_truth.md) — every fact lives in exactly one canonical location; other docs link; no summaries that can drift
+- [Mermaid for all diagrams](feedback_mermaid_for_diagrams.md) — chosen for plaintext grep/audit/render portability; use sequence/flowchart/state variants
