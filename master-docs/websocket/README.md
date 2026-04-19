@@ -2,7 +2,7 @@
 
 Conventions for every server-to-client WebSocket push between a DJI-Cloud-compatible server and DJI Pilot 2 (plus any web clients sharing Pilot's workspace context). This document is the canonical home for the WebSocket envelope and session lifecycle.
 
-Per-message catalog is Phase 5 under [`websocket/`](.).
+Per-message catalog is [`map-elements/`](map-elements/) and [`situation-awareness/`](situation-awareness/) — **Phase 5 landed** (8 push messages, pilot-to-cloud only). Jump table below in §4.
 
 ---
 
@@ -57,23 +57,23 @@ The in-repo v1.15 extract documents exactly two WebSocket message families. Per-
 
 Source: `[DJI_Cloud/DJI_CloudAPI_Pilot-WebSocket-Map-Elements-Push-Message.txt]`.
 
-| `biz_code` | Purpose |
-|---|---|
-| `map_element_create` | A map element was created. `data.resource.content` carries a GeoJSON Feature. |
-| `map_element_update` | A map element was updated. Same GeoJSON Feature shape as create. |
-| `map_element_delete` | A map element was deleted. `data` carries only `id` and `group_id`. |
-| `map_group_refresh` | Map group list should be refreshed. `data.ids` is an array of element IDs. |
+| `biz_code` | Doc | Purpose |
+|---|---|---|
+| `map_element_create` | [`map-elements/map_element_create.md`](map-elements/map_element_create.md) | A map element was created. `data.resource.content` carries a GeoJSON Feature. |
+| `map_element_update` | [`map-elements/map_element_update.md`](map-elements/map_element_update.md) | A map element was updated. Same GeoJSON Feature shape as create. |
+| `map_element_delete` | [`map-elements/map_element_delete.md`](map-elements/map_element_delete.md) | A map element was deleted. `data` carries only `id` and `group_id`. |
+| `map_group_refresh` | [`map-elements/map_group_refresh.md`](map-elements/map_group_refresh.md) | Batch-refresh signal: `data.ids` is an array of element IDs to re-fetch via HTTP `map/obtain`. |
 
 ### 4.2 Situation Awareness
 
 Source: `[DJI_Cloud/DJI_CloudAPI_Pilot-WebSocket-Situation-Awareness-Push-Message.txt]`.
 
-| `biz_code` | Purpose |
-|---|---|
-| `device_osd` | Fixed-frequency telemetry push for all devices in the workspace. `data.host` carries position / altitude / speed; `data.sn` carries the device SN. |
-| `device_online` | A workspace device came online. Pilot reacts by calling `Obtain Device Topology List` over HTTPS. |
-| `device_offline` | A workspace device went offline. Pilot reacts the same way. |
-| `device_update_topo` | The device topology changed. Pilot reacts the same way. |
+| `biz_code` | Doc | Purpose |
+|---|---|---|
+| `device_osd` | [`situation-awareness/device_osd.md`](situation-awareness/device_osd.md) | Fixed-frequency telemetry push for all devices in the workspace. `data.host` carries position / altitude / speed; `data.sn` carries the device SN. |
+| `device_online` | [`situation-awareness/device_online.md`](situation-awareness/device_online.md) | A workspace device came online. Pilot reacts by calling `Obtain Device Topology List` over HTTPS. |
+| `device_offline` | [`situation-awareness/device_offline.md`](situation-awareness/device_offline.md) | A workspace device went offline. Pilot reacts the same way. |
+| `device_update_topo` | [`situation-awareness/device_update_topo.md`](situation-awareness/device_update_topo.md) | The device topology changed. Pilot reacts the same way. |
 
 ## 5. Push-and-fetch coordination pattern
 

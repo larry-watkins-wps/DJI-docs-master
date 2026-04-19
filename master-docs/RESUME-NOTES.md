@@ -6,6 +6,77 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 5 close, ready for review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3, 4 complete and committed.
+- Phase 5 (WebSocket message catalog) **content-complete**. 8 push messages across two families — map-elements (4) + situation-awareness (4).
+- **Phase 5 review gate is the only remaining Phase 5 item.** Phase 6 (Device properties) is next.
+
+### What Phase 5 produced
+
+- `websocket/map-elements/` — 4 message docs: `map_element_create`, `map_element_update`, `map_element_delete`, `map_group_refresh`.
+- `websocket/situation-awareness/` — 4 message docs: `device_osd`, `device_online`, `device_offline`, `device_update_topo`.
+- `websocket/README.md` (Phase 2 doc) — extended §4 jump table with direct per-message doc links.
+- Corpus `README.md` updated with Phase 5 landing.
+- `TODO.md` Phase 5 section completed; only review gate remains.
+
+### Scope was smaller than original plan
+
+Phase 2's enumeration (which drafted the websocket/README.md) already surfaced the full 8-message inventory. Phase 5 did not discover additional `biz_code` values — the `sub_biz_code` possibility flagged in §3 of the README was checked during drafting and does not appear in any v1.15 sample. Per-message docs are straight instantiations of the Phase 2 inventory with payload tables + examples + cross-references to the MQTT / HTTP methods they coordinate with.
+
+### Filing convention
+
+- One file per message, filename verbatim after the `biz_code` (e.g., `map_element_create.md`) — consistent with Phase 4 method-doc naming.
+- Family dirs (`map-elements/`, `situation-awareness/`) mirror DJI's v1.11 canonical subtree structure.
+
+### DJI-source inconsistencies flagged during Phase 5 drafting
+
+- **`device_osd` example swaps latitude and longitude.** DJI's sample ships `"latitude": 113.44444, "longitude": 23.45656` — but 113.4° is a longitude (South China), not a latitude. Real wire follows the field names, not the values. Flagged inline in [`websocket/situation-awareness/device_osd.md`](websocket/situation-awareness/device_osd.md).
+
+Only one DJI bug in the whole phase — notably clean compared to the Phase 4 source inconsistency count. No new `OPEN-QUESTIONS.md` entries.
+
+### After Phase 5 review gate
+
+Phase 6 — Device properties — is the next major build. Sources were enumerated during 4i:
+
+- Dock 2: `DJI_CloudAPI-Dock2-Properties.txt`
+- Dock 3: `DJI_CloudAPI-Dock3-DeviceProperties.txt`
+- M3D/M3TD: `DJI_CloudAPI_M3D_M3DT_Properties.txt` + shared aircraft
+- M4D/M4TD: `DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt` + `DJI_CloudAPI_Matrice4-Enterprise-Properties.txt` + shared aircraft
+- Shared aircraft: `DJI_CloudAPI_Aircraft-Properties.txt`
+- RC Plus 2: `DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt` (625 lines)
+- RC Pro: `DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt` (68 lines)
+- v1.11 canonical: `Cloud-API-Doc/docs/en/60.api-reference/20.dock-to-cloud/00.mqtt/20.dock/10.dock2/00.properties.md` (dock-side) + `Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md` + `.../10.m3-series/00.properties.md` (pilot-side)
+
+Expected Phase 6 structure per PLAN.md:
+- Master matrix (property × device support, including out-of-scope rows for enum completeness).
+- Per-device doc: `device-properties/dock2.md`, `dock3.md`, `m3d.md`, `m3td.md`, `m4d.md`, `m4td.md`, `rc-plus-2.md`, `rc-pro.md`.
+- Resolution of [`OQ-001`](OPEN-QUESTIONS.md) (v1.11 vs v1.15 drift) happens here — per-property.
+- Phase 6 is substantial: the combined property sources likely total ~1500+ property entries across the 8 in-scope devices.
+
+The 4i property shells already point at Phase 6 per-device docs; Phase 6 fills in the content those shells point to.
+
+### Known gotchas for Phase 6
+
+- **Master matrix first.** Before writing per-device docs, enumerate every distinct property name across all sources and build the master matrix. Per-device docs are then filtered views of that matrix.
+- **Out-of-scope rows for enum completeness.** When a property has an enum that references devices outside scope (e.g., M30/M350 in a `compatible_device_type` enum), include the row but mark it out-of-scope rather than deleting it — complete enums matter for cloud implementations.
+- **Shared aircraft properties.** `DJI_CloudAPI_Aircraft-Properties.txt` is common across all in-scope aircraft. Handle by having per-aircraft docs inherit from a shared aircraft section, rather than re-listing every shared property on each of M3D/M3TD/M4D/M4TD.
+- **v1.11 vs v1.15 drift.** OQ-001 primarily affects Dock 2 enum values. Flag per-property drift inline and resolve by preferring v1.15 where the two versions disagree.
+
+Phase 6 is likely a multi-sub-drop phase similar to Phase 4 — consider structuring as 6a (master matrix + dock devices), 6b (aircraft), 6c (RCs) if context pressure is high.
+
+### Remaining phases
+
+- Phase 6 — Device properties (next).
+- Phase 7 — WPML + livestream protocols.
+- Phase 8 — HMS codes + error codes.
+- Phase 9 — Workflows.
+- Phase 10 — Device annexes + final review.
+
+---
+
 ## 2026-04-19 — handoff at Phase 4i close, ready for final Phase 4 review gate
 
 ### State of play

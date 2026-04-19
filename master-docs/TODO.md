@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 5 — WebSocket message catalog (in progress; Phase 4 closed 2026-04-19).
+**Current phase**: Phase 5 — WebSocket message catalog (landed 2026-04-19; review gate open). Phase 4 closed 2026-04-19.
 
 ---
 
@@ -216,9 +216,15 @@ Thin shells per family (not per device). One README per (path × family) — 6 R
 
 ## Phase 5 — WebSocket message catalog
 
-- [ ] Enumerate all push message types
-- [ ] One `.md` per message
-- [ ] Update corpus `README.md`
+Enumerated 8 push messages across two families from the v1.15 extracts (`DJI_CloudAPI_Pilot-WebSocket-Map-Elements-Push-Message.txt` + `DJI_CloudAPI_Pilot-WebSocket-Situation-Awareness-Push-Message.txt`) and verified against v1.11 canonical (`Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/20.websocket/`). No divergences between versions.
+
+- [x] Enumerate all push message types. 8 messages total: 4 map-elements + 4 situation-awareness.
+- [x] Write 8 per-message docs:
+  - `websocket/map-elements/` — `map_element_create.md`, `map_element_update.md`, `map_element_delete.md`, `map_group_refresh.md`.
+  - `websocket/situation-awareness/` — `device_osd.md`, `device_online.md`, `device_offline.md`, `device_update_topo.md`.
+- [x] Update `websocket/README.md` with per-message catalog links (jump table in §4).
+- [x] Update corpus `README.md`.
+- [x] Append to `RESUME-NOTES.md` with a Phase 5 close handoff.
 - [ ] **Review gate**
 
 ## Phase 6 — Device properties
