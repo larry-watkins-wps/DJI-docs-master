@@ -6,6 +6,85 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-20 — handoff at Phase 10 close, ready for final corpus review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 complete and committed. **Phase 10 (Device annexes + final corpus review) content-complete.**
+- Phase 9 review gate closed 2026-04-19 (commit `0633b7d`) before Phase 10 work began.
+- Phase 10 closing review gate is the only remaining corpus work. **Closing it also closes the whole corpus** — after that, Phase 2 (project-level, implementation spec / audit) is deferred per PLAN.md §Deferred and not started without explicit user approval.
+
+### What Phase 10 produced
+
+**8 per-device annex docs + 1 phase README** under [`device-annexes/`](device-annexes/README.md):
+
+- [`device-annexes/README.md`](device-annexes/README.md) — phase overview, annex layout template (6-section structure: Identity / Distinctive wire surface / Cohort asymmetries / Implementation gotchas / Features this device lacks / Cross-reference map + provenance), read-order guidance.
+- [`device-annexes/dock2.md`](device-annexes/dock2.md) — **Dock 2 gateway annex**. 48 properties / 3 writables / Agora livestream / 6 Dock-2-only DRC services (camera mode, linkage zoom, video+photo storage, interval photo, video resolution). Absent: Phase 4e-1 `rtk_calibration`, 28 Dock-3-only DRC (AI/PSDK/speaker/light/IR-night), 12 Phase 4g PSDK methods, in-flight wayline family. Source-defect enum labels (Chinese leftovers + duplicate `"Poor"` labels + malformed AC enum) flagged.
+- [`device-annexes/dock3.md`](device-annexes/dock3.md) — **Dock 3 gateway annex**. Property-superset of Dock 2 (adds `self_converge_coordinate` + 4-value `home_position_is_valid`). Method-superset across Phase 4e-1 (`rtk_calibration`), 4e-2 (28 DRC methods across camera night/denoise/night-vision, light control, speaker TTS, PSDK widgets, AI identify), 4g (8 PSDK services + 4 events), 4b (`in_flight_wayline_*`). Drops Agora. Drops 6 Dock-2-only DRC. Third-party `dji_cloud_dock3/` evidence noted as non-authoritative.
+- [`device-annexes/m3d.md`](device-annexes/m3d.md) — **M3D aircraft annex**. Dual-path reporting (Dock 2 vs RC Pro). 42 dock-path + 42 pilot-path (baseline verbatim — no M3-specific extensions). 6 writables dock-path: obstacle/height/night-lights/watermark/commander/RTH/distance-limit. Pilot-path writables inherited baseline-only. No `commander_*` pilot writables (M4D-only). No WPML megaphone/searchlight.
+- [`device-annexes/m3td.md`](device-annexes/m3td.md) — **M3TD thermal annex**. Property-level duplicate of M3D; thermal distinction via `»payload_index` enum + `{type-subtype-gimbalindex}` dynamic struct key. H30T-class thermal payload primary. IR metering + thermal gimbal control via same DRC methods. Livestream `ir`/`infrared` video types. HMS `0x14`/`0x1C` prefixes richer than non-thermal M3D.
+- [`device-annexes/m4d.md`](device-annexes/m4d.md) — **M4D aircraft annex**. Dock-path identical-shape to M3D + 2 cohort deltas (`mode_code` max `21`, RTH power text). Pilot-path delta-spec: **7 M4D-specific extensions** (`offline_map_enable`, `current_rth_mode`, `rth_mode`, `commander_flight_height` **rw**, `commander_flight_mode` **rw**, `current_commander_flight_mode` read-back, `commander_mode_lost_action` **rw**) + 6 override drift. Pilot-path extract is delta-only — baseline inherited. WPML megaphone + searchlight. Gateway-determined livestream (Agora via RC Plus 2 only).
+- [`device-annexes/m4td.md`](device-annexes/m4td.md) — **M4TD thermal annex**. Property-level duplicate of M4D. Dock-3-only thermal DRC methods available (`drc_camera_night_vision_enable`, `drc_camera_denoise_level_set`, `drc_camera_photo_format_set`) that M3TD lacks. Retains WPML megaphone + searchlight.
+- [`device-annexes/rc-plus-2.md`](device-annexes/rc-plus-2.md) — **RC Plus 2 Enterprise annex**. 93/94 pilot-to-cloud methods. 20 pilot-specific `drc_*` camera/IR/gimbal variants on `/drc/down` (DRC-envelope lightweight). POI surface (mode enter/exit, speed set, status notify) — RC-Plus-2-only. `fly_to_point` / `takeoff_to_point` / `return_home_*` pilot-path services — RC-Plus-2-only. `stick_control` / `drone_emergency_stop` — RC-Plus-2-only. `drc_state` OSD property. All 4 livestream protocols (only gateway with 4). DRC 2.0 commander writes target aircraft SN via standard `/property/set` (not `/drc/down`).
+- [`device-annexes/rc-pro.md`](device-annexes/rc-pro.md) — **RC Pro Enterprise annex**. ~50 pilot-to-cloud methods (narrower surface). 23 non-prefixed `camera_*` / `ir_metering_*` / `gimbal_reset` services on standard `/services` — **RC-Pro-only** among RCs (dock-canonical pattern). No POI, no stick, no pilot-initiated FlyTo/RTH. `country` OSD. No WebRTC. v1.11 → v1.15 drift adds `cloud_control_auth` state property.
+
+**Corpus updates**:
+
+- [`README.md`](README.md) — TOC row filled in for `device-annexes/` with 8 entries; `_build/` row added (internal tooling — Phase 8 catalog generators).
+- [`TODO.md`](TODO.md) — Phase 10 checklist fully checked with doc-level scope callouts; final review gate item unchecked; current-phase banner advanced to "Phase 10 landed, final review gate pending — closes corpus".
+- `OPEN-QUESTIONS.md` — **no new entries.** Phase 10 triangulates existing Phase 4 / 6 / 7 / 8 / 9 content; ambiguity would have surfaced in those phases.
+
+### Design decisions locked at Phase 10 drafting
+
+These decisions close the corpus; no further phases carry forward:
+
+1. **Annex template is 6 sections** — Identity / Distinctive wire surface / Cohort asymmetries / Implementation gotchas / Features this device lacks / Cross-reference map + provenance. "Features this device lacks" is the load-bearing section for implementers — saves them hunting for absent surface.
+2. **Thermal variants (M3TD / M4TD) are thin "see base" docs** — 3 sections of delta content (payload identity + thermal-specific camera surface + HMS coverage + livestream video types) then pointer to the base. Avoided duplicating M3D / M4D content.
+3. **RC annexes explicitly enumerate method participation vs exclusion**, because the cohort split between RC Plus 2 (DRC-prefixed `/drc/down`) and RC Pro (dock-canonical `/services`) is the single most-missed wire fact for cloud implementers targeting both RCs. Each annex §1 tables the inclusions + §"Features this device lacks" tables the exclusions.
+4. **Annex cross-linking is to Phase 4 / 6 / 7 / 8 / 9 docs, not to other annexes** — except where the thermal variants (M3TD / M4TD) point at their non-thermal siblings for the base catalog. Aligns with "annexes triangulate, don't restate."
+5. **Source-authority note in the annex README** restates the [OQ-001 resolution](OPEN-QUESTIONS.md#oq-001--source-version-mismatch-between-cloud-api-doc-v1113-and-dji_cloud-v115) (v1.15 primary for every claim) and declares `dji_cloud_dock3/` non-authoritative. Single citation; individual annexes don't re-litigate.
+6. **Gotchas section is drawn from Phase 6 "DJI-source inconsistencies" + Phase 4 per-method quirks** — filtered to items that materially affect cloud implementation (parse-by-code vs parse-by-label, type drift across paths, envelope differences, enum label drift between cohorts). Cosmetic-only quirks (label wording, whitespace) were excluded.
+
+### DJI-source inconsistencies noted during Phase 10
+
+Already flagged in upstream phases; re-surfaced in annexes with implementation context. None rise to new OQ level:
+
+- `{_{type-subtype-gimbalindex}__aembLbhPpc}` garbled struct-name on M4D / M4TD extract — authoritative key is literal `{type-subtype-gimbalindex}`.
+- Dock-path vs pilot-path type drift on position coordinates (`double` vs `float`) — cloud implementations must normalize.
+- `position_state.quality` enum extension (dock-path RTK-fixed code `10`) absent from pilot-path.
+- DRC camera aperture label form (`"F2.2"` Dock 2 vs `"F2_2"` Dock 3).
+- `live_start_push` Dock 3 example uses `url_type: 0` (enum-invalid — copy-paste defect).
+- Source copy-paste of aircraft-side wording into RC `wireless_link` descriptions.
+- v1.11 → v1.15 RC Pro drift adds `cloud_control_auth` state property.
+
+### Final review pass results
+
+Ran independent cross-check (Agent subagent) over the 9 device-annex files + corpus README + OPEN-QUESTIONS.md:
+
+- **Broken relative links**: zero.
+- **README TOC completeness**: all user-facing directories present; added `_build/` row (internal tooling — Phase 8 generators).
+- **OQ status**: OQ-001/003/004/005 resolved; OQ-002 remains open (DJI-side documentation bug; cannot close from the corpus side). Expected state matches.
+- **Provenance spot-check**: every primary `DJI_Cloud/*.txt` source cited in annex "Primary sources" exists on disk.
+- **Duplicate / orphan scan**: duplicate basenames are all semantically meaningful (README.md per dir, service/event method-name pairs per DJI convention, per-device property + annex file pairs). No orphan docs.
+
+### Remaining project-level work after Phase 10
+
+- **Phase 2 (project-level)** — implementation spec for a DJI-Cloud-compatible server, OR an audit of an existing implementation. **Deferred and not started without explicit user approval** per PLAN.md §Deferred. Decided after corpus completion.
+
+### What "corpus-complete" looks like
+
+After the final Phase 10 review gate closes:
+- 11 workflow docs (Phase 9) cross-link to 197 dock-to-cloud methods + 94 pilot-to-cloud methods + 16 HTTP endpoints + 8 WebSocket push messages (Phase 3/4/5).
+- 8 per-device property catalogs (Phase 6) + 8 per-device annexes (Phase 10) covering all in-scope DJI devices.
+- 4 WPML schema docs (Phase 7) + 4 livestream-protocol docs (Phase 7).
+- 1,769 HMS alarm codes + 448 general API error codes (Phase 8), regenerable via [`_build/`](_build/) generator pipeline.
+- 3 transport-protocol reference docs (Phase 2 HTTP / MQTT / WebSocket) + 1 architecture overview (Phase 1).
+- 5 OPEN-QUESTIONS entries (4 resolved + 1 open on DJI-side bug).
+
+Total: ~350 curated docs across the corpus.
+
+---
+
 ## 2026-04-19 — handoff at Phase 9c close, ready for final Phase 9 review gate
 
 ### State of play

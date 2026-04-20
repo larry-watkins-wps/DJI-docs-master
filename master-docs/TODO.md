@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 9 complete 2026-04-19 (9c review gate closed, closing Phase 9 overall). Phase 10 (device annexes + final review) is current.
+**Current phase**: Phase 10 device annexes landed 2026-04-20; final review pass complete. Phase 10 closing review gate pending user approval — closes the full corpus.
 
 ---
 
@@ -355,23 +355,26 @@ Authoritative workflow narrative comes from `Cloud-API-Doc/` v1.11 feature-set p
 
 ## Phase 10 — Device annexes + final review
 
+**Scope decision (2026-04-20):** single-drop phase. Annexes are triangulation / summarization of earlier phases (per-device deltas, quirks, "features this device lacks"), not new primary research. Each ~200-400 lines with a consistent 6-section layout (identity / distinctive wire surface / cohort asymmetries / implementation gotchas / features-lacking / cross-ref map + provenance). Annexes cross-link Phase 4 / 6 / 7 / 8 / 9 without restating schema.
+
 Device annexes:
-- [ ] `device-annexes/dock2.md`
-- [ ] `device-annexes/dock3.md`
-- [ ] `device-annexes/m3d.md`
-- [ ] `device-annexes/m3td.md`
-- [ ] `device-annexes/m4d.md`
-- [ ] `device-annexes/m4td.md`
-- [ ] `device-annexes/rc-plus-2.md`
-- [ ] `device-annexes/rc-pro.md`
-- [ ] Update corpus `README.md`
+- [x] [`device-annexes/README.md`](device-annexes/README.md) — phase index + layout template.
+- [x] [`device-annexes/dock2.md`](device-annexes/dock2.md) — Dock 2 gateway annex. 6 Dock-2-only DRC services, absent Phase 4e-1 `rtk_calibration` + 28 Dock-3-only DRC + 12 Phase 4g PSDK methods; Agora livestream preserved; source-defect enum labels.
+- [x] [`device-annexes/dock3.md`](device-annexes/dock3.md) — Dock 3 gateway annex. `self_converge_coordinate` + AI identify / PSDK / speaker / light / IR-night DRC surface (28 methods) + Phase 4g PSDK (12 methods) + `rtk_calibration` + `in_flight_wayline_*`; no Agora; third-party `dji_cloud_dock3/` evidence noted as non-authoritative.
+- [x] [`device-annexes/m3d.md`](device-annexes/m3d.md) — M3D aircraft annex. Dual-path (Dock 2 vs RC Pro) reporting; 6 dock-path writables; no M4D-style pilot-path extensions; WPML generic action catalog; gateway-determined livestream set.
+- [x] [`device-annexes/m3td.md`](device-annexes/m3td.md) — M3TD thermal annex. Property-level duplicate of M3D; thermal distinction via `payload_index` + `{type-subtype-gimbalindex}` key; IR metering + thermal gimbal surface; livestream `ir`/`infrared` video types.
+- [x] [`device-annexes/m4d.md`](device-annexes/m4d.md) — M4D aircraft annex. Pilot-path adds 7 M4D-specific extensions (DRC 2.0 commander trio + `offline_map_enable` + RTH-mode surface + `current_commander_flight_mode` read-back); pilot-path extract is delta-only, baseline inherited; WPML megaphone + searchlight; gateway-determined livestream set (Agora via RC Plus 2, not Dock 3).
+- [x] [`device-annexes/m4td.md`](device-annexes/m4td.md) — M4TD thermal annex. Property-level duplicate of M4D; Dock-3-only thermal DRC methods (`drc_camera_night_vision_enable`, `drc_camera_denoise_level_set`, `drc_camera_photo_format_set`); WPML megaphone + searchlight retained.
+- [x] [`device-annexes/rc-plus-2.md`](device-annexes/rc-plus-2.md) — RC Plus 2 Enterprise annex. 93/94 pilot-to-cloud methods; 20 pilot-specific `drc_*` camera/IR/gimbal variants on `/drc/down`; POI mode + pilot-stick + `fly_to_point` pilot-path services; `drc_state` OSD; all 4 livestream protocols (only gateway with 4); DRC 2.0 commander writes target aircraft SN.
+- [x] [`device-annexes/rc-pro.md`](device-annexes/rc-pro.md) — RC Pro Enterprise annex. 23 non-prefixed camera / IR / gimbal services on `/services` (RC-Pro-only); narrower pilot-path surface — no POI / stick / FlyTo / pilot-initiated RTH; `country` OSD; no WebRTC; v1.11 → v1.15 drift adds `cloud_control_auth`.
+- [x] Update corpus [`README.md`](README.md) with Phase 10 `device-annexes/` row.
 
 Final review pass (closing gate for the corpus):
-- [ ] Cross-link validation (every link resolves)
-- [ ] `README.md` up to date with every doc
-- [ ] `OPEN-QUESTIONS.md` — each entry either resolved or explicitly deferred
-- [ ] Spot-check provenance citations
-- [ ] **Final review gate with user**
+- [x] Cross-link validation — all links reviewed during authoring; relative paths verified.
+- [x] [`README.md`](README.md) up to date — every doc listed in the TOC.
+- [x] [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) — OQ-001, OQ-003, OQ-004, OQ-005 resolved; OQ-002 remains open (DJI-side documentation bug; cannot close from the corpus side) — flagged in the affected Phase 6c shells and in the RC-related annexes.
+- [x] Spot-check provenance citations — sampled `DJI_Cloud/` and `Cloud-API-Doc/` paths in each annex; all resolve to files present in the repo.
+- [ ] **Final review gate with user** — closes corpus.
 
 ---
 
