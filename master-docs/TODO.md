@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 6 content-complete 2026-04-19. Final Phase 6 review gate closed. Phase 7 (WPML + livestream protocols) is current.
+**Current phase**: Phase 7 content-complete 2026-04-19. Phase 7 review gate pending user approval. Phase 8 (HMS codes + error codes) is next.
 
 ---
 
@@ -278,20 +278,25 @@ Actual shape confirmed 2026-04-19: each RC carries 11 top-level properties (6 OS
 
 ## Phase 7 — Auxiliary specs (WPML + livestream protocols)
 
+Single-drop phase (no sub-phases). All 4 WPML files + 4 livestream-protocol files delivered together in one review gate, matching the PLAN.md Phase 7 intent.
+
 WPML:
-- [ ] `wpml/overview.md`
-- [ ] `wpml/template-kml.md`
-- [ ] `wpml/waylines.md`
-- [ ] `wpml/common-elements.md`
+- [x] [`wpml/overview.md`](wpml/overview.md) — format intro, `.kmz` archive layout, device-support conventions, labeling inconsistency (M4E/M4T vs M4D/M4TD), existing-route upgrade note.
+- [x] [`wpml/template-kml.md`](wpml/template-kml.md) — `template.kml` catalog. Covers create info + mission config + 4 template types (`waypoint` / `mapping2d` / `mapping3d` / `mappingStrip`) + waypoint info + coordinate params + overlap rates + mapping heading param. 5 DJI-source inconsistencies flagged.
+- [x] [`wpml/waylines.md`](wpml/waylines.md) — `waylines.wpml` catalog. Covers mission config + wayline Folder + waypoint Placemark + `executeHeightMode` vs template `heightMode` distinction + `startActionGroup`. Cross-links to `common-elements.md` for shared structs.
+- [x] [`wpml/common-elements.md`](wpml/common-elements.md) — shared schemas. Covers `<wpml:droneInfo>` / `<wpml:payloadInfo>` / `<wpml:payloadParam>` / heading & turn params / `<wpml:autoRerouteInfo>` (new-gen only) / action chain + **16 actuator functions** with full parameter tables. Includes M4D/M4TD-only `megaphone` + `searchlight` actions. 9 DJI-source inconsistencies flagged (enum completeness, typos, translation artifacts including Chinese char in `megaphoneOperateLoop` label).
+- [x] [`wpml/README.md`](wpml/README.md) — path-level index.
 
 Livestream protocols:
-- [ ] `livestream-protocols/rtmp.md`
-- [ ] `livestream-protocols/gb28181.md`
-- [ ] `livestream-protocols/webrtc.md`
-- [ ] `livestream-protocols/agora.md`
+- [x] [`livestream-protocols/rtmp.md`](livestream-protocols/rtmp.md) — `url_type 1`. All 4 in-scope cohorts. URL shape `rtmp://host:port/app/stream`. Cloud-side requirement: RTMP ingest server (nginx-rtmp, SRS, commercial).
+- [x] [`livestream-protocols/gb28181.md`](livestream-protocols/gb28181.md) — `url_type 3`. All 4 in-scope cohorts. URL shape: 7 kv pairs amp-joined. SIP registration + PS-over-RTP media. Cloud-side requirement: GB28181 SIP server + 20-digit ID allocation.
+- [x] [`livestream-protocols/webrtc.md`](livestream-protocols/webrtc.md) — `url_type 4` / WHIP only. **Not on RC Pro.** URL shape: HTTP endpoint `http://host:port/{whip-path}?app=...&stream=...`. Cloud-side requirement: WHIP ingest + STUN/TURN.
+- [x] [`livestream-protocols/agora.md`](livestream-protocols/agora.md) — `url_type 0`. **Not on Dock 3.** URL shape: `channel=...&sn=...&token=...&uid=...`. URL-encoding-once rule for `+` in tokens flagged. Cloud-side requirement: Agora App ID + App Certificate + viewer subscriber / Cloud Recording.
+- [x] [`livestream-protocols/README.md`](livestream-protocols/README.md) — path-level index with cross-cohort protocol matrix + JSBridge `type` enum cross-transport context note.
 
-- [ ] Update corpus `README.md`
-- [ ] **Review gate**
+- [x] Update corpus [`README.md`](README.md).
+- [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md).
+- [ ] **Review gate** — pending user approval 2026-04-19.
 
 ## Phase 8 — Codes (HMS + error codes)
 

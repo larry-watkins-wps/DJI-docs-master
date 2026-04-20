@@ -6,6 +6,100 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 7 close, ready for review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3, 4, 5, 6 complete and committed. **Phase 7 (WPML + livestream protocols) content-complete.**
+- Phase 7 review gate is the only remaining Phase 7 item.
+- **Phase 8 (HMS codes + error codes) is next** after the review gate.
+
+### What Phase 7 produced
+
+Phase 7 was a **single-drop phase** per PLAN.md's intent — no sub-phases. All 10 files delivered in one pass across two new top-level directories.
+
+**WPML** (wayline file format, 5 files):
+
+- [`wpml/overview.md`](wpml/overview.md) — WPML format intro. `.kmz` ZIP archive containing `template.kml` + `waylines.wpml` + `res/`. Namespace `xmlns:wpml="http://www.dji.com/wpmz/1.0.2"` (note: `wpmz` not `wpml` in the URL). Device-support conventions — WPML labels the M4 Enterprise cohort `M4E/M4T` with no separate M4D/M4TD row; the corpus treats that label as including in-scope M4D/M4TD (see §4.1). Existing-route change note (M300 RTK re-save in DJI Pilot 2 for format upgrade).
+- [`wpml/template-kml.md`](wpml/template-kml.md) — `template.kml` full catalog. Create info + mission config + 4 template types:
+  - `waypoint` — discrete waypoint flight; each `<Placemark>` is a concrete waypoint.
+  - `mapping2d` — 2D area mapping (survey polygon + overlap + grid pattern).
+  - `mapping3d` — 3D oblique photography. **Produces 5 executable waylines** (1 orthophoto + 4 oblique) → 5 `<Folder>` elements in `waylines.wpml`.
+  - `mappingStrip` — strip/linear flight (LineString + lateral extension).
+  Plus coordinate params + overlap rate + mapping heading param sections. 5 DJI-source inconsistencies flagged.
+- [`wpml/waylines.md`](wpml/waylines.md) — `waylines.wpml` catalog. Mission config + `<Folder>`-per-wayline + `<Placemark>`-per-waypoint + `wpml:executeHeightMode` vs template's `wpml:heightMode` distinction + optional `wpml:startActionGroup` (M30/M30T/M3-series/M4E family only; runs before wayline starts + on recovery from interruption).
+- [`wpml/common-elements.md`](wpml/common-elements.md) — the **largest Phase 7 doc**. Shared schemas (`droneInfo`, `payloadInfo`, `payloadParam`, `waypointHeadingParam` + `globalWaypointHeadingParam`, `waypointTurnParam`, `autoRerouteInfo` — the latter **M3D/M3TD + M4E/M4T only**, two-bool `missionAutoRerouteMode` + `transitionalAutoRerouteMode`), action chain (`actionGroup` → `actionTrigger` → `action`), and **16 actuator function parameter schemas**. Two actuator functions are explicitly **M4D/M4TD-labeled in DJI source** (not M4E/M4T): `megaphone` (plays Opus audio from `/wpmz/res/audio/`) and `searchlight` (off / illuminate / flash + brightness). 9 DJI-source inconsistencies flagged including: `actionActuatorFunc` enum lists 13 values but source documents 16 actuators; `focusY` description copy-pasted from `focusX`; `followBadArc` path-mode value reads as translation artifact; `megaphoneOperateLoop` label starts with Chinese character `是`; `accurateCameraApertue` / `orientedCameraApertue` DJI-typo (field must be sent with `Apertue` spelling); `payloadLensIndex` value `visable` DJI-typo; `accurateShoot` deprecated in favor of `orientedShoot`.
+- [`wpml/README.md`](wpml/README.md) — path-level index with scope + doc jumplinks + related-doc pointers.
+
+**Livestream protocols** (media-transport wire refs, 5 files):
+
+- [`livestream-protocols/rtmp.md`](livestream-protocols/rtmp.md) — `url_type 1`. **All 4 in-scope cohorts.** URL shape `rtmp://host:port/app/stream`. Only protocol supported by every cohort; implement RTMP first for broadest coverage. Notes on RTMP variants (RTMPT / RTMPS / RTMPE) — DJI does not document support.
+- [`livestream-protocols/gb28181.md`](livestream-protocols/gb28181.md) — `url_type 3`. **All 4 in-scope cohorts.** URL shape: `serverIP=…&serverPort=…&serverID=…&agentID=…&agentPassword=…&localPort=…&channel=…` (7 amp-joined kv pairs, not a URI). 20-digit GB28181 IDs. Describes SIP register → catalog → invite → PS-over-RTP media flow. Cloud must allocate valid 20-digit agent IDs.
+- [`livestream-protocols/webrtc.md`](livestream-protocols/webrtc.md) — `url_type 4` / **WHIP only** per DJI explicit note. **Dock 2 + Dock 3 + RC Plus 2 — not RC Pro.** URL shape: `http://host:port/{whip-path}?app=…&stream=…`. DJI example path `/rtc/v1/whip/` matches SRS WHIP. Notes on STUN/TURN for NAT traversal. WHIP handshake flow described (POST SDP offer, 201 Created with SDP answer, ICE/DTLS/SRTP).
+- [`livestream-protocols/agora.md`](livestream-protocols/agora.md) — `url_type 0`. **Dock 2 + RC Plus 2 + RC Pro — not Dock 3.** URL shape: `channel=…&sn=…&token=…&uid=…`. DJI's **URL-encode-exactly-once** rule for tokens containing `+` / `/` / `=` explicitly called out. Cloud must have Agora App ID + App Certificate and mint short-lived RTC tokens server-side. DJI's own DJI FlightHub historically used Agora — it's the default / historical option, not third-party.
+- [`livestream-protocols/README.md`](livestream-protocols/README.md) — overall index with cohort×protocol matrix + JSBridge `type` enum cross-transport context note (JSBridge `{0: Unknown, 1: Agora, 2: RTMP, 3: RTSP, 4: GB28181}` ≠ MQTT `url_type {0: Agora, 1: RTMP, 3: GB28181, 4: WebRTC}`; a cloud operating a Pilot webview must translate and must not forward JSBridge RTSP to MQTT).
+
+**Corpus updates**:
+
+- [`README.md`](README.md) — TOC rows filled in for `wpml/` and `livestream-protocols/`.
+- [`TODO.md`](TODO.md) — Phase 7 checklist fully checked with drop-down details; "current phase" banner advanced to "Phase 7 content-complete, review gate pending; Phase 8 next".
+- `OPEN-QUESTIONS.md` — **no new entries.** All Phase 7 DJI-source inconsistencies are local source defects (typos, incomplete enums, translation artifacts) that don't require DJI clarification.
+
+### Design decisions locked at Phase 7 drafting
+
+Carried into Phase 8 / 9 / 10 where relevant:
+
+1. **Single-drop phase** — no sub-phase split despite 10 files + ~2,500 lines of output. PLAN.md describes Phase 7 as "two self-contained spec references merged into one phase" and that framing held through drafting. No resume-mid-phase checkpoint was needed.
+2. **`wpml/` = 1:1 doc mapping from 4 source files + README.** Exactly mirrors DJI's own page structure (Overview / Template-KML / Waylines / Common-Elements) so cross-refs back to DJI's developer site remain trivial. The large Common-Elements doc was the right call — 16 actuator functions in one place is more usable than 16 separate files.
+3. **WPML "M4E/M4T" = in-scope M4D/M4TD** — carried throughout per [`overview.md §4.1`](wpml/overview.md#41-labeling-inconsistency--m4em4t-vs-m4dm4td). Exception: DJI explicitly labels `megaphone` and `searchlight` actuator functions as `M4D/M4TD` (not M4E/M4T), which [`common-elements.md §5.15 / §5.16`](wpml/common-elements.md#515-megaphone) preserves. This is DJI's distinction and the corpus mirrors it faithfully.
+4. **Livestream protocols = per-protocol wire contract docs, not protocol compendium.** Each doc captures the DJI `url` shape + device support + what the cloud must host, and links out to external specs (Adobe RTMP PDF, GB/T 28181 overview, WHIP draft, Agora docs). We do **not** restate RTMP / GB28181 / WebRTC / Agora externally — those are stable, well-documented standards.
+5. **RC Pro has no WebRTC; Dock 3 has no Agora.** These cohort asymmetries are the sharpest live-stream integration gotchas. Flagged in each affected doc's device-support table and cross-referenced back to the Phase 4d [`live_start_push.md`](mqtt/dock-to-cloud/services/live_start_push.md) doc (which already documented the Dock 3 enum drop and the v1.15 example's residual-Agora-URL copy-paste defect).
+6. **JSBridge cross-transport note in livestream-protocols/README.md** — Phase 7 is the right home for the JSBridge `type` vs MQTT `url_type` enum mismatch. JSBridge is pilot-app-only and the corpus treats MQTT as primary; a separate docs branch for JSBridge was considered and rejected.
+
+### DJI-source inconsistencies noted during Phase 7
+
+Carry into Phase 9 workflow authoring; none rise to OQ level:
+
+**WPML**:
+
+- Overview file-structure illustration is missing from v1.15 extract.
+- Template-KML: `wpml:imageFormat` intro row lacks explicit required-cell; `heightMode` value `WGS84` has verbose DJI prose; `gimbalPitchAngle` in mapping2d context has empty Type column; `stripUseTemplateAltitude` uses "opened"/"enabled" interchangeably in translated prose; `quickOrthoMappingEnable` labeled M4E only (unclear if M4D/M4TD inherits).
+- Waylines file: none beyond source inconsistencies already in common-elements.
+- Common-Elements: `actionActuatorFunc` enum description lists 13 of 16 actuators; `focusY` description is a copy-paste of `focusX`; `followBadArc` path-mode value reads as translation artifact; `megaphoneOperateLoop` label starts with Chinese `是`; `accurateCameraApertue` / `orientedCameraApertue` — DJI field-name typo, must send exactly as-is; `payloadLensIndex` value `visable` is a typo for `visible`; `panoShot` cohort lists inconsistent (M30-only fields + M30/M3D/M4 others); `accurateShoot` deprecated but still in enum; WPML namespace `1.0.2` stable across samples.
+
+**Livestream protocols**:
+
+- Dock 3 example payload in [`live_start_push.md`](mqtt/dock-to-cloud/services/live_start_push.md) uses `url_type: 0` despite Dock 3 dropping Agora — already flagged in the Phase 4d doc.
+- v1.11 prose for pilot-feature-set mentioned RTSP; v1.15 MQTT `url_type` does not expose RTSP; JSBridge `type=3` does expose RTSP. Cross-transport enum mismatch documented in [`livestream-protocols/README.md §3`](livestream-protocols/README.md#3-pilot-side-jsbridge-layer-cross-transport-context).
+- All v1.15 livestream sources (Dock 2, Dock 3, RC Plus 2, RC Pro, plain RC) diverge on `url_type` enum population per cohort but agree on what each value means.
+
+No new OQ entries.
+
+### Phase 7 completion summary
+
+| Doc | Lines | Scope |
+|---|---|---|
+| [`wpml/overview.md`](wpml/overview.md) | ~110 | format intro + archive layout + device support |
+| [`wpml/template-kml.md`](wpml/template-kml.md) | ~250 | template file catalog, 4 template types |
+| [`wpml/waylines.md`](wpml/waylines.md) | ~200 | execution file catalog |
+| [`wpml/common-elements.md`](wpml/common-elements.md) | ~460 | shared schemas + 16 actuator functions |
+| [`wpml/README.md`](wpml/README.md) | ~40 | index |
+| [`livestream-protocols/README.md`](livestream-protocols/README.md) | ~80 | protocol matrix + JSBridge note |
+| [`livestream-protocols/rtmp.md`](livestream-protocols/rtmp.md) | ~130 | `url_type 1`, all devices |
+| [`livestream-protocols/gb28181.md`](livestream-protocols/gb28181.md) | ~150 | `url_type 3`, all devices |
+| [`livestream-protocols/webrtc.md`](livestream-protocols/webrtc.md) | ~140 | `url_type 4`, not RC Pro |
+| [`livestream-protocols/agora.md`](livestream-protocols/agora.md) | ~160 | `url_type 0`, not Dock 3 |
+
+Total Phase 7 output: **10 files**, roughly **1,720 lines** of markdown.
+
+### Remaining phases after Phase 7
+
+- Phase 8 — HMS codes + error codes. Sources: `DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt` (full code list), `DJI_Cloud/HMS.json` (structured data), `DJI_Cloud/DJI_CloudAPI-HMS.txt` (overview), `DJI-Cloud-API-Demo/` error definitions, `Cloud-API-Doc/` error-code page. First step: inspect `HMS.json` structure to determine natural category partition and propose to user before drafting.
+- Phase 9 — Workflows. Dependency: Phases 3–5 transport catalogs (done). Phase 7 wayline docs are now available to cite for `workflows/wayline-upload-and-execution.md`, and the livestream-protocols docs feed `workflows/livestream-start-stop.md`.
+- Phase 10 — Device annexes + final corpus review.
+
+---
+
 ## 2026-04-19 — Phase 6 wrap-up: v1.15-only policy locked + OQ-003 resolved + TODO.md reconciled
 
 Brief housekeeping entry closing out the Phase 6 session. No new corpus content. Picked up after the `docs: close Phase 6 review gate` commit (`f4e9de4`).
