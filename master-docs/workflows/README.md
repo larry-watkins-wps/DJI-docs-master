@@ -19,7 +19,7 @@ Phase 9 is sub-phased to keep each drop reviewable in isolation. Every sub-phase
 |---|---|---|---|
 | **9a** | Lifecycle | bootstrap-pairing, device-binding, firmware+config | **Landed 2026-04-19, review gate closed** |
 | **9b** | Missions & operations | wayline upload+execution, live flight / DRC, livestream start/stop | **Landed 2026-04-19, review gate closed** |
-| **9c** | Events, media & handoff | HMS event reporting, FlySafe + CFA sync, AirSense, media upload, RC handoff | **Landed 2026-04-19** |
+| **9c** | Events, media & handoff | HMS event reporting, FlySafe + CFA sync, AirSense, media upload, RC handoff | **Landed 2026-04-19, review gate closed** |
 
 ## Catalog
 

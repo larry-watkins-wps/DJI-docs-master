@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 9c landed 2026-04-19, review gate pending. Phase 10 (device annexes + final review) next.
+**Current phase**: Phase 9 complete 2026-04-19 (9c review gate closed, closing Phase 9 overall). Phase 10 (device annexes + final review) is current.
 
 ---
 
@@ -351,7 +351,7 @@ Authoritative workflow narrative comes from `Cloud-API-Doc/` v1.11 feature-set p
 - [x] Update [`workflows/README.md`](workflows/README.md) with 9c catalog + sub-phase status.
 - [x] Update corpus [`README.md`](README.md) with 9c entries.
 - [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md) with 9c close handoff.
-- [ ] **Final Phase 9 review gate**.
+- [x] **Final Phase 9 review gate** closed 2026-04-19 (user: "9c review is complete"). Landing commit `6ceefda` (Phase 9c — events, media & handoff: HMS + FlySafe/CFA + AirSense + media + RC handoff). Closes the whole Phase 9.
 
 ## Phase 10 — Device annexes + final review
 
