@@ -6,6 +6,78 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 9c close, ready for final Phase 9 review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3, 4, 5, 6, 7, 8, 9a, 9b complete and committed. **Phase 9c (Events, media & handoff) content-complete.**
+- Phase 9b review gate closed 2026-04-19 (commit `14914eb`) before 9c work began.
+- Phase 9c review gate is the only remaining 9c item. Closing it also closes the full Phase 9.
+- **Phase 10 (Device annexes + final corpus review) is next** after the review gate.
+
+### What Phase 9c produced
+
+**5 workflow docs** added to [`workflows/`](workflows/README.md):
+
+- [`workflows/hms-event-reporting.md`](workflows/hms-event-reporting.md) — single-sequence diagram for the HMS event cycle: on-device detection → batched full-snapshot push via [`events/hms`](mqtt/dock-to-cloud/events/hms.md) → cloud-side Copy Key splicing → placeholder substitution → snapshot diff. Covers all three splicing variants (`dock_tip_{code}` for dock alarms, `fpv_tip_{code}` for airframe on-ground, `fpv_tip_{code}_in_the_sky` for airframe in flight) and the six placeholder substitution rules (`%alarmid` / `%component_index` / `%sensor_index` / `%battery_index` / `%dock_cover_index` / `%charging_rod_index` with the `+1` off-by-one on index forms). Cross-refs Phase 8 [`hms-codes/`](hms-codes/README.md) (curated 1,769-alarm catalog) and DJI's CDN-hosted runtime `hms.json`. Dock 2 + Dock 3 — pilot-path does not emit `hms`.
+- [`workflows/flysafe-custom-flight-area-sync.md`](workflows/flysafe-custom-flight-area-sync.md) — dual-diagram (FlySafe + CFA). **FlySafe**: [`unlock_license_list`](mqtt/dock-to-cloud/services/unlock_license_list.md) discovery (with `consistence` flag) → [`unlock_license_update`](mqtt/dock-to-cloud/services/unlock_license_update.md) refresh (online empty-body vs offline KMZ-with-MD5 modes) → [`unlock_license_switch`](mqtt/dock-to-cloud/services/unlock_license_switch.md) individual toggles. All 7 unlock types documented (authorization zone / circle / country / altitude / polygon / power / RID). `begin_time` / `end_time` called out as second-level timestamps. **CFA**: [`flight_areas_update`](mqtt/dock-to-cloud/services/flight_areas_update.md) trigger → dock pulls [`flight_areas_get`](mqtt/dock-to-cloud/requests/flight_areas_get.md) file manifest with SHA-256 checksums → download + verify → push to aircraft → [`flight_areas_sync_progress`](mqtt/dock-to-cloud/events/flight_areas_sync_progress.md) with 5 statuses (`wait_sync` / `synchronizing` / `synchronized` / `fail` / `switch_fail`) and 13-value `reason` failure enum → steady-state [`flight_areas_drone_location`](mqtt/dock-to-cloud/events/flight_areas_drone_location.md) telemetry. File-naming constraint (`geofence_{fileMD5}.json`). Dock 2 + Dock 3.
+- [`workflows/airsense-events.md`](workflows/airsense-events.md) — single-sequence diagram for ADS-B traffic warning: crewed aircraft ADS-B Out → aircraft AirSense receiver → classify to 5-level severity → push [`airsense_warning`](mqtt/dock-to-cloud/events/airsense_warning.md) as `data`-as-array (unusual shape for this corpus) with `need_reply: 1`. Levels ≥3 triggering onboard avoidance documented. Snapshot-diff semantics by `icao`. Altitude-type (`0` ellipsoidal vs `1` MSL) interpretation for cloud-side vertical separation math. M3D / M3TD / M4D / M4TD (AirSense-equipped) only.
+- [`workflows/media-upload-from-dock.md`](workflows/media-upload-from-dock.md) — dual-diagram (dock-MQTT path + pilot-HTTPS path). **Dock**: [`storage_config_get`](mqtt/dock-to-cloud/requests/storage_config_get.md) (`module: 0`) STS → direct OSS/S3/MinIO PUT → [`file_upload_callback`](mqtt/dock-to-cloud/events/file_upload_callback.md) per file + optional [`upload_flighttask_media_prioritize`](mqtt/dock-to-cloud/services/upload_flighttask_media_prioritize.md) cloud-initiated / [`highest_priority_upload_flighttask_media`](mqtt/dock-to-cloud/events/highest_priority_upload_flighttask_media.md) dock-emitted queue prioritization. **Pilot**: JSBridge `platformLoadComponent("MediaLibrary")` preload → [`/files/tiny-fingerprints`](http/media/tiny-fingerprint.md) bulk probe → per-file [`/fast-upload`](http/media/fast-upload.md) (fingerprint hit → skip; miss → full flow) → [`/sts`](http/storage/sts-credential.md) → direct storage PUT → [`/upload-callback`](http/media/upload-callback.md) → end-of-task [`/group-upload-callback`](http/media/group-upload-callback.md). PPK / RTCM / SRT-embedded-in-MP4 handling. `tinny_fingerprint` DJI spelling preserved. `flight_task` v1.11-optional-v1.15-dropped documented. All cohorts.
+- [`workflows/remote-control-handoff.md`](workflows/remote-control-handoff.md) — pilot-path consent-gated authority (distinct from dock-path unilateral grab). Single sequence diagram with alt-branches for accept / reject / supersession and handoff-back modes. [`cloud_control_auth_request`](mqtt/pilot-to-cloud/services/cloud_control_auth_request.md) (`services_reply: 0` = pop-up shown, NOT accepted — common misread) → pilot consent → [`cloud_control_auth_notify`](mqtt/pilot-to-cloud/events/cloud_control_auth_notify.md) with `output.status ∈ {ok, failed, canceled}` (`need_reply: 0`, atypical) → state push (`cloud_control_auth` v1.15 array of `string` per Phase 6c / `is_cloud_control_auth` v1.11 boolean narrative) → session → [`cloud_control_release`](mqtt/pilot-to-cloud/services/cloud_control_release.md) cloud-initiated or pilot grab-back (state flips back, no reply event). Pilot-path single-authority (no flight/payload split) explicitly called out. RC Plus 2 + RC Pro.
+
+**Corpus updates**:
+
+- [`workflows/README.md`](workflows/README.md) — 9c sub-phase marked landed; 9c catalog table links 5 docs with per-doc scope summaries; sub-phase roadmap rows all three show landed (9a + 9b + 9c).
+- [`README.md`](README.md) — corpus TOC workflows row extended with 9c entries.
+- [`TODO.md`](TODO.md) — 9c checklist fully checked with doc-level scope callouts; final Phase 9 review gate unchecked; current-phase banner advanced to "9c landed, review gate pending; Phase 10 next".
+- `OPEN-QUESTIONS.md` — **no new entries.** No DJI-source defects encountered during 9c authoring rose to OQ level. Several cosmetic / label-casing / timestamp-width issues carried forward inline in each doc's "DJI source quirks" section.
+
+### Design decisions locked at 9c drafting
+
+Carried forward into Phase 10:
+
+1. **Snapshot diff pattern is the corpus's recurring event idiom.** HMS, AirSense, and (to a lesser extent) FlySafe license lists all push the full current set, with disappearance from the set being the "cleared" signal. CFA `flight_areas_drone_location` inverts this (per-area distance push — cumulative). Cloud implementations should expect snapshot-diff as the default and be ready to age out stale entries rather than wait for explicit clears.
+2. **Single-diagram sufficient for events-and-pushes workflows.** All 5 docs use 1–2 Mermaid sequences. Simpler than 9b's 3-diagram wayline / 2-diagram DRC / 3-diagram livestream because 9c workflows have simpler variants to express. Kept the 9b pattern where dual-path workflows (media-upload) get one diagram per path.
+3. **Pilot-path HTTP + JSBridge preload citation pattern established.** Media-upload doc demonstrates the full pilot-HTTPS flow with JSBridge module preload at step 0. This pattern applies to future pilot-path docs (Phase 10 annexes may reference). It contrasts with the dock-path MQTT-only pattern used for most of Phase 9.
+4. **Consent-vs-grab distinction for authority workflows.** Pilot-path consent is asynchronous (pop-up + `_notify`) and has three possible outcomes (ok / failed / canceled). Dock-path grab is synchronous (single services_reply). Having both docs — 9b's DRC + 9c's RC handoff — side by side makes the contrast explicit. The two are cross-linked.
+5. **`need_reply: 0` on `cloud_control_auth_notify` is a deliberate quirk worth calling out.** Most events in 4f / 4h families set `need_reply: 1`; `_notify` is the exception. Documented in the workflow doc's "Variants" section for implementer awareness.
+6. **Error path tables reference BC modules only where applicable.** HMS has no BC module (event-only); AirSense same (event-only); FlySafe/CFA none (per-method services_reply + sync_progress.reason enum); media-upload none (transport-layer errors, no dedicated BC module); RC handoff uses BC module `514` (`ControlErrorCodeEnum`) for authority failures after consent granted. Kept the per-workflow error-path tables cohesive rather than inventing mappings.
+7. **Provenance lists include a "no Cloud-API-Doc feature-set equivalent" note where applicable.** AirSense + FlySafe have no dedicated v1.11 feature-set prose (only method references under `60.api-reference/`). The workflow narrative is synthesized from wire schema + observed behaviour. Noted in each affected doc's Provenance section.
+
+### DJI-source inconsistencies noted during 9c
+
+Carry into Phase 10; none rise to OQ level:
+
+- **`tinny_fingerprint` spelling** — already flagged in Phase 3 media endpoints; reiterated in [`media-upload-from-dock.md`](workflows/media-upload-from-dock.md) because cloud implementers copying from the wire must match it exactly.
+- **`cloud_control_auth_notify` reply `output.status` echo** — DJI's example includes `output: { status: "ok" }` on the services_reply for both `cloud_control_auth_request` and `cloud_control_release`, but neither is in the schema table. Treat `result` as authoritative. Previously flagged in Phase 4h; re-surfaced in [`remote-control-handoff.md`](workflows/remote-control-handoff.md).
+- **v1.11 `is_cloud_control_auth` boolean vs v1.15 `cloud_control_auth` array** — v1.11 pilot-DRC feature-set page uses the boolean form; Phase 6c confirms v1.15 adds the array form to RC state. Treated as complementary representations; array form is wire-authoritative on current firmware.
+- **Dock 3 `hms` example `"timestamp:"` trailing-colon typo** — already flagged in Phase 4f [`events/hms.md`](mqtt/dock-to-cloud/events/hms.md); reiterated for implementer awareness.
+- **`flight_areas_drone_location` Dock 3 schema table drops `area_id`** but example carries it — already flagged in Phase 4f.
+- **`flight_areas_sync_progress` success example sends `reason: 0`** (not in documented enum range `1`–`13`) — treat as "no error" informational; authoritative outcome is `status`.
+- **AirSense `data` is an array, not struct** — non-standard for the corpus. Cloud parser must handle.
+- **Pervasive 14-digit timestamp typo** in v1.15 AirSense / CFA / HMS examples — 13-digit epoch-ms is canonical; flagged inline.
+
+### Handoff to Phase 10
+
+**Phase 10 scope** (per [PLAN.md Phase 10](PLAN.md)):
+
+- Device annexes — 8 per-device docs under `device-annexes/`: [`dock2.md`](device-annexes/dock2.md), [`dock3.md`](device-annexes/dock3.md), [`m3d.md`](device-annexes/m3d.md), [`m3td.md`](device-annexes/m3td.md), [`m4d.md`](device-annexes/m4d.md), [`m4td.md`](device-annexes/m4td.md), [`rc-plus-2.md`](device-annexes/rc-plus-2.md), [`rc-pro.md`](device-annexes/rc-pro.md). Cover per-device deltas, quirks, and anything that differs meaningfully across cohorts. Should reference (not duplicate) Phase 6 property files + Phase 4 per-method docs + Phase 9 workflow docs.
+- Final review pass — cross-link validation, README consistency, [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) resolution / explicit deferral, provenance spot-check.
+
+**Sources for Phase 10 annexes**:
+
+- [`dji_cloud_dock3/`](../dji_cloud_dock3/) — non-authoritative but relevant Dock-3-specific evidence for the Dock 3 annex.
+- Phase 6 per-device files already carry the authoritative property-surface info; annexes layer in quirks (e.g. "Dock 3 drops Agora from livestream `url_type`", "M4D-only writable properties for DRC 2.0 commander_flight_height", "RC Pro has no WebRTC, no `drc_state` OSD property").
+- Workflow docs flagged device-specific divergences inline (DRC 2.0, payload authority split, JSBridge availability) — annexes aggregate these.
+
+**Estimated Phase 10 output**: 8 device-annex docs + final-review cross-link sweep. Annexes are summarization / triangulation, not new primary research. Typical per-doc length ~200–400 lines. Final review is a checklist walk, not net-new writing.
+
+### Remaining phases after Phase 9
+
+- Phase 10 — Device annexes + final corpus review. After closing, the corpus is content-complete. Phase 2 at project level (implementation spec or audit of an existing implementation) is **deferred and not started without explicit user approval** per PLAN.md §Deferred.
+
+---
+
 ## 2026-04-19 — handoff at Phase 9b close, ready for review gate
 
 ### State of play

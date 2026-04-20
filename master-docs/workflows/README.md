@@ -17,9 +17,9 @@ Phase 9 is sub-phased to keep each drop reviewable in isolation. Every sub-phase
 
 | Sub-phase | Theme | Docs | Status |
 |---|---|---|---|
-| **9a** | Lifecycle | bootstrap-pairing, device-binding, firmware+config | **Landed 2026-04-19** |
+| **9a** | Lifecycle | bootstrap-pairing, device-binding, firmware+config | **Landed 2026-04-19, review gate closed** |
 | **9b** | Missions & operations | wayline upload+execution, live flight / DRC, livestream start/stop | **Landed 2026-04-19, review gate closed** |
-| 9c | Events, media & handoff | HMS event reporting, FlySafe + CFA sync, AirSense, media upload, RC handoff | pending |
+| **9c** | Events, media & handoff | HMS event reporting, FlySafe + CFA sync, AirSense, media upload, RC handoff | **Landed 2026-04-19** |
 
 ## Catalog
 
@@ -39,15 +39,15 @@ Phase 9 is sub-phased to keep each drop reviewable in isolation. Every sub-phase
 | [`live-flight-controls-drc.md`](live-flight-controls-drc.md) | Authority-grab (`flight_authority_grab`, `payload_authority_grab`) + `drc_mode_enter` → stick / drone-control DRC stream + heartbeat + HSI/OSD/delay push. Dock DRC (Phase 4c + 4e-2) and pilot DRC (Phase 4h). DRC 2.0 commander_flight_height semantics. |
 | [`livestream-start-stop.md`](livestream-start-stop.md) | `live_start_push` / `live_stop_push` per protocol (RTMP / GB28181 / WebRTC / Agora), mid-stream quality / lens / camera changes, pilot-side JSBridge coordination. Cohort × protocol matrix. Cross-references Phase 7 livestream-protocols docs. |
 
-### Sub-phase 9c — Events, media & handoff (pending)
+### Sub-phase 9c — Events, media & handoff (landed)
 
-| Doc | Planned scope |
+| Doc | Scope |
 |---|---|
-| `hms-event-reporting.md` | `hms` event emission (Phase 4f) + code lookup via Phase 8 hms-codes/. |
-| `flysafe-custom-flight-area-sync.md` | License switch / update / list (`unlock_license_*`) + CFA area download (`flight_areas_get` + `flight_areas_update`) + sync progress events. |
-| `airsense-events.md` | `airsense_warning` event — ADS-B traffic alerting. |
-| `media-upload-from-dock.md` | `file_upload_callback` + `storage_config_get` + Pilot-HTTPS media endpoints + STS credential handshake. |
-| `remote-control-handoff.md` | RC Plus 2 + RC Pro `cloud_control_auth_request` / `cloud_control_auth_notify` / `cloud_control_release`. |
+| [`hms-event-reporting.md`](hms-event-reporting.md) | `hms` event push (Phase 4f) — full-set snapshot semantics, up to 20 alarms per event, Copy Key splicing (`dock_tip_{code}` / `fpv_tip_{code}[_in_the_sky]`), placeholder substitution (`%alarmid` / `%component_index` / `%sensor_index` / `%battery_index` / `%dock_cover_index` / `%charging_rod_index`), lookup into Phase 8 [`hms-codes/`](../hms-codes/README.md). Dock 2 + Dock 3. |
+| [`flysafe-custom-flight-area-sync.md`](flysafe-custom-flight-area-sync.md) | **FlySafe**: [`unlock_license_list`](../mqtt/dock-to-cloud/services/unlock_license_list.md) / [`_update`](../mqtt/dock-to-cloud/services/unlock_license_update.md) / [`_switch`](../mqtt/dock-to-cloud/services/unlock_license_switch.md) + 7 unlock types (authorization zone / circle / country / altitude / polygon / power / RID) + online vs offline update modes. **CFA**: [`flight_areas_update`](../mqtt/dock-to-cloud/services/flight_areas_update.md) (trigger) → [`flight_areas_get`](../mqtt/dock-to-cloud/requests/flight_areas_get.md) (manifest) → [`flight_areas_sync_progress`](../mqtt/dock-to-cloud/events/flight_areas_sync_progress.md) (five states, 13 failure reasons) → [`flight_areas_drone_location`](../mqtt/dock-to-cloud/events/flight_areas_drone_location.md) (continuous telemetry). Dock 2 + Dock 3. |
+| [`airsense-events.md`](airsense-events.md) | [`airsense_warning`](../mqtt/dock-to-cloud/events/airsense_warning.md) ADS-B proximity warning — 5-level severity (≥3 triggers onboard avoidance), full-snapshot push, `data`-as-array shape, 14-digit timestamp source typo. M3D / M3TD / M4D / M4TD (AirSense-equipped). |
+| [`media-upload-from-dock.md`](media-upload-from-dock.md) | Dual-diagram — **Dock path**: [`storage_config_get`](../mqtt/dock-to-cloud/requests/storage_config_get.md) (`module: 0`) → direct OSS/S3/MinIO PUT → [`file_upload_callback`](../mqtt/dock-to-cloud/events/file_upload_callback.md) + optional prioritization ([`upload_flighttask_media_prioritize`](../mqtt/dock-to-cloud/services/upload_flighttask_media_prioritize.md) / [`highest_priority_upload_flighttask_media`](../mqtt/dock-to-cloud/events/highest_priority_upload_flighttask_media.md)). **Pilot path**: JSBridge preload → [`tiny-fingerprint`](../http/media/tiny-fingerprint.md) → [`fast-upload`](../http/media/fast-upload.md) → [`sts-credential`](../http/storage/sts-credential.md) → [`upload-callback`](../http/media/upload-callback.md) → [`group-upload-callback`](../http/media/group-upload-callback.md). All cohorts. |
+| [`remote-control-handoff.md`](remote-control-handoff.md) | Pilot-path consent-gated authority — [`cloud_control_auth_request`](../mqtt/pilot-to-cloud/services/cloud_control_auth_request.md) (pop-up) → [`cloud_control_auth_notify`](../mqtt/pilot-to-cloud/events/cloud_control_auth_notify.md) (`ok` / `failed` / `canceled`) → `cloud_control_auth` state push (v1.15 array form / v1.11 `is_cloud_control_auth` narrative) → session → [`cloud_control_release`](../mqtt/pilot-to-cloud/services/cloud_control_release.md) or pilot grab-back. RC Plus 2 + RC Pro. |
 
 ## Authoring rules
 

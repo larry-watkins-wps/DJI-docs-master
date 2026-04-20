@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 9b review gate closed 2026-04-19. Phase 9c (events + media + handoff) is current.
+**Current phase**: Phase 9c landed 2026-04-19, review gate pending. Phase 10 (device annexes + final review) next.
 
 ---
 
@@ -343,11 +343,14 @@ Authoritative workflow narrative comes from `Cloud-API-Doc/` v1.11 feature-set p
 
 ### Sub-phase 9c — Events, media & handoff
 
-- [ ] `workflows/hms-event-reporting.md` — `hms` event emission (Phase 4f) + code lookup via Phase 8 [`hms-codes/`](hms-codes/README.md).
-- [ ] `workflows/flysafe-custom-flight-area-sync.md` — `unlock_license_switch`/`update`/`list` + `flight_areas_get` / `flight_areas_update` + `flight_areas_drone_location` + `flight_areas_sync_progress`.
-- [ ] `workflows/airsense-events.md` — `airsense_warning` (Phase 4f).
-- [ ] `workflows/media-upload-from-dock.md` — `file_upload_callback` (Phase 4d) + `storage_config_get` + Phase 3 media + storage endpoints + STS credential handshake.
-- [ ] `workflows/remote-control-handoff.md` — RC Plus 2 + RC Pro `cloud_control_auth_request` / `cloud_control_auth_notify` / `cloud_control_release` (Phase 4h) + DRC cross-ref.
+- [x] [`workflows/hms-event-reporting.md`](workflows/hms-event-reporting.md) — full-snapshot `hms` event push (Phase 4f `events/hms.md`) + Copy Key splicing (`dock_tip_{code}` / `fpv_tip_{code}[_in_the_sky]`) + placeholder substitution rules (`%alarmid` / `%component_index` / `%sensor_index` / `%battery_index` / `%dock_cover_index` / `%charging_rod_index`) + `hms.json` runtime dictionary cross-ref + snapshot-diff UI semantics. Dock 2 + Dock 3.
+- [x] [`workflows/flysafe-custom-flight-area-sync.md`](workflows/flysafe-custom-flight-area-sync.md) — two Mermaid sequences (FlySafe + CFA). **FlySafe**: `unlock_license_list` (7 unlock types: authorization zone / circle / country / altitude / polygon / power / RID) + `unlock_license_update` (online empty-body vs offline file-push modes) + `unlock_license_switch`. **CFA**: `flight_areas_update` → `flight_areas_get` → download + SHA-256 verify → `flight_areas_sync_progress` (5 statuses × 13 failure reasons) → in-flight `flight_areas_drone_location` telemetry. File-naming constraint (`geofence_{fileMD5}.json`). Dock 2 + Dock 3.
+- [x] [`workflows/airsense-events.md`](workflows/airsense-events.md) — `airsense_warning` (Phase 4f) with 5-level severity (≥3 triggers onboard avoidance), `need_reply: 1`, `data`-as-array shape, snapshot-diff semantics by `icao`. Altitude-type (`0` ellipsoidal vs `1` MSL) interpretation. M3D / M3TD / M4D / M4TD (AirSense-equipped only). Pervasive 14-digit-timestamp source typo carried forward.
+- [x] [`workflows/media-upload-from-dock.md`](workflows/media-upload-from-dock.md) — dual-path (dock-MQTT + pilot-HTTPS) with two full Mermaid sequences. **Dock**: `storage_config_get` (`module: 0`) → direct storage PUT → `file_upload_callback` + optional `upload_flighttask_media_prioritize` / `highest_priority_upload_flighttask_media`. **Pilot**: JSBridge preload → `/files/tiny-fingerprints` → `/fast-upload` → `/sts` → storage PUT → `/upload-callback` → `/group-upload-callback`. PPK / RTCM / SRT-embedded-in-MP4 handling. `tinny_fingerprint` DJI-spelling preserved. `flight_task` struct v1.11-vs-v1.15 divergence.
+- [x] [`workflows/remote-control-handoff.md`](workflows/remote-control-handoff.md) — pilot-path consent-gated authority (distinct from dock-path's unilateral authority-grab). `cloud_control_auth_request` (pop-up) → `services_reply: 0` (pop-up shown, not answer) → `cloud_control_auth_notify` (`need_reply: 0`) with `output.status: {ok, failed, canceled}` → state push (`cloud_control_auth` v1.15 array form / `is_cloud_control_auth` v1.11 narrative form) → session → `cloud_control_release` or pilot-initiated grab-back. Supersession scenario + wording drift between RC Pro / RC Plus 2 sources + undocumented `output.status` in reply example. RC Plus 2 + RC Pro.
+- [x] Update [`workflows/README.md`](workflows/README.md) with 9c catalog + sub-phase status.
+- [x] Update corpus [`README.md`](README.md) with 9c entries.
+- [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md) with 9c close handoff.
 - [ ] **Final Phase 9 review gate**.
 
 ## Phase 10 — Device annexes + final review
