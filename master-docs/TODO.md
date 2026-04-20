@@ -262,7 +262,7 @@ Each sub-phase has its own review gate. Design decisions locked at 6a kickoff (2
 - [x] Update 4i dock-to-cloud + pilot-to-cloud shells (`osd/`, `state/`, `property-set/`) to link the real Phase 6b docs.
 - [x] Update corpus `README.md`.
 - [x] Append to `RESUME-NOTES.md`.
-- [ ] **Review gate 6b**
+- [x] **Review gate 6b** closed 2026-04-19. Landing commit `defcbb3` (5 new device-properties docs + master matrix §4.2 + 6 shell updates + session handoff).
 
 ### Sub-phase 6c — RC properties (RC Plus 2 Enterprise, RC Pro Enterprise)
 
