@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 8 content-complete 2026-04-19. Review gate pending. Phase 9 (Workflows) is next.
+**Current phase**: Phase 8 closed 2026-04-19. Phase 9 (Workflows) is next.
 
 ---
 
@@ -314,7 +314,7 @@ Error codes:
 
 - [x] Update corpus [`README.md`](README.md).
 - [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md).
-- [ ] **Review gate**
+- [x] **Review gate** closed 2026-04-19. Landing commit `70d87c1` (Phase 8 — HMS codes + error codes, 17 files + generator pipeline, 2,217 codes).
 
 ## Phase 9 — Workflows
 
