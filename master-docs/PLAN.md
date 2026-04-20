@@ -1,7 +1,7 @@
 # DJI Cloud Docs Corpus — Plan
 
-**Status**: Phase 1 closed 2026-04-18. Phase 2 (transport protocol references) is current.
-**Last updated**: 2026-04-18.
+**Status**: **Corpus complete 2026-04-20.** All 10 phases closed. Project-level Phase 2 (implementation spec or audit) remains deferred per §Deferred until explicit user approval.
+**Last updated**: 2026-04-20.
 
 ## Objective
 

@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 10 device annexes landed 2026-04-20; final review pass complete. Phase 10 closing review gate pending user approval — closes the full corpus.
+**Current phase**: **Corpus complete 2026-04-20.** Phase 10 closed (final review gate approved). No further corpus work scheduled. Project-level Phase 2 (implementation spec or audit) remains deferred per PLAN.md §Deferred until explicit user approval.
 
 ---
 
@@ -374,7 +374,7 @@ Final review pass (closing gate for the corpus):
 - [x] [`README.md`](README.md) up to date — every doc listed in the TOC.
 - [x] [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) — OQ-001, OQ-003, OQ-004, OQ-005 resolved; OQ-002 remains open (DJI-side documentation bug; cannot close from the corpus side) — flagged in the affected Phase 6c shells and in the RC-related annexes.
 - [x] Spot-check provenance citations — sampled `DJI_Cloud/` and `Cloud-API-Doc/` paths in each annex; all resolve to files present in the repo.
-- [ ] **Final review gate with user** — closes corpus.
+- [x] **Final review gate with user** closed 2026-04-20 (user: "Reviewed, and close"). Corpus content-complete. Landing commit for Phase 10: `22b3826` (Phase 10 — device annexes + final corpus review).
 
 ---
 
