@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 9b (missions & operations) landed 2026-04-19; review gate pending. Phase 9c (events + media + handoff) is next.
+**Current phase**: Phase 9b review gate closed 2026-04-19. Phase 9c (events + media + handoff) is current.
 
 ---
 
@@ -339,7 +339,7 @@ Authoritative workflow narrative comes from `Cloud-API-Doc/` v1.11 feature-set p
 - [x] Update [`workflows/README.md`](workflows/README.md) with 9b catalog + sub-phase status.
 - [x] Update corpus [`README.md`](README.md) with 9b entries.
 - [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md) with 9b close handoff.
-- [ ] **Review gate 9b** — pending.
+- [x] **Review gate 9b** closed 2026-04-19 (user: "Reviewed and approved"). Landing commit `5a25a99` (Phase 9b — missions & operations: wayline + DRC + livestream).
 
 ### Sub-phase 9c — Events, media & handoff
 
