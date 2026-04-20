@@ -46,15 +46,86 @@ sequenceDiagram
     participant oss as Object Storage
 
     pilot ->> pilot: author + save wayline locally
-    pilot ->> cloud: GET /wayline/api/v1/workspaces/{workspace_id}/waylines/duplicate-names<br/>(check for name collision)
-    cloud -->> pilot: 200 — names checked
-    pilot ->> cloud: POST /storage/api/v1/workspaces/{workspace_id}/sts<br/>(obtain STS credential)
-    cloud -->> pilot: credential + object key
-    pilot ->> oss: PUT KMZ using STS credential
-    oss -->> pilot: 200
-    pilot ->> cloud: POST /wayline/api/v1/workspaces/{workspace_id}/upload-callback<br/>(report upload result)
-    cloud -->> pilot: 200
+    pilot ->> cloud: GET /wayline/.../waylines/duplicate-names   [A]
+    cloud -->> pilot: 200   [A-reply]
+    pilot ->> cloud: POST /storage/.../sts   [B]
+    cloud -->> pilot: 200   [B-reply]
+    pilot ->> oss: PUT {object_key_prefix}/… (STS-signed)
+    oss -->> pilot: 200 OK
+    pilot ->> cloud: POST /wayline/.../upload-callback   [C]
+    cloud -->> pilot: 200   [C-reply]
     note over pilot,cloud: Wayline now discoverable via<br/>GET /wayline/api/v1/workspaces/{workspace_id}/waylines
+```
+
+Payloads (verbatim from Phase 3 HTTP endpoint docs — DJI source):
+
+**[A]** — `GET /wayline/api/v1/workspaces/{workspace_id}/waylines/duplicate-names` — query parameter `name` is a repeated string of candidate wayline file names. Request body: none.
+
+**[A-reply]** — `200 OK`:
+
+```json
+{
+  "code": 0,
+  "message": "string",
+  "data": ["name1", "name2"]
+}
+```
+
+`data` returns the **subset already present** in the workspace — the pilot warns or auto-suffixes collisions before proceeding.
+
+**[B]** — `POST /storage/api/v1/workspaces/{workspace_id}/sts` — request body is empty (endpoint requires only `x-auth-token`).
+
+**[B-reply]** — `200 OK`:
+
+```json
+{
+  "code": 0,
+  "data": {
+    "bucket": "string",
+    "credentials": {
+      "access_key_id": "STS.NUBdKtVadL1U8aBJ2TH6PWoYo",
+      "access_key_secret": "9NG2P2yJaUrck576CkdRoRbchKssJiZygi5D93CBsduY",
+      "expire": 3600,
+      "security_token": "CAIS8AN1q6Ft5B2yfSjIr5b3L/HAu75F+/O+OkfzrjIBRLl8uKryjTz2IHhOenBhB..."
+    },
+    "endpoint": "https://oss-cn-hangzhou.aliyuncs.com",
+    "object_key_prefix": "5a6f9d4b-2a38-4b4b-86f9-3a678da0bf4a",
+    "provider": "ali",
+    "region": "cn-hangzhou"
+  },
+  "message": "success"
+}
+```
+
+- `provider` — `ali` / `aws` (waypoint-section schema). Media-section schema also lists `minio`.
+- `credentials.expire` — TTL in seconds.
+- `object_key_prefix` — the client prepends this to every PUT key.
+
+**[C]** — `POST /wayline/api/v1/workspaces/{workspace_id}/upload-callback` request body (`wayline.UploadCallbackInput`):
+
+```json
+{
+  "metadata": {
+    "drone_model_key": "string",
+    "payload_model_keys": ["string"],
+    "template_types": [0]
+  },
+  "name": "string",
+  "object_key": "string"
+}
+```
+
+- `object_key` — required. The key returned after the direct PUT to object storage.
+- `metadata.drone_model_key` / `payload_model_keys` — enum values documented in [`device-properties/`](../device-properties/README.md).
+
+**[C-reply]** — `200 OK`:
+
+```json
+{
+  "code": 0,
+  "data": {},
+  "message": "success"
+}
 ```
 
 ### Immediate / timed task (MQTT)
@@ -70,34 +141,274 @@ sequenceDiagram
         note over aircraft,cloud: Cloud defers dispatch until 24h before execute_time
     end
 
-    cloud ->> dock: thing/product/{gateway_sn}/services<br/>method: flighttask_prepare<br/>{ flight_id, task_type, file: { url, fingerprint }, ... }
+    cloud ->> dock: services / flighttask_prepare   [A]
     dock ->> dock: download KMZ, validate MD5
-    dock -->> cloud: services_reply<br/>{ result: 0 }
+    dock -->> cloud: services_reply { result: 0 }
 
     alt task_type=1 and execute_time > now + 2min
         note over aircraft,cloud: Wait until 2min before execute_time
     end
     note over aircraft,dock: Dock boots aircraft, acquires GNSS, uploads waypoints
 
-    cloud ->> dock: services<br/>method: flighttask_execute<br/>{ flight_id }
-    dock -->> cloud: services_reply<br/>{ result: 0 }
+    cloud ->> dock: services / flighttask_execute   [B]
+    dock -->> cloud: services_reply { result: 0 }
     aircraft ->> aircraft: mission executes
 
     opt Dock needs resource re-fetch
-        dock ->> cloud: requests<br/>method: flighttask_resource_get<br/>{ flight_id }
-        cloud -->> dock: requests_reply<br/>{ file: { url, fingerprint } }
+        dock ->> cloud: requests / flighttask_resource_get   [C]
+        cloud -->> dock: requests_reply / flighttask_resource_get   [C-reply]
     end
 
     loop Mission in progress
-        dock ->> cloud: events<br/>method: flighttask_progress<br/>{ output: { progress, status, track, ext: { break_point } } }
+        dock ->> cloud: events / flighttask_progress   [D]
         cloud -->> dock: events_reply { result: 0 }
     end
 
     opt Cloud cancels mid-flight
-        cloud ->> dock: services<br/>method: flighttask_stop<br/>{ flight_id }
+        cloud ->> dock: services / flighttask_stop   [E]
         dock -->> cloud: services_reply { result: 0 }
     end
 ```
+
+Payloads (verbatim from Phase 4b method docs — DJI source):
+
+**[A]** — service `flighttask_prepare` on `thing/product/{gateway_sn}/services`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "flighttask_prepare",
+  "timestamp": 1234567890123,
+  "data": {
+    "flight_id": "xxxxxxx",
+    "task_type": 2,
+    "execute_time": 1234567890123,
+    "file": {
+      "url": "https://xxx.com/xxxx",
+      "fingerprint": "xxxx"
+    },
+    "ready_conditions": {
+      "battery_capacity": 90,
+      "begin_time": 1234567890123,
+      "end_time": 1234567890123
+    },
+    "executable_conditions": {
+      "storage_capacity": 1000
+    },
+    "break_point": {
+      "index": 1,
+      "state": 0,
+      "progress": 0.34,
+      "wayline_id": 0
+    },
+    "rth_altitude": 100,
+    "out_of_control_action": 0,
+    "exit_wayline_when_rc_lost": 0,
+    "wayline_precision_type": 0,
+    "simulate_mission": {
+      "is_enable": 1,
+      "latitude": 22.1223,
+      "longitude": 113.2222,
+      "altitude": 66.6
+    },
+    "flight_safety_advance_check": 1
+  }
+}
+```
+
+- `task_type` — `0` immediate · `1` timed · `2` conditional. For this block: `0` or `1`.
+- `rth_mode` — `0` optimal · `1` preset. Dock currently supports preset only.
+- `out_of_control_action` — `0` return · `1` hover · `2` land. Current fixed value is `0`.
+- `exit_wayline_when_rc_lost` — `0` continue wayline · `1` exit and execute RC-lost action.
+- `wayline_precision_type` — `0` GPS · `1` high-precision RTK.
+- `simulate_mission.altitude` — Dock 3 only; v1.11 Dock 2 omits.
+
+`services_reply` envelope: `{ "data": { "result": 0 }, "tid": ..., "bid": ..., "timestamp": ..., "method": "flighttask_prepare" }`.
+
+**[B]** — service `flighttask_execute` on `thing/product/{gateway_sn}/services`. Single-dock form carries only `flight_id`; multi-dock adds the `multi_dock_task` block. Multi-dock example:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "flighttask_execute",
+  "timestamp": 1720095314016,
+  "data": {
+    "flight_id": "aee739dc-f1cc-47d5-beaa-64d327f2d797",
+    "multi_dock_task": {
+      "wireless_link_topo": {
+        "center_node": { "sdr_id": 933765657, "sn": "1581F6Q8D245P00EKS87" },
+        "leaf_nodes": [
+          { "control_source_index": 1, "sdr_id": 920128532, "sn": "7CTDM5900B3X1B" },
+          { "control_source_index": 2, "sdr_id": 911741468, "sn": "7CTDM5900BK07M" }
+        ],
+        "secret_code": [0,0,0,0,1,0,0,0,123,114,19,203,192,100,244,160,146,228,196,213,105,220,176,147,87,182,90,210]
+      },
+      "dock_infos": [
+        {
+          "dock_type": "takeoff",
+          "sn": "7CTDM5900B3X1B",
+          "latitude": 37.3487657248638,
+          "longitude": 116.52893686422743,
+          "height": 30.81130027770996,
+          "heading": -78.7066650390625,
+          "home_position_is_valid": 1,
+          "index": 1,
+          "rtcm_info": {
+            "host": "120.253.226.97",
+            "port": "8002",
+            "mount_point": "RTCM33_GRCEJ",
+            "rtcm_device_type": 1,
+            "source_type": 3
+          },
+          "alternate_land_point": {
+            "latitude": 37.348792490321514,
+            "longitude": 116.52867090782102,
+            "height": 0,
+            "safe_land_height": 30,
+            "is_configured": 1
+          }
+        },
+        {
+          "dock_type": "landing",
+          "sn": "7CTDM5900BK07M",
+          "latitude": 37.33605462094235,
+          "longitude": 116.55416413516038,
+          "height": 32.31420135498047,
+          "heading": -69.79183197021484,
+          "home_position_is_valid": 1,
+          "index": 2,
+          "rtcm_info": {
+            "host": "120.253.226.97",
+            "port": "8002",
+            "mount_point": "RTCM33_GRCEJ",
+            "rtcm_device_type": 1,
+            "source_type": 3
+          },
+          "alternate_land_point": {
+            "latitude": 37.336024417709915,
+            "longitude": 116.554075635852,
+            "height": 0,
+            "safe_land_height": 30,
+            "is_configured": 1
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+- `dock_infos[].dock_type` — `takeoff` or `landing`.
+- `dock_infos[].home_position_is_valid` — `0` invalid · `1` valid.
+
+`services_reply` envelope: `{ "data": { "result": 0 }, ... "method": "flighttask_execute" }`.
+
+**[C]** — request `flighttask_resource_get` on `thing/product/{gateway_sn}/requests`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "flighttask_resource_get",
+  "timestamp": 1234567890123,
+  "data": {
+    "flight_id": "xxxxxxx"
+  }
+}
+```
+
+**[C-reply]** — `requests_reply` on `thing/product/{gateway_sn}/requests_reply`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "flighttask_resource_get",
+  "timestamp": 1234567890123,
+  "data": {
+    "result": 0,
+    "output": {
+      "file": {
+        "url": "https://xx.oss-cn-hangzhou.aliyuncs.com/xx.kmz?Expires=xx&OSSAccessKeyId=xxx&Signature=xxx",
+        "fingerprint": "signxxxx"
+      }
+    }
+  }
+}
+```
+
+- Same `{url, fingerprint}` shape as `flighttask_prepare.file` — used by the dock when the local KMZ copy is missing or expired.
+
+**[D]** — event `flighttask_progress` on `thing/product/{gateway_sn}/events`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "flighttask_progress",
+  "timestamp": 1654070968655,
+  "data": {
+    "result": 0,
+    "output": {
+      "status": "ok",
+      "ext": {
+        "flight_id": "flight_id",
+        "track_id": "track_id",
+        "current_waypoint_index": 3,
+        "wayline_id": 0,
+        "wayline_mission_state": 9,
+        "media_count": 6,
+        "break_point": {
+          "index": 1,
+          "state": 0,
+          "progress": 0.34,
+          "wayline_id": 0,
+          "break_reason": 1,
+          "latitude": 23.4,
+          "longitude": 113.99,
+          "height": 100.23,
+          "attitude_head": 30
+        }
+      },
+      "progress": {
+        "current_step": 19,
+        "percent": 100
+      }
+    }
+  }
+}
+```
+
+Field legend (non-obvious enums):
+
+- `output.status` — non-terminal: `sent` / `in_progress` / `paused`. Terminal: `ok` / `partially_done` / `canceled` / `rejected` / `failed` / `timeout`.
+- `output.ext.wayline_mission_state` — `0` disconnected · `1` waypoint unsupported · `2` wayline prep · `3` uploading · `4` trigger-start received · `5` entering wayline · `6` executing · `7` interrupted · `8` recovery · `9` stopped (v1.15) / completed (v1.11).
+- `output.ext.break_point.state` — `0` on segment · `1` on waypoint.
+- `progress.current_step` — ~50 documented values covering the dock state machine (pre-flight checks → takeoff → execution → landing → cover close). Full enum in [`flighttask_progress.md`](../mqtt/dock-to-cloud/events/flighttask_progress.md).
+- `break_reason` — ~100 documented values; see Phase 8 [`error-codes/`](../error-codes/README.md).
+
+`events_reply` envelope: `{ "data": { "result": 0 }, ... "method": "flighttask_progress" }`.
+
+**[E]** — service `flighttask_stop` on `thing/product/{gateway_sn}/services`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "flighttask_stop",
+  "timestamp": 1234567890123,
+  "data": {
+    "flight_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+    "reason": 0
+  }
+}
+```
+
+- `reason` — `0` normal termination · `1` state machine of the other dock is abnormal (multi-dock).
+
+`services_reply` envelope: `{ "data": { "result": 0 }, ... "method": "flighttask_stop" }`.
 
 ### Conditional task
 
@@ -107,17 +418,17 @@ sequenceDiagram
     participant dock as DJI Dock
     participant cloud as Cloud Server
 
-    cloud ->> dock: services<br/>method: flighttask_prepare<br/>{ task_type: 2, ready_conditions: { battery_capacity, begin_time, end_time }, executable_conditions }
+    cloud ->> dock: services / flighttask_prepare   [A]
     dock -->> cloud: services_reply { result: 0 }
 
     loop Dock periodically checks ready_conditions
         dock ->> dock: evaluate battery + time window
     end
 
-    dock ->> cloud: events<br/>method: flighttask_ready<br/>{ flight_id }
+    dock ->> cloud: events / flighttask_ready   [B]
     cloud -->> dock: events_reply { result: 0 }
 
-    cloud ->> dock: services<br/>method: flighttask_execute<br/>{ flight_id }
+    cloud ->> dock: services / flighttask_execute   [C]
     alt executable_conditions satisfied
         dock -->> cloud: services_reply { result: 0 }
         note over aircraft,dock: Mission executes — then flighttask_resource_get / flighttask_progress as in immediate/timed
@@ -125,6 +436,95 @@ sequenceDiagram
         dock -->> cloud: services_reply { result: <non-zero> }
     end
 ```
+
+Payloads (verbatim from Phase 4b method docs — DJI source):
+
+**[A]** — service `flighttask_prepare` on `thing/product/{gateway_sn}/services` with `task_type: 2`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "flighttask_prepare",
+  "timestamp": 1234567890123,
+  "data": {
+    "flight_id": "xxxxxxx",
+    "task_type": 2,
+    "execute_time": 1234567890123,
+    "file": {
+      "url": "https://xxx.com/xxxx",
+      "fingerprint": "xxxx"
+    },
+    "ready_conditions": {
+      "battery_capacity": 90,
+      "begin_time": 1234567890123,
+      "end_time": 1234567890123
+    },
+    "executable_conditions": {
+      "storage_capacity": 1000
+    },
+    "break_point": {
+      "index": 1,
+      "state": 0,
+      "progress": 0.34,
+      "wayline_id": 0
+    },
+    "rth_altitude": 100,
+    "out_of_control_action": 0,
+    "exit_wayline_when_rc_lost": 0,
+    "wayline_precision_type": 0,
+    "simulate_mission": {
+      "is_enable": 1,
+      "latitude": 22.1223,
+      "longitude": 113.2222,
+      "altitude": 66.6
+    },
+    "flight_safety_advance_check": 1
+  }
+}
+```
+
+- `task_type: 2` — conditional. `execute_time` is optional for conditional tasks.
+- `ready_conditions` — required for conditional tasks. Dock evaluates `battery_capacity` + time window (`begin_time`, `end_time`) periodically; fires `flighttask_ready` when all satisfied.
+- `executable_conditions.storage_capacity` — pre-execution gate applied at `[C]`. Missing means no execution gate.
+
+`services_reply` envelope: `{ "data": { "result": 0 }, ... "method": "flighttask_prepare" }`.
+
+**[B]** — event `flighttask_ready` on `thing/product/{gateway_sn}/events`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "flighttask_ready",
+  "timestamp": 1654070968655,
+  "data": {
+    "flight_ids": ["aaaaaaa", "bbbbbbb"]
+  }
+}
+```
+
+- `flight_ids` — array of task IDs whose `ready_conditions` are now met. A single event may signal readiness for multiple previously-prepared conditional tasks.
+
+`events_reply` envelope: `{ "data": { "result": 0 }, ... "method": "flighttask_ready" }`.
+
+**[C]** — service `flighttask_execute` on `thing/product/{gateway_sn}/services`. Single-dock form:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "flighttask_execute",
+  "timestamp": 1234567890123,
+  "data": {
+    "flight_id": "xxxxxxx"
+  }
+}
+```
+
+- For a conditional task, `[C]` is rejected (`result: <non-zero>`) until `executable_conditions` (e.g., `storage_capacity`) are satisfied in addition to the already-signaled `ready_conditions` from `[B]`. Multi-dock form adds the same `multi_dock_task` block documented in Block 2 `[B]`.
+
+`services_reply` envelope: `{ "data": { "result": 0 }, ... "method": "flighttask_execute" }` on success, non-zero `result` when executable_conditions are not met.
 
 ## Step-by-step
 

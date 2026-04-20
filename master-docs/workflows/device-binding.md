@@ -50,32 +50,125 @@ sequenceDiagram
 
     note over aircraft,dock: Aircraft connects / is powered
     aircraft ->> dock: internal link up
-    dock ->> cloud: sys/product/{gateway_sn}/status<br/>method: update_topo<br/>{ sub_devices: [{ sn: drone_sn, ... }] }
+    dock ->> cloud: status / update_topo   [A]
     cloud -->> dock: status_reply { result: 0 }
 
     loop OSD at 0.5 Hz
         aircraft ->> dock: internal telemetry
-        dock ->> cloud: thing/product/{device_sn}/osd<br/>(aircraft OSD payload)
-        dock ->> cloud: thing/product/{device_sn}/osd<br/>(dock OSD payload)
+        dock ->> cloud: osd (aircraft)
+        dock ->> cloud: osd (dock)
     end
 
     opt State change (discrete)
         aircraft ->> dock: property value changed
-        dock ->> cloud: thing/product/{device_sn}/state<br/>(changed property delta)
+        dock ->> cloud: state (changed property delta)
     end
 
     opt Cloud writes a writable property
-        cloud ->> dock: thing/product/{gateway_sn}/property/set<br/>{ property_key: value }
+        cloud ->> dock: property/set   [B]
         dock ->> aircraft: route to aircraft if aircraft-owned
         aircraft -->> dock: internal ack
-        dock -->> cloud: thing/product/{gateway_sn}/property/set_reply<br/>{ result: 0 }
+        dock -->> cloud: property/set_reply   [B-reply]
     end
 
     note over aircraft,dock: Aircraft disconnects
     aircraft --x dock: internal link down
-    dock ->> cloud: sys/product/{gateway_sn}/status<br/>method: update_topo<br/>{ sub_devices: [] }
+    dock ->> cloud: status / update_topo   [C]
     cloud -->> dock: status_reply { result: 0 }
 ```
+
+Payloads (verbatim from Phase 4 method docs — DJI source):
+
+**[A]** — `update_topo` on `sys/product/{gateway_sn}/status`, full-snapshot with paired sub-device (verbatim from [`dock-to-cloud/status/update_topo.md`](../mqtt/dock-to-cloud/status/update_topo.md)):
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "update_topo",
+  "timestamp": 1234567890123,
+  "data": {
+    "domain": "3",
+    "type": 119,
+    "sub_type": 0,
+    "device_secret": "secret",
+    "nonce": "nonce",
+    "thing_version": "1.1.2",
+    "sub_devices": [
+      {
+        "sn": "drone001",
+        "domain": "0",
+        "type": 60,
+        "sub_type": 0,
+        "index": "A",
+        "device_secret": "secret",
+        "nonce": "nonce",
+        "thing_version": "1.1.2"
+      }
+    ]
+  }
+}
+```
+
+`status_reply` envelope: `{ "tid": ..., "bid": ..., "method": "update_topo", "timestamp": ..., "data": { "result": 0 } }`.
+
+**[B]** — `property/set` on `thing/product/{gateway_sn}/property/set`. Envelope carries one or more `property_key: value` pairs; Dock 3 example for `air_transfer_enable` (verbatim from [`device-properties/dock3.md`](../device-properties/dock3.md) §6):
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1643268212187,
+  "data": {
+    "air_transfer_enable": true
+  }
+}
+```
+
+**[B-reply]** — `property/set_reply` on `thing/product/{gateway_sn}/property/set_reply`. Per-property `result`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1643268212187,
+  "data": {
+    "air_transfer_enable": {
+      "result": 0
+    }
+  }
+}
+```
+
+**[C]** — `update_topo` aircraft-disconnect push. Same envelope as **[A]**; `sub_devices` is now empty (verbatim from [`dock-to-cloud/status/update_topo.md`](../mqtt/dock-to-cloud/status/update_topo.md)):
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "update_topo",
+  "timestamp": 1234567890123,
+  "data": {
+    "domain": "3",
+    "type": 119,
+    "sub_type": 0,
+    "device_secret": "secret",
+    "nonce": "nonce",
+    "thing_version": "1.1.2",
+    "sub_devices": []
+  }
+}
+```
+
+Field legend (non-obvious enums):
+
+- `data.domain` / `sub_devices[].domain` — device namespace; `"0"` = aircraft, `"3"` = dock gateway. Full enum per Phase 6 [`device-properties/`](../device-properties/README.md).
+- `data.type` / `sub_type` — product-family identifiers; `119` = dock family (example), `60` = M3-series aircraft (example).
+- `sub_devices[].index` — channel index on the gateway (e.g., `"A"`).
+- `property/set_reply.data.<key>.result` — `0` success · `1` fail · `2` time exceed · other = refer to [`error-codes/`](../error-codes/) (Phase 8).
+- `air_transfer_enable` — Dock 3 writable `bool` — `true` enables rapid photo upload during flight; see Dock 3 §3 and Dock 2 §3 for the full 3-key dock writable surface.
+
+OSD and state payloads in the `loop` / `opt` blocks are omitted here — the full per-device surface (37 OSD + 12 state properties on Dock 3, plus aircraft-side OSD / state) lives in Phase 6 [`device-properties/`](../device-properties/README.md).
 
 ### Pilot-path
 
@@ -89,36 +182,224 @@ sequenceDiagram
     note over rc,cloud: Pairing complete (RC-side JSBridge flow)
 
     note over aircraft,rc: Aircraft paired to RC
-    rc ->> cloud: sys/product/{gateway_sn}/status<br/>method: update_topo<br/>{ sub_devices: [{ sn: drone_sn, ... }] }
+    rc ->> cloud: status / update_topo   [A]
     cloud -->> rc: status_reply { result: 0 }
 
-    cloud ->> pilot: WS device_update_topo push
-    pilot ->> cloud: HTTP GET /manage/api/v1/workspaces/{workspace_id}/devices/topologies
-    cloud -->> pilot: topology snapshot
+    cloud ->> pilot: WS device_update_topo   [B]
+    pilot ->> cloud: HTTP GET /devices/topologies   [C]
+    cloud -->> pilot: 200 topology snapshot   [C-reply]
 
     loop OSD at 0.5 Hz
         aircraft ->> rc: internal telemetry
-        rc ->> cloud: thing/product/{device_sn}/osd<br/>(aircraft OSD payload)
-        cloud ->> pilot: WS device_osd push
+        rc ->> cloud: osd (aircraft)
+        cloud ->> pilot: WS device_osd   [D]
     end
 
     opt State change (discrete)
         aircraft ->> rc: property value changed
-        rc ->> cloud: thing/product/{device_sn}/state<br/>(changed property delta)
+        rc ->> cloud: state (changed property delta)
     end
 
     opt Cloud writes a writable aircraft property
-        cloud ->> rc: thing/product/{gateway_sn}/property/set<br/>{ property_key: value }
+        cloud ->> rc: property/set   [E]
         rc ->> aircraft: route to aircraft
         aircraft -->> rc: internal ack
-        rc -->> cloud: thing/product/{gateway_sn}/property/set_reply<br/>{ result: 0 }
+        rc -->> cloud: property/set_reply   [E-reply]
     end
 
     note over aircraft,rc: Aircraft unpaired
-    rc ->> cloud: sys/product/{gateway_sn}/status<br/>method: update_topo<br/>{ sub_devices: [] }
+    rc ->> cloud: status / update_topo   [F]
     cloud -->> rc: status_reply { result: 0 }
-    cloud ->> pilot: WS device_offline or device_update_topo
+    cloud ->> pilot: WS device_offline or device_update_topo   [G]
 ```
+
+Payloads (verbatim from Phase 4 / Phase 5 / Phase 3 method docs — DJI source):
+
+**[A]** — `update_topo` on `sys/product/{gateway_sn}/status`. RC acts as gateway; `sub_devices[0]` is the paired aircraft (verbatim from [`pilot-to-cloud/status/update_topo.md`](../mqtt/pilot-to-cloud/status/update_topo.md)):
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "update_topo",
+  "timestamp": 1234567890123,
+  "data": {
+    "domain": "3",
+    "type": 119,
+    "sub_type": 0,
+    "device_secret": "secret",
+    "nonce": "nonce",
+    "thing_version": "1.1.2",
+    "sub_devices": [
+      {
+        "sn": "drone001",
+        "domain": "0",
+        "type": 60,
+        "sub_type": 0,
+        "index": "A",
+        "device_secret": "secret",
+        "nonce": "nonce",
+        "thing_version": "1.1.2"
+      }
+    ]
+  }
+}
+```
+
+`status_reply` envelope: `{ "tid": ..., "bid": ..., "method": "update_topo", "timestamp": ..., "data": { "result": 0 } }`.
+
+**[B]** — WebSocket push (verbatim from [`websocket/situation-awareness/device_update_topo.md`](../websocket/situation-awareness/device_update_topo.md)). Content-free trigger; Pilot 2 reacts by firing **[C]**:
+
+```json
+{
+  "biz_code": "device_update_topo",
+  "version": "1.0",
+  "timestamp": 146052438362,
+  "data": {}
+}
+```
+
+**[C]** — `GET /manage/api/v1/workspaces/{workspace_id}/devices/topologies`. Request body: none; `x-auth-token` header only (see [`http/device/topology.md`](../http/device/topology.md)).
+
+**[C-reply]** — `200 OK` (verbatim from [`http/device/topology.md`](../http/device/topology.md)):
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "list": [
+      {
+        "hosts": [
+          {
+            "sn": "drone01",
+            "device_model": {
+              "key": "0-60-0",
+              "domain": "0",
+              "type": "60",
+              "sub_type": "0"
+            },
+            "online_status": true,
+            "device_callsign": "Rescue aircraft",
+            "user_id": "string",
+            "user_callsign": "string",
+            "icon_urls": {
+              "normal_icon_url": "resource://pilot/drawable/tsa_aircraft_others_normal",
+              "selected_icon_url": "resource://pilot/drawable/tsa_aircraft_others_pressed"
+            }
+          }
+        ],
+        "parents": [
+          {
+            "sn": "rc02",
+            "online_status": true,
+            "device_model": {
+              "key": "2-56-0",
+              "domain": "2",
+              "type": "56",
+              "sub_type": "0"
+            },
+            "device_callsign": "Remote controller",
+            "user_id": "string",
+            "user_callsign": "string",
+            "icon_urls": {
+              "normal_icon_url": "resource://pilot/drawable/tsa_aircraft_others_normal",
+              "selected_icon_url": "resource://pilot/drawable/tsa_aircraft_others_pressed"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**[D]** — WebSocket push carrying the re-projected aircraft OSD (verbatim from [`websocket/situation-awareness/device_osd.md`](../websocket/situation-awareness/device_osd.md)):
+
+```json
+{
+  "biz_code": "device_osd",
+  "version": "1.0",
+  "timestamp": 146052438362,
+  "data": {
+    "host": {
+      "latitude": 113.44444,
+      "longitude": 23.45656,
+      "height": 44.35,
+      "attitude_head": 90,
+      "elevation": 40,
+      "horizontal_speed": 0,
+      "vertical_speed": 2.3
+    },
+    "sn": "string"
+  }
+}
+```
+
+Note: DJI's example swaps the `latitude` / `longitude` values — see [`device_osd.md` source inconsistencies](../websocket/situation-awareness/device_osd.md#source-inconsistencies-flagged-by-djis-own-example). Real wire traffic follows the field names.
+
+**[E]** — `property/set` on `thing/product/{gateway_sn}/property/set`. Pilot-path `{gateway_sn}` is the RC; the RC routes aircraft-targeted property writes through to the aircraft. RCs own 0 gateway-level writable properties — every pilot-path `property/set` targets an aircraft property. Envelope carries `property_key: value` pairs. Schema shell: [`pilot-to-cloud/property-set/README.md`](../mqtt/pilot-to-cloud/property-set/README.md); aircraft-path writable keys per [`device-properties/m4d.md`](../device-properties/m4d.md) §3 / [`m3d.md`](../device-properties/m3d.md) §3.
+
+Schematic (DJI's canonical `data` shell):
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1643268212187,
+  "data": {
+    "property_key": "property_value"
+  }
+}
+```
+
+**[E-reply]** — `property/set_reply` on `thing/product/{gateway_sn}/property/set_reply`. Per-property `result`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1643268212187,
+  "data": {
+    "property_key": {
+      "result": 0
+    }
+  }
+}
+```
+
+**[F]** — `update_topo` unpair push. Same envelope as **[A]**; `sub_devices` is now empty (verbatim from [`pilot-to-cloud/status/update_topo.md`](../mqtt/pilot-to-cloud/status/update_topo.md)):
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "update_topo",
+  "timestamp": 1234567890123,
+  "data": { "sub_devices": [] }
+}
+```
+
+**[G]** — WebSocket push. Same shape as **[B]** but `biz_code` is `device_offline` when a gateway goes offline entirely, or `device_update_topo` when only the sub-device membership changed (verbatim from [`websocket/situation-awareness/device_offline.md`](../websocket/situation-awareness/device_offline.md)):
+
+```json
+{
+  "biz_code": "device_offline",
+  "version": "1.0",
+  "timestamp": 146052438362,
+  "data": {}
+}
+```
+
+Field legend (non-obvious enums):
+
+- `data.domain` — `"0"` aircraft, `"2"` RC gateway, `"3"` dock gateway (distinguishes gateway cohort).
+- `data.type` / `sub_type` — `56` = RC family (example), `60` = M3-series aircraft (example), `119` = dock family. Full enum per Phase 6 [`device-properties/`](../device-properties/README.md).
+- `hosts[]` vs `parents[]` (topology reply) — `hosts` = sub-devices (aircraft); `parents` = gateways (Dock / RC).
+- `biz_code` (WebSocket) — `device_online` / `device_offline` / `device_update_topo` are all **content-free triggers** with empty `data`. Pilot 2 does not branch on the code; it always re-reads topology via **[C]**. `device_osd` is the only situation-awareness push that carries a payload.
+- `property/set_reply.data.<key>.result` — `0` success · `1` fail · `2` time exceed · other = refer to [`error-codes/`](../error-codes/) (Phase 8).
+
+OSD and state payloads in the `loop` / `opt` blocks are omitted here — the full per-device surface (aircraft OSD / state, RC state) lives in Phase 6 [`device-properties/`](../device-properties/README.md).
 
 ## Step-by-step
 

@@ -50,13 +50,13 @@ sequenceDiagram
     participant web as Web Viewer
 
     note over dock,cloud: Dock paired, topology reported
-    dock ->> cloud: thing/product/{gateway_sn}/state<br/>{ live_capacity: { ... } }
+    dock ->> cloud: state / live_capacity   [A]
     note over cloud: Cloud parses + persists live_capacity
 
     note over cloud,web: Operator clicks "start live"
 
-    cloud ->> dock: services<br/>method: live_start_push<br/>{ url_type, url, video_id, video_quality }
-    dock -->> cloud: services_reply<br/>method: live_start_push { result: 0 }
+    cloud ->> dock: services / live_start_push   [B]
+    dock -->> cloud: services_reply / live_start_push   [B-reply]
 
     dock ->> media: push media (RTMP / GB28181 / WHIP / Agora)
     activate media
@@ -64,25 +64,153 @@ sequenceDiagram
     media ->> web: deliver
 
     opt Operator changes quality
-        cloud ->> dock: services<br/>method: live_set_quality<br/>{ video_id, video_quality }
+        cloud ->> dock: services / live_set_quality   [C]
         dock -->> cloud: services_reply { result: 0 }
     end
 
     opt Operator changes lens on same camera
-        cloud ->> dock: services<br/>method: live_lens_change<br/>{ video_id, video_type }
+        cloud ->> dock: services / live_lens_change   [D]
         dock -->> cloud: services_reply { result: 0 }
     end
 
     opt Operator switches camera
-        cloud ->> dock: services<br/>method: live_camera_change<br/>{ ... }
+        cloud ->> dock: services / live_camera_change   [E]
         dock -->> cloud: services_reply { result: 0 }
     end
 
-    cloud ->> dock: services<br/>method: live_stop_push<br/>{ video_id }
+    cloud ->> dock: services / live_stop_push   [F]
     dock -->> cloud: services_reply { result: 0 }
     dock --x media: disconnect
     deactivate media
 ```
+
+Payloads (verbatim from Phase 4d method docs — DJI source):
+
+**[A]** — `live_capacity` struct on `thing/product/{gateway_sn}/state` (shape per [`device-properties/dock3.md`](../device-properties/dock3.md) §2):
+
+```text
+live_capacity: {
+  available_video_number: <int>,
+  coexist_video_number_max: <int>,
+  device_list: [
+    {
+      sn: "<aircraft_sn>",
+      available_video_number: <int>,
+      coexist_video_number_max: <int>,
+      camera_list: [
+        {
+          camera_index: "<type-subtype-gimbalindex>",
+          available_video_number: <int>,
+          coexist_video_number_max: <int>,
+          video_list: [
+            { video_index: "<idx>", video_type: "normal|wide|zoom|infrared", switchable_video_types: ["..."] }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+State pushes use the standard `thing/product/{gateway_sn}/state` envelope; `live_capacity` is pushed only on change. DJI source does not include a full verbatim JSON example for this struct on either Dock 2 or Dock 3 — shape above is the authoritative property-table breakdown.
+
+**[B]** — service `live_start_push` on `thing/product/{gateway_sn}/services`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "url": "channel=1ZNDH1D0010098_39-0-7&sn=1ZNDH1D0010098&token=006dca67721582a48768ec4d817b7b25a86IADk%2Fcm%2Fdv%2BHY6qT%2FAKM6y7TcUe4lXNvZpycH7vUMAlM6pFALUKF2zyCIgA82pQE8cCoYAQAAQDxwKhgAgDxwKhgAwDxwKhgBADxwKhg&uid=50000",
+    "url_type": 0,
+    "video_id": "1ZNDH1D0010098/39-0-7/normal-0",
+    "video_quality": 0
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "live_start_push"
+}
+```
+
+**[B-reply]** — `services_reply` on `thing/product/{gateway_sn}/services_reply`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "result": 0
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "live_start_push"
+}
+```
+
+**[C]** — service `live_set_quality` on `thing/product/{gateway_sn}/services`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "video_id": "1ZNDH1D0010098/39-0-7/normal-0",
+    "video_quality": 4
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "live_set_quality"
+}
+```
+
+**[D]** — service `live_lens_change` on `thing/product/{gateway_sn}/services` (v1.15 form — `video_id` dropped):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "video_type": "zoom"
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "live_lens_change"
+}
+```
+
+**[E]** — service `live_camera_change` on `thing/product/{gateway_sn}/services`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "camera_position": 0,
+    "video_id": "1ZNDH1D0010098/165-0-7/normal-0"
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "live_camera_change"
+}
+```
+
+**[F]** — service `live_stop_push` on `thing/product/{gateway_sn}/services`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "video_id": "1ZNDH1D0010098/42-0-0/zoom-0"
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "live_stop_push"
+}
+```
+
+`services_reply` envelope for [C] / [D] / [E] / [F] is the same shape as [B-reply] — `{ "data": { "result": 0 }, ... }`.
+
+Field legend (non-obvious enums):
+
+- `url_type` — `0` = Agora (not Dock 3) · `1` = RTMP · `3` = GB28181 · `4` = WebRTC / WHIP. DJI's Dock 3 example sets `url_type: 0` which is not in the Dock 3 enum — known copy-paste defect flagged in [`live_start_push.md`](../mqtt/dock-to-cloud/services/live_start_push.md).
+- `video_quality` — `0` Adaptive · `1` Smooth · `2` SD · `3` HD · `4` UHD.
+- `video_type` (`live_lens_change`) — `ir` Infrared · `normal` Default · `wide` Wide-angle · `zoom` Zoom.
+- `camera_position` (`live_camera_change`) — `0` Inside the dock · `1` Outside the dock. Toggles the dock's own FPV cameras, not aircraft payload.
 
 ### Pilot-path server-initiated livestream
 
@@ -95,13 +223,13 @@ sequenceDiagram
     participant web as Web Viewer
 
     note over rc,cloud: Pilot 2 logged in, live module loaded via JSBridge
-    rc ->> cloud: state<br/>{ live_capacity: { ... } }
+    rc ->> cloud: state / live_capacity   [A]
 
     web ->> cloud: query device live capability
     cloud -->> web: capability from database
 
     note over web,cloud: Operator clicks "start live"
-    cloud ->> rc: services<br/>method: live_start_push<br/>{ url_type, url, video_id, video_quality }
+    cloud ->> rc: services / live_start_push   [B]
     note over rc: Pilot 2 verifies —<br/>camera is decoding?<br/>on flight-control screen?
 
     alt Verification ok
@@ -109,22 +237,82 @@ sequenceDiagram
         rc ->> rc: open encoder
         rc ->> media: push media
         activate media
-        rc ->> cloud: osd<br/>{ live_status: <active> }
+        rc ->> cloud: osd / live_status   [C]
         web ->> media: pull + play
     else Verification failed
         rc -->> cloud: services_reply { result: <non-zero>, reason }
     end
 
     opt Quality / lens mid-stream
-        cloud ->> rc: services<br/>method: live_set_quality / live_lens_change
+        cloud ->> rc: services / live_set_quality | live_lens_change   [D]
         rc -->> cloud: services_reply { result: 0 }
     end
 
-    cloud ->> rc: services<br/>method: live_stop_push
+    cloud ->> rc: services / live_stop_push   [E]
     rc -->> cloud: services_reply { result: 0 }
     rc --x media: disconnect
     deactivate media
 ```
+
+Payloads (verbatim from Phase 4d / pilot-to-cloud docs — DJI source):
+
+**[A]** — `live_capacity` struct on `thing/product/{gateway_sn}/state` (same shape as dock-path [A]; see [`device-properties/rc-plus-2.md`](../device-properties/rc-plus-2.md) / [`device-properties/rc-pro.md`](../device-properties/rc-pro.md)).
+
+**[B]** — service `live_start_push` on `thing/product/{gateway_sn}/services`. Pilot-path uses the same payload as dock-path; per [`pilot-to-cloud/README.md`](../mqtt/pilot-to-cloud/README.md) RC Plus 2 + RC Pro reuse the dock-to-cloud [`live_start_push`](../mqtt/dock-to-cloud/services/live_start_push.md) shape verbatim. RC Plus 2 retains Agora (`url_type: 0`); Dock 3 does not:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "url": "channel=1ZNDH1D0010098_39-0-7&sn=1ZNDH1D0010098&token=006dca67721582a48768ec4d817b7b25a86IADk%2Fcm%2Fdv%2BHY6qT%2FAKM6y7TcUe4lXNvZpycH7vUMAlM6pFALUKF2zyCIgA82pQE8cCoYAQAAQDxwKhgAgDxwKhgAwDxwKhgBADxwKhg&uid=50000",
+    "url_type": 0,
+    "video_id": "1ZNDH1D0010098/39-0-7/normal-0",
+    "video_quality": 0
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "live_start_push"
+}
+```
+
+**[C]** — `live_status` array on `thing/product/{gateway_sn}/osd` (shape per [`device-properties/dock3.md`](../device-properties/dock3.md) §2):
+
+```text
+live_status: [
+  {
+    video_id: "<sn>/<camera_index>/<video_index>",
+    video_type: "<normal|wide|zoom|ir>",
+    video_quality: <0..4>,
+    status: <0 Not livestreaming | 1 Livestreaming>,
+    error_status: <int>
+  }
+]
+```
+
+Per-stream struct pushed in the standard OSD envelope. No verbatim full JSON example is carried in DJI source for pilot OSD; the struct breakdown is the authoritative shape from the property table.
+
+**[D]** — service `live_set_quality` or `live_lens_change` on `thing/product/{gateway_sn}/services`. Same payloads as dock-path [C] / [D]. **RC Plus 2 note:** `live_lens_change` is delivered via the DRC channel variant [`drc_live_lens_change`](../mqtt/pilot-to-cloud/drc/drc_live_lens_change.md) on `/drc/down` — payload differs (`payload_index` + `video_type`):
+
+```json
+{
+  "data": {
+    "payload_index": "80-0-0",
+    "video_type": "zoom"
+  },
+  "timestamp:": 1654070968655,
+  "method": "drc_live_lens_change"
+}
+```
+
+(The `"timestamp:"` trailing-colon typo is verbatim from DJI source — see [`drc_live_lens_change.md`](../mqtt/pilot-to-cloud/drc/drc_live_lens_change.md#source-inconsistencies-flagged-by-djis-own-example).) RC Pro uses the non-DRC [`live_lens_change`](../mqtt/dock-to-cloud/services/live_lens_change.md) directly.
+
+**[E]** — service `live_stop_push` on `thing/product/{gateway_sn}/services`. Same payload as dock-path [F].
+
+Field legend (non-obvious enums) — identical to Block 1:
+
+- `url_type` — `0` = Agora (**RC Pro yes, RC Plus 2 yes, Dock 3 no**) · `1` = RTMP · `3` = GB28181 · `4` = WebRTC / WHIP (**not RC Pro**).
+- `video_quality` — `0` Adaptive · `1` Smooth · `2` SD · `3` HD · `4` UHD.
+- `live_status.status` — `0` Not livestreaming · `1` Livestreaming.
 
 ### Pilot-path app-initiated livestream (JSBridge `liveshareSetConfig`)
 
@@ -136,16 +324,71 @@ sequenceDiagram
     participant media as Media Server
     participant web as Web Viewer
 
-    webview ->> cloud: request live streaming parameters
-    cloud -->> webview: return URL + quality + ...
-    webview ->> pilot: JSBridge liveshareSetConfig({ url, url_type, video_quality })
+    webview ->> cloud: request live streaming parameters   [A]
+    cloud -->> webview: return URL + quality + ...   [A-reply]
+    webview ->> pilot: JSBridge liveshareSetConfig(type, params)   [B]
     note over pilot: Operator chooses start/stop<br/>from flight control UI
 
-    pilot ->> media: push media
+    pilot ->> media: push media   [C]
     activate media
     web ->> media: pull + play
     deactivate media
 ```
+
+Payloads (verbatim from `DJI_Cloud/DJI_CloudAPI_Pilot-JSBridge.txt` — DJI source):
+
+**[A]** / **[A-reply]** — webview-to-cloud call is operator-scoped HTTP, not governed by the DJI wire contract. Cloud returns the `type` + `params` bundle the webview will hand to Pilot 2.
+
+**[B]** — JSBridge call. **Not MQTT.** Invoked directly by the webview on `window.djiBridge`:
+
+```text
+window.djiBridge.liveshareSetConfig(type: Int, params: String)
+```
+
+`params` is a protocol-specific JSON string, verbatim from DJI source:
+
+```text
+// type: 1 Agora
+{
+  uid: xxxxx,
+  token: xxxxx,
+  channelId: xxxxx
+}
+// type: 2 RTMP
+{
+  url: xxxxxx.xxxxx.xxxxxx.xxx
+}
+// type: 3 RTSP
+{
+  userName: xxx,
+  password: xxx,
+  port: xxxx
+}
+// type: 4 GB28181
+{
+  serverIp: xxx,
+  serverPort: xxx,
+  serverId: xxxx,
+  agentId: xxxx,
+  password: xxx,
+  agentPort: xxx,
+  agentChannel: xxx,
+}
+```
+
+Status is reported back via the companion callback:
+
+```text
+window.djiBridge.liveshareSetStatusCallback(jsCallback)
+// callback payload: { type: Int, status: Int, fps: Int, videoBitRate: Int, rtt: Int, quality: Int, ... }
+```
+
+**[C]** — media-plane push is identical to the MQTT-initiated paths — the device streams directly to the media server over the chosen transport. No MQTT ceremony.
+
+Field legend (non-obvious enums):
+
+- **JSBridge `type`** — verbatim from DJI source: `0` = Unknown · `1` = Agora · `2` = RTMP · `3` = RTSP · `4` = GB28181. **This is a distinct enum from the MQTT `url_type`** (`0` Agora / `1` RTMP / `3` GB28181 / `4` WebRTC). JSBridge does not include WebRTC; MQTT does not include RTSP. Values do not round-trip — cloud backends bridging the two surfaces must map explicitly.
+- The JSBridge API is a Pilot-2-side in-app interface (webview → app), **not** an MQTT topic. It never rides over the `thing/product/{gateway_sn}/...` topic tree.
 
 ## Step-by-step
 

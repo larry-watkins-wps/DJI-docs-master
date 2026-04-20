@@ -52,22 +52,22 @@ sequenceDiagram
     note over web,pilot: Authority request
 
     web ->> cloud: "I want control of RC {sn}"
-    cloud ->> rc: services<br/>method: cloud_control_auth_request<br/>{ user_id, user_callsign, control_keys: ["flight"] }
-    rc -->> cloud: services_reply { result: 0 }<br/>(pop-up shown)
+    cloud ->> rc: services / cloud_control_auth_request   [A]
+    rc -->> cloud: services_reply { result: 0 } (pop-up shown)
     rc ->> pilot: pop-up: "Allow {user_callsign} to control?"
 
     alt Pilot accepts
         pilot ->> rc: tap Allow
-        rc ->> cloud: events<br/>method: cloud_control_auth_notify<br/>{ result: 0, output: { status: "ok" } }<br/>(need_reply: 0)
-        rc ->> cloud: state push<br/>{ cloud_control_auth: ["flight"] }
+        rc ->> cloud: events / cloud_control_auth_notify   [B]
+        rc ->> cloud: state push / cloud_control_auth   [C]
         note over cloud: Cloud may now issue DRC mode entry<br/>and subsequent flight commands
     else Pilot rejects / times out
         pilot ->> rc: tap Reject (or ignore)
-        rc ->> cloud: events<br/>method: cloud_control_auth_notify<br/>{ output: { status: "failed" } }
+        rc ->> cloud: events / cloud_control_auth_notify   [B]
         note over cloud: Cloud must not send flight commands
     else Another request supersedes this one
         note over cloud: Second user requests authority<br/>before first accepted
-        rc ->> cloud: events<br/>method: cloud_control_auth_notify<br/>{ output: { status: "canceled" } }<br/>(for the first request)
+        rc ->> cloud: events / cloud_control_auth_notify   [B]
     end
 
     note over web,pilot: Session runs (see live-flight-controls-drc.md)
@@ -76,15 +76,114 @@ sequenceDiagram
 
     alt Cloud-initiated release
         web ->> cloud: "Release control"
-        cloud ->> rc: services<br/>method: cloud_control_release<br/>{ control_keys: ["flight"] }
+        cloud ->> rc: services / cloud_control_release   [D]
         rc -->> cloud: services_reply { result: 0 }
-        rc ->> cloud: state push<br/>{ cloud_control_auth: [] }
+        rc ->> cloud: state push / cloud_control_auth   [E]
     else Pilot grab-back
         pilot ->> rc: tap grab-back button
-        rc ->> cloud: state push<br/>{ cloud_control_auth: [] }
+        rc ->> cloud: state push / cloud_control_auth   [E]
         note over cloud: Halt outgoing commands immediately.<br/>Re-request consent if needed.
     end
 ```
+
+Payloads (verbatim from Phase 4h method docs and Phase 6c state catalog — DJI source):
+
+**[A]** — service `cloud_control_auth_request` on `thing/product/{gateway_sn}/services` (verbatim from [`cloud_control_auth_request.md`](../mqtt/pilot-to-cloud/services/cloud_control_auth_request.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "control_keys": ["flight"],
+    "user_callsign": "xxxxxxx",
+    "user_id": "xxxxxxxxxxx"
+  },
+  "method": "cloud_control_auth_request",
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1704038400000
+}
+```
+
+- `control_keys` — only `"flight"` is defined by DJI; array size `= 1` in practice.
+- `user_id` / `user_callsign` — rendered on the RC pop-up so the pilot knows who is asking.
+
+`services_reply`: `{ "data": { "output": { "status": "ok" }, "result": 0 }, "tid": ..., "bid": ..., "method": "cloud_control_auth_request", "timestamp": ... }`. `result: 0` means the pop-up was shown, not that the pilot accepted; the outcome follows on `[B]`. The `output.status` field is present in DJI's example but not declared in the `services_reply` schema — treat `result` as authoritative.
+
+**[B]** — event `cloud_control_auth_notify` on `thing/product/{gateway_sn}/events`. `need_reply: 0` — fire-and-forget. Primary `ok` payload shown; `failed` and `canceled` differ only in `output.status` (verbatim from [`cloud_control_auth_notify.md`](../mqtt/pilot-to-cloud/events/cloud_control_auth_notify.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "output": {
+      "status": "ok"
+    },
+    "result": 0
+  },
+  "method": "cloud_control_auth_notify",
+  "need_reply": 0,
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1704038400000
+}
+```
+
+- `output.status` enum (DJI schema):
+  - `"ok"` — "User agreed". Cloud may proceed.
+  - `"failed"` — "Error or user denied". Cloud must not send flight commands.
+  - `"canceled"` — "Superseded by another user's authorization request". Cloud re-requests if still wanted.
+- `need_reply: 0` — unlike most events in the 4f / 4h families, cloud does **not** send `events_reply`.
+
+**[C]** — state push on `thing/product/{rc_sn}/state` carrying the `cloud_control_auth` property in the granted form (v1.15 per [Phase 6c `rc-plus-2.md`](../device-properties/rc-plus-2.md) §2 and [`rc-pro.md`](../device-properties/rc-pro.md) §2). DJI's property catalog is tab-separated without a full envelope example; the `data.cloud_control_auth` field is verbatim, the envelope follows the standard `state` shape from [`mqtt/README.md`](../mqtt/README.md) §5.2:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1704038400000,
+  "gateway": "rc_sn",
+  "data": {
+    "cloud_control_auth": ["flight"]
+  }
+}
+```
+
+- `cloud_control_auth` — `array` of `string`, access `r`. "Identifies which control permissions are granted to the cloud." `["flight"]` when granted.
+- **v1.11 narrative form**: DJI's v1.11 pilot-feature-set DRC Mermaid (`Cloud-API-Doc/docs/en/30.feature-set/10.pilot-feature-set/90.drc.md`) renders this push as `is_cloud_control_auth = true` — a scalar boolean rather than an array. `cloud_control_auth` (array) was added in v1.15; cloud implementations targeting current firmware should rely on the v1.15 array form.
+
+**[D]** — service `cloud_control_release` on `thing/product/{gateway_sn}/services` (verbatim from [`cloud_control_release.md`](../mqtt/pilot-to-cloud/services/cloud_control_release.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "control_keys": ["flight"]
+  },
+  "method": "cloud_control_release",
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1704038400000
+}
+```
+
+- `control_keys` — same single-element `["flight"]` array as in [A]. Releases the named keys; `"flight"` is the only defined value.
+
+`services_reply`: `{ "data": { "output": { "status": "ok" }, "result": 0 }, ... , "method": "cloud_control_release" }`. Same `output.status` echo-in-example quirk as [A] — `result` is authoritative.
+
+**[E]** — state push on `thing/product/{rc_sn}/state` carrying the `cloud_control_auth` property in the revoked form. Fires on both cloud-initiated release (after `[D]`) and pilot grab-back (no preceding command). Envelope shape as in [C]:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1704038400000,
+  "gateway": "rc_sn",
+  "data": {
+    "cloud_control_auth": []
+  }
+}
+```
+
+- Empty array signals "cloud holds no authorized scopes". Cloud must halt outgoing DRC / flight commands on this transition.
+- **v1.11 narrative form**: `is_cloud_control_auth = false` per the v1.11 pilot-feature-set DRC Mermaid.
 
 ## Step-by-step
 

@@ -45,26 +45,67 @@ sequenceDiagram
     participant dock as DJI Dock
     participant cloud as Cloud Server
 
-    crewed -->> drone: ADS-B broadcast<br/>(1090 MHz, out-of-band)
-    drone ->> drone: decode + classify:<br/>distance, relative altitude,<br/>vert_trend → warning_level 0–4
+    crewed -->> drone: ADS-B broadcast (1090 MHz, out-of-band)
+    drone ->> drone: decode + classify<br/>→ warning_level 0–4
 
     drone ->> dock: internal alert bus
-    dock ->> cloud: events<br/>method: airsense_warning<br/>data: [ { icao, warning_level, latitude, longitude, altitude, altitude_type, heading, relative_altitude, vert_trend, distance }, ... ]
+    dock ->> cloud: events / airsense_warning   [A]
     cloud -->> dock: events_reply { result: 0 }
 
-    cloud ->> cloud: merge with prior set by icao<br/>→ new / updated / cleared UI rows
+    cloud ->> cloud: snapshot-diff by icao<br/>→ new / updated / cleared UI rows
 
     alt warning_level ≥ 3
         drone ->> drone: onboard avoidance (autonomous)
-        note right of drone: Cloud receives updated<br/>warning on next push
+        note right of drone: Cloud sees level ≥3 on the<br/>next scheduled push
     end
 
     note over crewed,drone: Intruder departs coverage
     drone ->> dock: updated set (icao absent)
-    dock ->> cloud: events<br/>method: airsense_warning<br/>data: [ ... without that icao ... ]
+    dock ->> cloud: events / airsense_warning   [B]
     cloud -->> dock: events_reply { result: 0 }
     cloud ->> cloud: diff → mark cleared
 ```
+
+Payloads (verbatim from [`events/airsense_warning.md`](../mqtt/dock-to-cloud/events/airsense_warning.md) — DJI source):
+
+**[A]** — active-set push on `thing/product/{gateway_sn}/events`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": [
+    {
+      "altitude": 100,
+      "altitude_type": 1,
+      "distance": 100,
+      "heading": 89.1,
+      "icao": "B-5931",
+      "latitude": 12.23,
+      "longitude": 12.23,
+      "relative_altitude": 80,
+      "vert_trend": 0,
+      "warning_level": 3
+    }
+  ],
+  "need_reply": 1,
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 16540709686556,
+  "method": "airsense_warning"
+}
+```
+
+Field legend (non-obvious enums):
+
+- `warning_level` — `0` No danger · `1` Level One · `2` Level Two · `3` Level Three (aircraft triggers onboard avoidance) · `4` Level Four.
+- `altitude_type` — `0` ellipsoidal · `1` altitude above sea level.
+- `vert_trend` — `0` relative altitude unchanged · `1` increasing (closing vertically) · `2` decreasing.
+- `distance` — metres, horizontal.
+- `relative_altitude` — metres, positive = intruder above the drone.
+- `timestamp` — 14 digits in DJI's own example (canonical epoch-ms is 13 digits; carried-forward source typo, see [`flight_areas_drone_location.md`](../mqtt/dock-to-cloud/events/flight_areas_drone_location.md#source-inconsistencies-flagged-by-djis-own-example)).
+
+`events_reply` envelope: `{ "data": { "result": 0 }, "tid": ..., "bid": ..., "timestamp": ..., "method": "airsense_warning" }`.
+
+**[B]** — clear push: same envelope as [A]; `data` array now omits the departed intruder's struct. No explicit "cleared" field — the cloud discovers the clear via snapshot diff by `icao`.
 
 ## Step-by-step
 

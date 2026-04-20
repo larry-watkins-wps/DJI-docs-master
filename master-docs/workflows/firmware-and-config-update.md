@@ -47,15 +47,93 @@ sequenceDiagram
 
     note over cloud: Cloud compares against known-latest firmware set<br/>Decides which devices need upgrade + type (2 / 3 / 4)
 
-    cloud ->> dock: thing/product/{gateway_sn}/services<br/>method: ota_create<br/>{ devices: [{ sn, product_version, file_url, md5, file_size, file_name, firmware_upgrade_type }, ...] }
-    dock -->> cloud: services_reply<br/>method: ota_create<br/>{ result, output.status: "sent" or "in_progress" }
+    cloud ->> dock: services / ota_create   [A]
+    dock -->> cloud: services_reply / ota_create   [A-reply]
 
     loop Until terminal status
-        dock ->> cloud: thing/product/{gateway_sn}/events<br/>method: ota_progress<br/>{ output.status, output.progress.percent, output.progress.current_step }
+        dock ->> cloud: events / ota_progress   [B]
     end
 
     note over dock,cloud: Terminal status: ok | failed | canceled | rejected | timeout
 ```
+
+Payloads (verbatim from Phase 4 method docs — DJI source):
+
+**[A]** — service `ota_create` on `thing/product/{gateway_sn}/services`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "devices": [
+      {
+        "file_name": "wm245_1.00.223.zip",
+        "file_size": 653467234,
+        "file_url": "https://s3.com/xxx.zip",
+        "firmware_upgrade_type": 2,
+        "md5": "abcdefabcdefabcdef",
+        "product_version": "1.00.223",
+        "sn": "drone_sn"
+      },
+      {
+        "firmware_upgrade_type": 3,
+        "product_version": "1.00.223",
+        "sn": "dock_sn"
+      }
+    ]
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "ota_create"
+}
+```
+
+- `devices[].firmware_upgrade_type` — `2` Consistency upgrade · `3` Standard / Regular upgrade · `4` PSDK update (Dock 3 only).
+- Second `devices[]` entry omits `file_url` / `md5` / `file_size` / `file_name` verbatim from DJI's example — treat these as required for the target that owns the artifact and optional for secondary targets that inherit from a staged image.
+
+**[A-reply]** — `services_reply` on `thing/product/{gateway_sn}/services_reply`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "output": {
+      "status": "in_progress"
+    },
+    "result": 0
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "ota_create"
+}
+```
+
+- `output.status` at ACK — typically `sent` (accepted, upgrade starting) or `in_progress`. Full enum shared with [B]: `sent / in_progress / paused / ok / failed / canceled / rejected / timeout`.
+
+**[B]** — event `ota_progress` on `thing/product/{gateway_sn}/events`. Reuses the originating `bid` from [A]. No `need_reply`; cloud is not required to publish `events_reply`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "output": {
+      "progress": {
+        "percent": 10,
+        "current_step": "download_firmware"
+      },
+      "status": "in_progress"
+    },
+    "result": 0
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "ota_progress"
+}
+```
+
+- `output.status` — `sent` / `in_progress` / `paused` (non-terminal) · `ok` / `failed` / `canceled` / `rejected` / `timeout` (terminal).
+- `output.progress.percent` — `0`–`100`, step `1`.
+- `output.progress.current_step` — `download_firmware` (download in progress) · `upgrade_firmware` (apply in progress). **Named `step_key` in v1.11** (Cloud-API-Doc Dock 2); renamed to `current_step` in v1.15 (both Dock 2 and Dock 3). A cloud speaking v1.15 wire must accept `current_step`; legacy support tolerates `step_key` as an alias.
 
 ### Step-by-step — firmware
 
@@ -110,11 +188,54 @@ sequenceDiagram
 
     note over dock: Trigger: dock-internal refresh timer,<br/>License rotation, or startup
 
-    dock ->> cloud: thing/product/{gateway_sn}/requests<br/>method: config<br/>{ config_scope: "product", config_type: "json" }
-    cloud -->> dock: requests_reply<br/>method: config<br/>{ app_id, app_key, app_license, ntp_server_host, ntp_server_port }
+    dock ->> cloud: requests / config   [A]
+    cloud -->> dock: requests_reply / config   [A-reply]
 
     note over dock: Re-verify License<br/>(fails → disconnect, like bootstrap)
 ```
+
+Payloads (verbatim from [`requests/config.md`](../mqtt/dock-to-cloud/requests/config.md) — DJI source):
+
+**[A]** — request `config` on `thing/product/{gateway_sn}/requests`:
+
+```json
+{
+  "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+  "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+  "gateway": "sn",
+  "timestamp": 1667803298000,
+  "method": "config",
+  "data": {
+    "config_scope": "product",
+    "config_type": "json"
+  }
+}
+```
+
+- `config_scope` — documented value `"product"` (only value in v1.15).
+- `config_type` — documented value `"json"` (only value in v1.15).
+
+**[A-reply]** — `requests_reply` on `thing/product/{gateway_sn}/requests_reply`:
+
+```json
+{
+  "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+  "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+  "gateway": "sn",
+  "timestamp": 1667803298000,
+  "method": "config",
+  "data": {
+    "app_id": "123456",
+    "app_key": "app_key",
+    "app_license": "app_license",
+    "ntp_server_host": "host_url",
+    "ntp_server_port": 456
+  }
+}
+```
+
+- `ntp_server_port` — default `123` if omitted.
+- `app_id` type drift: v1.11 example shows integer `123456`; v1.15 example shows string `"123456"` — v1.15 string form matches the documented type and is canonical.
 
 ### Step-by-step — config
 

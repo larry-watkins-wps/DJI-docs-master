@@ -54,31 +54,153 @@ sequenceDiagram
     aircraft ->> dock: media files (post-task)
 
     note over dock,cloud: Auto-upload begins
-    dock ->> cloud: requests<br/>method: storage_config_get<br/>{ module: 0 (Media) }
-    cloud -->> dock: requests_reply<br/>{ output: { bucket, endpoint, provider, region, object_key_prefix, credentials: { access_key_id, access_key_secret, security_token, expire } } }
+    dock ->> cloud: requests / storage_config_get   [A]
+    cloud -->> dock: requests_reply / storage_config_get   [A-reply]
 
     loop per file (one flight → many files)
-        dock ->> oss: PUT {object_key_prefix}/... using STS creds
+        dock ->> oss: PUT {object_key_prefix}/… (STS-signed, direct to storage)
         oss -->> dock: 200 OK
-
-        dock ->> cloud: events<br/>method: file_upload_callback<br/>{ file: { object_key, name, path, ext: { flight_id, drone_model_key, payload_model_key, is_original }, metadata: { shoot_position, gimbal_yaw_degree, absolute_altitude, relative_altitude, create_time } } }
+        dock ->> cloud: events / file_upload_callback   [B]
         cloud -->> dock: events_reply { result: 0 }
     end
 
     opt Cloud prioritizes a backlog task
-        cloud ->> dock: services<br/>method: upload_flighttask_media_prioritize<br/>{ flight_id }
+        cloud ->> dock: services / upload_flighttask_media_prioritize   [C]
         dock -->> cloud: services_reply { result: 0 }
         dock ->> dock: re-order queue
-        dock ->> cloud: events<br/>method: highest_priority_upload_flighttask_media<br/>{ flight_id }
+        dock ->> cloud: events / highest_priority_upload_flighttask_media   [D]
         cloud -->> dock: events_reply { result: 0 }
     end
 
     opt STS expires during a long upload
         note over dock: expire timer elapses
-        dock ->> cloud: requests<br/>method: storage_config_get<br/>{ module: 0 }
+        dock ->> cloud: requests / storage_config_get   (re-run [A])
         cloud -->> dock: fresh credentials
     end
 ```
+
+Payloads (verbatim from Phase 4d method docs — DJI source):
+
+**[A]** — request `storage_config_get` on `thing/product/{gateway_sn}/requests`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "module": 0
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "storage_config_get"
+}
+```
+
+- `module` — `0` = Media (this workflow) · `1` = PSDK UI resources (different workflow; see [`psdk_ui_resource_upload_result`](../mqtt/dock-to-cloud/events/psdk_ui_resource_upload_result.md)).
+
+**[A-reply]** — `requests_reply` on `thing/product/{gateway_sn}/requests_reply`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "output": {
+      "bucket": "bucket_name",
+      "credentials": {
+        "access_key_id": "access_key_id",
+        "access_key_secret": "access_key_secret",
+        "expire": 3600,
+        "security_token": "security_token"
+      },
+      "endpoint": "https://oss-cn-hangzhou.aliyuncs.com",
+      "object_key_prefix": "b4cfaae6-bd9d-4cd0-8472-63b608c3c581",
+      "provider": "ali",
+      "region": "hz"
+    },
+    "result": 0
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "storage_config_get"
+}
+```
+
+- `provider` — `ali` / `aws` / `minio`.
+- `credentials.expire` — TTL in seconds. Dock re-requests before or on expiry; cloud must not assume stickiness.
+- `object_key_prefix` — the dock prepends this to every PUT key.
+
+**[B]** — event `file_upload_callback` on `thing/product/{gateway_sn}/events`. One event per file. v1.15 example (see [`file_upload_callback.md`](../mqtt/dock-to-cloud/events/file_upload_callback.md) for the v1.11 form that includes `flight_task` progress counters):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "file": {
+      "cloud_to_cloud_id": "DEFAULT",
+      "ext": {
+        "drone_model_key": "0-67-0",
+        "flight_id": "xxx",
+        "is_original": true,
+        "payload_model_key": "0-67-0"
+      },
+      "metadata": {
+        "absolute_altitude": 56.311,
+        "create_time": "2021-05-10 16:04:20",
+        "gimbal_yaw_degree": "-91.40",
+        "relative_altitude": 41.124,
+        "shoot_position": {
+          "lat": 22.1,
+          "lng": 122.5
+        }
+      },
+      "name": "dog.jpeg",
+      "object_key": "object_key",
+      "path": "xxx"
+    }
+  },
+  "gateway": "xxx",
+  "method": "file_upload_callback",
+  "need_reply": 1,
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655
+}
+```
+
+- `file.cloud_to_cloud_id` — `"DEFAULT"` unless routing to a customer-supplied bucket.
+- `file.ext.flight_id` — ties the file back to the wayline task that produced it.
+- `file.ext.is_original` — `true` = original capture · `false` = thumbnail / derived.
+- `file.ext.drone_model_key` / `payload_model_key` — enum values documented in [`device-properties/`](../device-properties/README.md).
+
+**[C]** — service `upload_flighttask_media_prioritize` on `thing/product/{gateway_sn}/services`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "flight_id": "xxx"
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "upload_flighttask_media_prioritize"
+}
+```
+
+**[D]** — event `highest_priority_upload_flighttask_media` on `thing/product/{gateway_sn}/events`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "flight_id": "xxx"
+  },
+  "gateway": "xxx",
+  "need_reply": 1,
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "highest_priority_upload_flighttask_media"
+}
+```
+
+Same `flight_id` as [C] when [C] triggered this event. `services_reply` / `events_reply` envelopes carry `{ "data": { "result": 0 }, ... }`.
 
 ## Sequence — pilot path
 
@@ -94,30 +216,169 @@ sequenceDiagram
     note right of pilot: Pilot 2 media module loaded
 
     note over pilot,cloud: Post-task — Pilot 2 downloaded files from aircraft
-    pilot ->> cloud: POST /media/.../files/tiny-fingerprints<br/>{ tiny_fingerprints: [tf1, tf2, ...] }
-    cloud -->> pilot: 200 { tiny_fingerprints: [tf already-present, ...] }
+    pilot ->> cloud: POST /media/.../files/tiny-fingerprints   [E]
+    cloud -->> pilot: 200   [E-reply]
     pilot ->> pilot: filter out already-uploaded
 
     loop per remaining file
-        pilot ->> cloud: POST /media/.../fast-upload<br/>{ fingerprint, name, path, ext }
+        pilot ->> cloud: POST /media/.../fast-upload   [F]
         alt file already exists (fingerprint hit)
             cloud -->> pilot: 200 { code: 0 } → skip upload
         else first time
-            cloud -->> pilot: 200 but missing on storage
-            pilot ->> cloud: POST /storage/.../sts<br/>(no body)
-            cloud -->> pilot: { credentials, bucket, endpoint, object_key_prefix, provider, region }
-            pilot ->> oss: PUT {object_key_prefix}/... using STS
+            cloud -->> pilot: 200 { data: {} } — missing on storage
+            pilot ->> cloud: POST /storage/.../sts   [G]
+            cloud -->> pilot: 200   [G-reply]
+            pilot ->> oss: PUT {object_key_prefix}/… (STS-signed)
             oss -->> pilot: 200 OK
-            pilot ->> cloud: POST /media/.../upload-callback<br/>{ result: 0, object_key, name, ext, metadata }
-            cloud -->> pilot: 200 { object_key (echoed) }
+            pilot ->> cloud: POST /media/.../upload-callback   [H]
+            cloud -->> pilot: 200   [H-reply]
         end
     end
 
     opt End of task — batch signal
-        pilot ->> cloud: POST /media/.../group-upload-callback<br/>{ file_group_id, file_count, file_uploaded_count }
-        cloud -->> pilot: 200
+        pilot ->> cloud: POST /media/.../group-upload-callback   [I]
+        cloud -->> pilot: 200 { data: {} }
     end
 ```
+
+Payloads (verbatim from Phase 3 HTTP endpoint docs — DJI source):
+
+**[E]** — `POST /media/api/v1/workspaces/{workspace_id}/files/tiny-fingerprints` request body:
+
+```json
+{
+  "tiny_fingerprints": [
+    "5aec4c6e78052bf38fab901bcd1a2319_2021_12_8_22_13_10"
+  ]
+}
+```
+
+**[E-reply]** — `200 OK`:
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "tiny_fingerprints": [
+      "5aec4c6e78052bf38fab901bcd1a2319_2021_12_8_22_13_10"
+    ]
+  }
+}
+```
+
+`data.tiny_fingerprints` returns the **subset already present** in workspace storage — the pilot filters these out before proceeding.
+
+**[F]** — `POST /media/api/v1/workspaces/{workspace_id}/fast-upload` request body (`media.FastUploadInput`):
+
+```json
+{
+  "ext": {
+    "drone_model_key": "string",
+    "is_original": true,
+    "payload_model_key": "string",
+    "tinny_fingerprint": "string",
+    "sn": "string"
+  },
+  "fingerprint": "string",
+  "name": "string",
+  "path": "string"
+}
+```
+
+- `ext.tinny_fingerprint` — DJI spells it `tinny` (not `tiny`) verbatim in source. Preserved.
+- `fingerprint` — the primary lookup key for "does this file already exist?".
+
+Response is `{ code: 0, message: "success", data: {} }` on both fingerprint-hit and miss; the miss-path triggers the full [G] → PUT → [H] flow.
+
+**[G]** — `POST /storage/api/v1/workspaces/{workspace_id}/sts` — request body is empty (endpoint requires only `x-auth-token`).
+
+**[G-reply]** — `200 OK`:
+
+```json
+{
+  "code": 0,
+  "data": {
+    "bucket": "string",
+    "credentials": {
+      "access_key_id": "STS.NUBdKtVadL1U8aBJ2TH6PWoYo",
+      "access_key_secret": "9NG2P2yJaUrck576CkdRoRbchKssJiZygi5D93CBsduY",
+      "expire": 3600,
+      "security_token": "CAIS8AN1q6Ft5B2yfSjIr5b3L/HAu75F+/O+OkfzrjIBRLl8uKryjTz2IHhOenBhB..."
+    },
+    "endpoint": "https://oss-cn-hangzhou.aliyuncs.com",
+    "object_key_prefix": "5a6f9d4b-2a38-4b4b-86f9-3a678da0bf4a",
+    "provider": "ali",
+    "region": "cn-hangzhou"
+  },
+  "message": "success"
+}
+```
+
+- `provider` — `ali` / `aws` / `minio` (the media section of the source catalog adds `minio`; the waypoint section is `ali`/`aws` only).
+- `security_token` is ~800 characters in practice; DJI's sample truncates.
+
+**[H]** — `POST /media/api/v1/workspaces/{workspace_id}/upload-callback` request body (`media.UploadCallbackInput`):
+
+```json
+{
+  "result": 0,
+  "ext": {
+    "file_group_id": "string",
+    "drone_model_key": "string",
+    "is_original": true,
+    "payload_model_key": "string",
+    "tinny_fingerprint": "string",
+    "sn": "string"
+  },
+  "fingerprint": "string",
+  "metadata": {
+    "absolute_altitude": 0,
+    "created_time": "string",
+    "gimbal_yaw_degree": 0,
+    "relative_altitude": 0,
+    "shoot_position": {
+      "lat": 0,
+      "lng": 0
+    }
+  },
+  "name": "string",
+  "object_key": "string",
+  "path": "string",
+  "sub_file_type": 0
+}
+```
+
+- `result` — `0` = upload success · non-zero = failure.
+- `sub_file_type` — `0` = normal · `1` = panorama (images only).
+- `ext.file_group_id` — shared across every file from a single wayline task (ties [H] calls to the later [I] group callback).
+
+**[H-reply]** — `200 OK` echoes the persisted key:
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "object_key": "5asjwu24-2a18-4b4b-86f9-3a678da0bf4d/example.jpg"
+  }
+}
+```
+
+**[I]** — `POST /media/api/v1/workspaces/{workspace_id}/group-upload-callback` request body (`storage.FolderUploadCallbackInput`):
+
+```json
+{
+  "file_group_id": "xxx",
+  "file_count": 0,
+  "file_uploaded_count": 0
+}
+```
+
+- `file_group_id` matches the `ext.file_group_id` from each `[H]` call in the group.
+- `file_count` / `file_uploaded_count` let the cloud report partial-success states.
+
+Response: `{ "code": 0, "data": {}, "message": "success" }`.
 
 ## Step-by-step — dock path
 

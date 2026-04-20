@@ -49,16 +49,59 @@ sequenceDiagram
         dock ->> dock: merge with dock-bus alarms<br/>current active set = { … }
     end
 
-    dock ->> cloud: thing/product/{gateway_sn}/events<br/>method: hms<br/>{ list: [ { code, level, module, in_the_sky, device_type, imminent, args }, … ] }
+    dock ->> cloud: events / hms   [A]
     note right of cloud: No services_reply / events_reply<br/>(need_reply absent → fire-and-forget)
 
     cloud ->> cloud: for each list[i]:<br/>1. build Copy Key<br/>2. look up hms.json<br/>3. substitute args placeholders<br/>4. emit UI row
     cloud ->> cloud: diff against last snapshot<br/>→ fire "resolved" UI for disappeared codes
 
     note over aircraft,dock: Fault clears later
-    dock ->> cloud: method: hms<br/>{ list: [ … without the resolved code … ] }
+    dock ->> cloud: events / hms   [B]
     cloud ->> cloud: diff → mark resolved
 ```
+
+Payloads (verbatim from [`events/hms.md`](../mqtt/dock-to-cloud/events/hms.md) — DJI source):
+
+**[A]** — active-set push on `thing/product/{gateway_sn}/events`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "list": [
+      {
+        "args": {
+          "component_index": 0,
+          "sensor_index": 0
+        },
+        "code": "0x16100083",
+        "device_type": "0-67-0",
+        "imminent": 1,
+        "in_the_sky": 0,
+        "level": 2,
+        "module": 3
+      }
+    ]
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "hms"
+}
+```
+
+Field legend (non-obvious enums):
+
+- `level` — `0` Notification · `1` Reminder · `2` Warning.
+- `module` — `0` Flight mission · `1` Device management · `2` Media · `3` HMS (v1.11 + v1.15 Dock 2 label `"hms"` lowercase; v1.15 Dock 3 relabels to `"HMS"` — numeric value stable).
+- `in_the_sky` — `0` on-ground · `1` in-flight. Load-bearing for Copy Key (`fpv_tip_{code}` vs `fpv_tip_{code}_in_the_sky`).
+- `imminent` — `0` persistent · `1` transient (clears on its own).
+- `code` — hex string; first byte identifies the subsystem. See [`hms-codes/README.md`](../hms-codes/README.md).
+- `device_type` — `{domain}-{type}-{subtype}`.
+- `args.component_index` / `args.sensor_index` — 0-indexed on the wire, 1-indexed after substitution into copy placeholders (see step 4).
+
+No `events_reply`: `need_reply` is omitted from the example (envelope default applies — fire-and-forget). Cloud must not emit a reply.
+
+**[B]** — clear push: same envelope as [A]; `data.list` now omits the resolved alarm's struct. No explicit "cleared" field — the cloud discovers the clear via snapshot diff by `(code, device_type, args.sensor_index, args.component_index)` tuple.
 
 ## Step-by-step
 

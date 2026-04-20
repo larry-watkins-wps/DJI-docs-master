@@ -51,51 +51,280 @@ sequenceDiagram
 
     note over aircraft,cloud: Dock paired, topology reported, aircraft idle in dock
 
-    cloud ->> dock: services<br/>method: flight_authority_grab
+    cloud ->> dock: services / flight_authority_grab   [A]
     dock -->> cloud: services_reply { result: 0 }
-    cloud ->> dock: services<br/>method: payload_authority_grab
+    cloud ->> dock: services / payload_authority_grab
     dock -->> cloud: services_reply { result: 0 }
 
-    cloud ->> dock: services<br/>method: drc_mode_enter<br/>{ mqtt_broker: {...}, osd_frequency, hsi_frequency }
+    cloud ->> dock: services / drc_mode_enter   [B]
     dock ->> drc: CONNECT (relay broker) + SUBSCRIBE /drc/down
     dock -->> cloud: services_reply { result: 0 }
     cloud ->> drc: CONNECT + SUBSCRIBE /drc/up
 
     opt One-key takeoff (aircraft in dock)
-        cloud ->> dock: services<br/>method: takeoff_to_point<br/>{ target_latitude, target_longitude, target_height, security_takeoff_height, ... }
+        cloud ->> dock: services / takeoff_to_point   [C]
         dock -->> cloud: services_reply { result: 0 }
-        dock ->> cloud: events<br/>method: takeoff_to_point_progress
+        dock ->> cloud: events / takeoff_to_point_progress
     end
 
     loop Control session active
-        cloud ->> drc: drc/down<br/>method: stick_control<br/>{ x, y, h, w, seq }
+        cloud ->> drc: drc/down / stick_control   [D]
         drc ->> dock: drc/down delivery
-        cloud ->> drc: drc/down<br/>method: heart_beat<br/>{ seq, timestamp }
+        cloud ->> drc: drc/down / heart_beat   [E]
         drc ->> dock: drc/down delivery
-        dock ->> drc: drc/up<br/>method: osd_info_push (at osd_frequency)
+        dock ->> drc: drc/up / osd_info_push   [F]
         drc ->> cloud: drc/up delivery
-        dock ->> drc: drc/up<br/>method: hsi_info_push (at hsi_frequency)
+        dock ->> drc: drc/up / hsi_info_push   [G]
         drc ->> cloud: drc/up delivery
-        dock ->> drc: drc/up<br/>method: delay_info_push
+        dock ->> drc: drc/up / delay_info_push   [H]
     end
 
     opt Flight manoeuvre
-        cloud ->> drc: drc/down<br/>method: drone_control<br/>{ cmd, action }
+        cloud ->> drc: drc/down / drone_control
     end
 
     opt Payload action
-        cloud ->> dock: services<br/>method: camera_photo_take / gimbal_reset / ...
+        cloud ->> dock: services / camera_photo_take (or gimbal_reset / ...)
         dock -->> cloud: services_reply { result: 0 }
     end
 
     opt Emergency stop
-        cloud ->> drc: drc/down<br/>method: drone_emergency_stop
+        cloud ->> drc: drc/down / drone_emergency_stop   [I]
     end
 
-    cloud ->> dock: services<br/>method: drc_mode_exit
+    cloud ->> dock: services / drc_mode_exit   [J]
     dock ->> drc: DISCONNECT
     dock -->> cloud: services_reply { result: 0 }
 ```
+
+Payloads (verbatim from Phase 4c dock DRC catalog — DJI source):
+
+**[A]** — service `flight_authority_grab` on `thing/product/{gateway_sn}/services` (verbatim from [`flight_authority_grab.md`](../mqtt/dock-to-cloud/services/flight_authority_grab.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {},
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "flight_authority_grab"
+}
+```
+
+- No payload fields; the authority transition is a single-step "grab" by virtue of the method name. `services_reply` shorthand: `{ result: 0 }` (success) / non-zero error code.
+- [`payload_authority_grab`](../mqtt/dock-to-cloud/services/payload_authority_grab.md) uses the **identical empty-`data` shape** on both request and reply — the two grabs differ only in method name and in which authority they acquire.
+
+**[B]** — service `drc_mode_enter` on `thing/product/{gateway_sn}/services` (verbatim from [`drc_mode_enter.md`](../mqtt/dock-to-cloud/services/drc_mode_enter.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "hsi_frequency": 1,
+    "mqtt_broker": {
+      "address": "mqtt.dji.com:8883",
+      "client_id": "sn_a",
+      "enable_tls": true,
+      "expire_time": 1672744922,
+      "password": "jwt_token",
+      "username": "sn_a_username"
+    },
+    "osd_frequency": 10
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "drc_mode_enter"
+}
+```
+
+- `mqtt_broker.address` — `"host:port"` of the relay EMQX broker (distinct from the standard gateway broker).
+- `mqtt_broker.expire_time` — Unix seconds. Reusability window; does **not** force-terminate an already-open connection (per [Variants §"Relay-broker credential expiry"](#relay-broker-credential-expiry)).
+- `osd_frequency` / `hsi_frequency` — integer Hz, range `1`–`30`. DJI's example uses `10` / `1` as a working default.
+- `services_reply` shorthand: `{ result: 0 }`.
+
+**[C]** — service `takeoff_to_point` on `thing/product/{gateway_sn}/services` (verbatim from [`takeoff_to_point.md`](../mqtt/dock-to-cloud/services/takeoff_to_point.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "flight_id": "ABDEAC21DCADDA",
+    "max_speed": 12,
+    "rc_lost_action": 0,
+    "rth_altitude": 100,
+    "security_takeoff_height": 100,
+    "target_height": 100,
+    "target_latitude": 12.23,
+    "target_longitude": 12.32,
+    "commander_mode_lost_action": 1,
+    "commander_flight_height": 80,
+    "flight_safety_advance_check": 1
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "takeoff_to_point"
+}
+```
+
+- `rc_lost_action` — `0` hovering · `1` landing · `2` returning to home.
+- `commander_mode_lost_action` — **required.** `0` continue the to-point mission · `1` exit and perform normal lost-control behavior.
+- `commander_flight_height` — meters relative to dock, range `2`–`3000`, step `0.1`. In DRC 2.0 the aircraft climbs to the higher of this and `security_takeoff_height`.
+- `flight_safety_advance_check` — `0` disabled (default) · `1` pre-check flight-safety files against the cloud and pull updates if stale.
+- Progress on `thing/product/{gateway_sn}/events` → [`takeoff_to_point_progress`](../mqtt/dock-to-cloud/events/takeoff_to_point_progress.md); `services_reply` shorthand: `{ result: 0 }`.
+
+**[D]** — DRC `stick_control` on `thing/product/{gateway_sn}/drc/down` (verbatim from [`stick_control.md`](../mqtt/dock-to-cloud/drc/stick_control.md)):
+
+```json
+{
+  "seq": 1,
+  "method": "stick_control",
+  "data": {
+    "roll": 1024,
+    "pitch": 1024,
+    "throttle": 1024,
+    "yaw": 1024,
+    "gimbal_pitch": 1024
+  }
+}
+```
+
+- Four stick channels are integers in `[364, 1684]` — RC raw ticks, span ±660 around neutral `1024`. `roll` (Aileron), `pitch` (Elevator), `throttle` (Throttle), `yaw` (Rudder).
+- `gimbal_pitch` appears in DJI's example but is **not** declared in the schema table — treat as a documentation inconsistency (range/behavior undocumented).
+- **No ack on `drc/up`** — DJI explicitly: "This protocol has no acknowledgment mechanism." Cloud publishes at 5–10 Hz.
+- [`drone_control`](../mqtt/dock-to-cloud/drc/drone_control.md) rides the same DRC envelope as `stick_control` (method `drone_control`, different `data` fields — mode switch / RTH trigger / motor start-stop); requires flight authority.
+
+**[E]** — DRC `heart_beat` on `thing/product/{gateway_sn}/drc/down` (verbatim from [`heart_beat.md`](../mqtt/dock-to-cloud/drc/heart_beat.md)):
+
+```json
+{
+  "method": "heart_beat",
+  "data": {
+    "timestamp": 1670415891013
+  },
+  "method": "heart_beat",
+  "seq": 1
+}
+```
+
+- `data.timestamp` — 13-digit ms Unix time. `seq` is deprecated; new integrations rely on `timestamp`.
+- DJI's example has `"method"` written **twice** — a DJI source error; on the wire expect a single `method` key alongside a single envelope-level `seq`.
+- **Heartbeat loss > 1 minute** triggers an implicit `drc_mode_exit` on the device side. Cloud publishes at 1 Hz.
+
+**[F]** — DRC `osd_info_push` on `thing/product/{gateway_sn}/drc/up` at `osd_frequency` Hz (verbatim from [`osd_info_push.md`](../mqtt/dock-to-cloud/drc/osd_info_push.md)):
+
+```json
+{
+  "method": "osd_info_push",
+  "timestamp": 1670415891013,
+  "data": {
+    "attitude_head": 60,
+    "latitude": 10,
+    "longitude": 10,
+    "height": 10,
+    "speed_x": 10,
+    "speed_y": 10,
+    "speed_z": 10,
+    "gimbal_pitch": 60,
+    "gimbal_roll": 60,
+    "gimbal_yaw": 60
+  }
+}
+```
+
+- `height` — meters. DJI's source labels the unit as `degree` — this is a DJI typo; it is an altitude in meters.
+- Distinct from the standard `thing/product/{device_sn}/osd` channel — DRC OSD is higher-cadence and payload-smaller; fires only during an active DRC session.
+
+**[G]** — DRC `hsi_info_push` on `thing/product/{gateway_sn}/drc/up` at `hsi_frequency` Hz (verbatim from [`hsi_info_push.md`](../mqtt/dock-to-cloud/drc/hsi_info_push.md)):
+
+```json
+{
+  "method": "hsi_info_push",
+  "timestamp": 1670415891013,
+  "data": {
+    "up_distance": 10,
+    "down_distance": 10,
+    "around_distance": [
+      10,
+      8,
+      9,
+      16,
+      2
+    ],
+    "up_enable": true,
+    "up_work": true,
+    "down_enable": true,
+    "down_work": true,
+    "left_enable": true,
+    "left_work": true,
+    "right_enable": true,
+    "right_work": true,
+    "front_enable": true,
+    "front_work": true,
+    "back_enable": true,
+    "back_work": true,
+    "vertical_enable": true,
+    "vertical_work": true,
+    "horizontal_enable": true,
+    "horizontal_work": true
+  }
+}
+```
+
+- `up_distance` / `down_distance` — integer mm; `around_distance` — horizontal ring (schema calls it `around_distances` (plural); DJI's example uses singular, carried verbatim above).
+- The eight `*_enable` / `*_work` booleans beyond the up/down pair (left / right / front / back / vertical / horizontal) appear in DJI's example but **not** in the schema table — finer-grained per-direction flags of undocumented formal status.
+
+**[H]** — DRC `delay_info_push` on `thing/product/{gateway_sn}/drc/up` (verbatim from [`delay_info_push.md`](../mqtt/dock-to-cloud/drc/delay_info_push.md)):
+
+```json
+{
+  "method": "delay_info_push",
+  "timestamp": 1670415891013,
+  "data": {
+    "sdr_cmd_delay": 10,
+    "liveview_delay_list": [
+      {
+        "video_id": "1581BN210004555439234/52-0-0/normal-0",
+        "liveview_delay_time": 60
+      },
+      {
+        "video_id": "1581BN210004555439234/53-0-0/normal-0",
+        "liveview_delay_time": 80
+      }
+    ]
+  }
+}
+```
+
+- `sdr_cmd_delay` — ms; image-transmission command-link delay. Rising values flag DRC teleoperation stalling because the video path has degraded.
+- `liveview_delay_list[].video_id` — code-stream identifier (see [`livestream-lifecycle.md`](livestream-lifecycle.md) for the composite `{device_sn}/{payload_index}/{video_index}` shape).
+
+**[I]** — DRC `drone_emergency_stop` on `thing/product/{gateway_sn}/drc/down` (verbatim from [`drone_emergency_stop.md`](../mqtt/dock-to-cloud/drc/drone_emergency_stop.md)):
+
+```json
+{
+  "method": "drone_emergency_stop",
+  "data": {}
+}
+```
+
+- No payload. Device replies on `drc/up` with `{ "method": "drone_emergency_stop", "data": { "result": 0 } }`.
+- **Dock-path only** — pilot path does not expose an e-stop on the DRC channel.
+
+**[J]** — service `drc_mode_exit` on `thing/product/{gateway_sn}/services` (verbatim from [`drc_mode_exit.md`](../mqtt/dock-to-cloud/services/drc_mode_exit.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {},
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "drc_mode_exit"
+}
+```
+
+- No payload. After success the relay session is torn down and DRC-channel commands are rejected. `services_reply` shorthand: `{ result: 0 }`.
+
+Camera / gimbal setters (`camera_photo_take`, `gimbal_reset`, and the rest of the `camera_*` family) ride the **standard** `/services` topic with the normal thing-model envelope and require payload authority — see [`mqtt/dock-to-cloud/services/`](../mqtt/dock-to-cloud/services/) for schemas.
 
 ### Pilot-path DRC
 
@@ -110,37 +339,137 @@ sequenceDiagram
     note over rc,cloud: RC logged in to cloud, aircraft bound
 
     web ->> cloud: request cloud control
-    cloud ->> rc: services<br/>method: cloud_control_auth_request
+    cloud ->> rc: services / cloud_control_auth_request   [A]
     note over rc: Operator taps "allow"
-    rc -->> cloud: services_reply<br/>method: cloud_control_auth_request { result: 0 }
-    rc ->> cloud: state push<br/>is_cloud_control_auth: true
+    rc -->> cloud: services_reply { result: 0 }
+    rc ->> cloud: state / cloud_control_auth (granted)   [B]
 
     web ->> cloud: request control link
-    cloud ->> rc: services<br/>method: drc_mode_enter<br/>{ mqtt_broker, osd_frequency, hsi_frequency }
+    cloud ->> rc: services / drc_mode_enter   [C]
     rc ->> drc: CONNECT + SUBSCRIBE /drc/down
     rc -->> cloud: services_reply { result: 0 }
     cloud -->> web: broker connection info
     web ->> drc: CONNECT + SUBSCRIBE /drc/up
 
     loop Control session
-        web ->> drc: drc/down<br/>(control commands)
+        web ->> drc: drc/down (control commands)
         drc ->> rc: deliver
         rc ->> aircraft: relay to aircraft
-        rc ->> drc: drc/up<br/>(telemetry)
+        rc ->> drc: drc/up (telemetry)
         drc ->> web: deliver
     end
 
     opt Operator grabs authority back
         note over rc: Pilot presses the grab button
-        rc ->> cloud: state push<br/>is_cloud_control_auth: false
+        rc ->> cloud: state / cloud_control_auth (revoked)   [D]
     end
 
     opt Web releases
         web ->> cloud: release control
-        cloud ->> rc: services<br/>method: cloud_control_release
+        cloud ->> rc: services / cloud_control_release   [E]
         rc -->> cloud: services_reply { result: 0 }
     end
 ```
+
+Payloads (verbatim from Phase 4h pilot DRC methods and Phase 6c RC state catalog — DJI source):
+
+**[A]** — service `cloud_control_auth_request` on `thing/product/{gateway_sn}/services` (verbatim from [`cloud_control_auth_request.md`](../mqtt/pilot-to-cloud/services/cloud_control_auth_request.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "control_keys": ["flight"],
+    "user_callsign": "xxxxxxx",
+    "user_id": "xxxxxxxxxxx"
+  },
+  "method": "cloud_control_auth_request",
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1704038400000
+}
+```
+
+- `control_keys` — DJI documents only `"flight"`; array size is `1` in practice. Pilot path is single-authority — no separate flight / payload split.
+- `user_id` / `user_callsign` — rendered on the RC pop-up so the pilot knows who is asking.
+- `services_reply` carries `{ "output": { "status": "ok" }, "result": 0 }`. `result: 0` means **the pop-up was shown**, not that the pilot accepted — the pilot's answer follows on [`cloud_control_auth_notify`](../mqtt/pilot-to-cloud/events/cloud_control_auth_notify.md). The `output.status` field is in DJI's example but not declared in the schema — treat `result` as authoritative. See [`remote-control-handoff.md`](remote-control-handoff.md) for the full authority-lifecycle workflow including the `_notify` event and its three-state outcome (`ok` / `failed` / `canceled`).
+
+**[B]** — state push on `thing/product/{rc_sn}/state` carrying the `cloud_control_auth` property in the **granted** form (per Phase 6c [`rc-plus-2.md`](../device-properties/rc-plus-2.md) §2 + [`rc-pro.md`](../device-properties/rc-pro.md) §2; envelope follows the standard `state` shape from [`mqtt/README.md`](../mqtt/README.md) §5.2):
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1704038400000,
+  "gateway": "rc_sn",
+  "data": {
+    "cloud_control_auth": ["flight"]
+  }
+}
+```
+
+- `cloud_control_auth` — `array` of `string`, access `r`. "Identifies which control permissions are granted to the cloud." `["flight"]` when granted.
+- **v1.11 narrative form**: DJI's v1.11 pilot-feature-set DRC Mermaid (`Cloud-API-Doc/docs/en/30.feature-set/10.pilot-feature-set/90.drc.md`) renders this push as `is_cloud_control_auth = true` — a scalar boolean rather than an array. `cloud_control_auth` (array) was added in v1.15; cloud implementations targeting current firmware should rely on the v1.15 array form. The diagram label above uses the v1.15 canonical property name (`cloud_control_auth`).
+
+**[C]** — service `drc_mode_enter` on `thing/product/{gateway_sn}/services` (pilot variant — same schema as dock-path [B] above; verbatim from [`drc_mode_enter.md`](../mqtt/dock-to-cloud/services/drc_mode_enter.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "hsi_frequency": 1,
+    "mqtt_broker": {
+      "address": "mqtt.dji.com:8883",
+      "client_id": "sn_a",
+      "enable_tls": true,
+      "expire_time": 1672744922,
+      "password": "jwt_token",
+      "username": "sn_a_username"
+    },
+    "osd_frequency": 10
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "method": "drc_mode_enter"
+}
+```
+
+- Schema is identical to dock-path `drc_mode_enter`; the difference is which gateway SN the service targets (RC SN for pilot path) and that the cloud **also** forwards the relay broker credentials to the web page so both the RC and the browser connect to the same relay.
+- `services_reply` shorthand: `{ result: 0 }`.
+
+**[D]** — state push on `thing/product/{rc_sn}/state` carrying `cloud_control_auth` in the **revoked** form. Fires on both pilot grab-back (no preceding command) and after cloud-initiated release:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1704038400000,
+  "gateway": "rc_sn",
+  "data": {
+    "cloud_control_auth": []
+  }
+}
+```
+
+- Empty array signals "cloud holds no authorized scopes". Cloud must halt outgoing DRC / flight commands on this transition.
+- **v1.11 narrative form**: `is_cloud_control_auth = false` per the v1.11 pilot-feature-set DRC Mermaid.
+
+**[E]** — service `cloud_control_release` on `thing/product/{gateway_sn}/services` (verbatim from [`cloud_control_release.md`](../mqtt/pilot-to-cloud/services/cloud_control_release.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "control_keys": ["flight"]
+  },
+  "method": "cloud_control_release",
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1704038400000
+}
+```
+
+- `control_keys` — same single-element `["flight"]` array as `_auth_request`. Releases the named keys.
+- `services_reply` carries `{ "output": { "status": "ok" }, "result": 0 }` — the same undocumented-`output` quirk as [A]; `result` is authoritative.
+- Cloud-initiated release is always followed by state push [D] in the revoked form.
 
 ## Step-by-step
 

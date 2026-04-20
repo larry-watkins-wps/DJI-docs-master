@@ -57,8 +57,8 @@ sequenceDiagram
 
     note over dock,cloud: License verification
 
-    dock ->> cloud: thing/product/{gateway_sn}/requests<br/>method: config<br/>{ config_scope: "product", config_type: "json" }
-    cloud -->> dock: thing/product/{gateway_sn}/requests_reply<br/>method: config<br/>{ app_id, app_key, app_license, ntp_server_host, ntp_server_port }
+    dock ->> cloud: requests / config   [A]
+    cloud -->> dock: requests_reply / config   [A-reply]
 
     alt License invalid
         note over dock: License verification fails
@@ -67,25 +67,234 @@ sequenceDiagram
         note over dock,cloud: Organization binding
 
         pilot ->> dock: (local) request device bind information
-        dock ->> cloud: thing/product/{gateway_sn}/requests<br/>method: airport_bind_status<br/>{ devices: [dock_sn, drone_sn] }
-        cloud -->> dock: thing/product/{gateway_sn}/requests_reply<br/>method: airport_bind_status<br/>{ bind_status: [{ is_device_bind_organization, organization_id, organization_name, device_callsign }, ...] }
+        dock ->> cloud: requests / airport_bind_status   [B]
+        cloud -->> dock: requests_reply / airport_bind_status   [B-reply]
 
         opt Either device is not bound
             pilot ->> dock: (local) request org info for binding code
-            dock ->> cloud: thing/product/{gateway_sn}/requests<br/>method: airport_organization_get<br/>{ device_binding_code }
-            cloud -->> dock: thing/product/{gateway_sn}/requests_reply<br/>method: airport_organization_get<br/>{ organization_name }
+            dock ->> cloud: requests / airport_organization_get   [C]
+            cloud -->> dock: requests_reply / airport_organization_get   [C-reply]
 
             pilot ->> dock: (local) commit bind
-            dock ->> cloud: thing/product/{gateway_sn}/requests<br/>method: airport_organization_bind<br/>{ bind_devices: [{ sn, device_binding_code, organization_id, device_callsign, device_model_key }, ...] }
-            cloud -->> dock: thing/product/{gateway_sn}/requests_reply<br/>method: airport_organization_bind<br/>{ result, output.err_infos[] }
+            dock ->> cloud: requests / airport_organization_bind   [D]
+            cloud -->> dock: requests_reply / airport_organization_bind   [D-reply]
         end
 
-        dock ->> cloud: sys/product/{gateway_sn}/status<br/>method: update_topo<br/>{ domain, type, sub_type, sub_devices: [aircraft] }
-        cloud -->> dock: sys/product/{gateway_sn}/status_reply<br/>method: update_topo<br/>{ result: 0 }
+        dock ->> cloud: status / update_topo   [E]
+        cloud -->> dock: status_reply { result: 0 }
 
         note over dock,cloud: Dock is now operational — see device-binding.md for ongoing topology lifecycle
     end
 ```
+
+Payloads (verbatim from Phase 4 method docs — DJI source):
+
+**[A]** — request `config` on `thing/product/{gateway_sn}/requests`:
+
+```json
+{
+  "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+  "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+  "gateway": "sn",
+  "timestamp": 1667803298000,
+  "method": "config",
+  "data": {
+    "config_scope": "product",
+    "config_type": "json"
+  }
+}
+```
+
+- `config_scope` — documented value `"product"` (only value in v1.15).
+- `config_type` — documented value `"json"` (only value in v1.15).
+
+**[A-reply]** — `requests_reply` on `thing/product/{gateway_sn}/requests_reply`:
+
+```json
+{
+  "tid": "6a7bfe89-c386-4043-b600-b518e10096cc",
+  "bid": "42a19f36-5117-4520-bd13-fd61d818d52e",
+  "gateway": "sn",
+  "timestamp": 1667803298000,
+  "method": "config",
+  "data": {
+    "app_id": "123456",
+    "app_key": "app_key",
+    "app_license": "app_license",
+    "ntp_server_host": "host_url",
+    "ntp_server_port": 456
+  }
+}
+```
+
+- `ntp_server_port` — default `123` if omitted.
+- `app_id` type drift: v1.11 example shows integer `123456`; v1.15 example shows string `"123456"` — v1.15 string form matches the documented type and is canonical.
+
+**[B]** — request `airport_bind_status` on `thing/product/{gateway_sn}/requests`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "data": {
+    "devices": [
+      { "sn": "drone-sn" },
+      { "sn": "dock-sn" }
+    ]
+  }
+}
+```
+
+**[B-reply]** — `requests_reply` on `thing/product/{gateway_sn}/requests_reply`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "data": {
+    "result": 0,
+    "output": {
+      "bind_status": [
+        {
+          "sn": "12345",
+          "is_device_bind_organization": true,
+          "organization_id": "12345678",
+          "organization_name": "12345",
+          "device_callsign": "Device organization callsign"
+        },
+        {
+          "sn": "12345",
+          "is_device_bind_organization": true,
+          "organization_id": "12345678",
+          "organization_name": "12345",
+          "device_callsign": "Device organization callsign"
+        }
+      ]
+    }
+  }
+}
+```
+
+- `is_device_bind_organization` — `true` if already bound; `false` drives the opt-block binding flow [C] → [D].
+
+**[C]** — request `airport_organization_get` on `thing/product/{gateway_sn}/requests`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "data": {
+    "device_binding_code": "device_binding_code",
+    "organization_id": "organization_id"
+  }
+}
+```
+
+**[C-reply]** — `requests_reply` on `thing/product/{gateway_sn}/requests_reply`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "data": {
+    "result": 0,
+    "output": {
+      "organization_name": "organization_name"
+    }
+  }
+}
+```
+
+**[D]** — request `airport_organization_bind` on `thing/product/{gateway_sn}/requests`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "data": {
+    "bind_devices": [
+      {
+        "device_binding_code": "device_binding_code",
+        "device_callsign": "dock-device-callsign",
+        "device_model_key": "3-1-0",
+        "organization_id": "organization_id",
+        "sn": "dock-sn"
+      },
+      {
+        "device_binding_code": "device_binding_code",
+        "device_callsign": "drone-device-callsign",
+        "device_model_key": "0-67-0",
+        "organization_id": "organization_id",
+        "sn": "drone-sn"
+      }
+    ]
+  }
+}
+```
+
+- `device_model_key` — e.g., `3-1-0` for a dock, `0-67-0` for an M4D aircraft. Full enum in Phase 6 (`device-properties/`).
+
+**[D-reply]** — `requests_reply` on `thing/product/{gateway_sn}/requests_reply`:
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655,
+  "data": {
+    "result": 0,
+    "output": {
+      "err_infos": [
+        { "sn": "dock-sn",  "err_code": 210231 },
+        { "sn": "drone-sn", "err_code": 210231 }
+      ]
+    }
+  }
+}
+```
+
+- Even when top-level `result: 0`, individual devices in `err_infos[]` can carry non-zero `err_code`. Cloud must walk the array to detect partial failure.
+- Error code reference: Phase 8 [`error-codes/`](../error-codes/README.md).
+
+**[E]** — status push `update_topo` on `sys/product/{gateway_sn}/status` (first-time topology — gateway and sub-device online):
+
+```json
+{
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "method": "update_topo",
+  "timestamp": 1234567890123,
+  "data": {
+    "domain": "3",
+    "type": 119,
+    "sub_type": 0,
+    "device_secret": "secret",
+    "nonce": "nonce",
+    "thing_version": "1.1.2",
+    "sub_devices": [
+      {
+        "sn": "drone001",
+        "domain": "0",
+        "type": 60,
+        "sub_type": 0,
+        "index": "A",
+        "device_secret": "secret",
+        "nonce": "nonce",
+        "thing_version": "1.1.2"
+      }
+    ]
+  }
+}
+```
+
+- `domain` / `type` / `sub_type` — device-class enums resolved via Phase 6 (`device-properties/`).
+- `sub_devices[]` — empty array = no sub-device attached. Every `update_topo` is a full snapshot, not a delta.
+- `status_reply` envelope: `{ "data": { "result": 0 }, "tid": ..., "bid": ..., "timestamp": ..., "method": "update_topo" }`.
 
 ## Step-by-step
 

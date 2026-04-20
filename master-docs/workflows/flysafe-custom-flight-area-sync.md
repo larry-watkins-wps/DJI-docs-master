@@ -45,28 +45,259 @@ sequenceDiagram
     participant drone as Aircraft
 
     note over cloud,dock: Discovery — after bind / on demand
-    cloud ->> dock: services<br/>method: unlock_license_list<br/>{ device_model_domain: 0 (Aircraft) }
-    dock -->> cloud: services_reply<br/>{ result: 0, consistence, licenses[] }
-    cloud ->> dock: services<br/>method: unlock_license_list<br/>{ device_model_domain: 3 (Dock) }
-    dock -->> cloud: services_reply<br/>{ result: 0, consistence, licenses[] }
+    cloud ->> dock: services / unlock_license_list   [A]
+    dock -->> cloud: services_reply / unlock_license_list   [A-reply]
+    cloud ->> dock: services / unlock_license_list   [B]
+    dock -->> cloud: services_reply / unlock_license_list   [B-reply]
 
     alt consistence == false, online refresh
-        cloud ->> dock: services<br/>method: unlock_license_update<br/>{} (no file → online mode)
+        cloud ->> dock: services / unlock_license_update   [C]
         dock ->> flysafe: pull latest licenses
         flysafe -->> dock: license material
         dock -->> cloud: services_reply { result: 0 }
     else consistence == false, offline KMZ push
         cloud ->> cloud: upload signed KMZ to OSS
-        cloud ->> dock: services<br/>method: unlock_license_update<br/>{ file: { url, fingerprint (MD5) } }
+        cloud ->> dock: services / unlock_license_update   [D]
         dock ->> dock: download + verify MD5
         dock ->> dock: import licenses
         dock -->> cloud: services_reply { result: 0 }
     end
 
     note over cloud,dock: Operator toggles a specific license
-    cloud ->> dock: services<br/>method: unlock_license_switch<br/>{ license_id, enable }
-    dock -->> cloud: services_reply { result: 0, license_id }
+    cloud ->> dock: services / unlock_license_switch   [E]
+    dock -->> cloud: services_reply / unlock_license_switch   [E-reply]
 ```
+
+Payloads (verbatim from Phase 4f method docs — DJI source):
+
+**[A]** — service `unlock_license_list` on `thing/product/{gateway_sn}/services` (query aircraft-imported licenses via `device_model_domain: 0`):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "device_model_domain": 0
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655
+}
+```
+
+**[A-reply]** — `services_reply` on `thing/product/{gateway_sn}/services_reply` (full example showing the seven license sub-struct shapes from [`unlock_license_list.md`](../mqtt/dock-to-cloud/services/unlock_license_list.md)):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "consistence": false,
+    "device_model_domain": 0,
+    "licenses": [
+      {
+        "area_unlock": {
+          "area_ids": [115001769, 8724]
+        },
+        "common_fields": {
+          "begin_time": 1696948115,
+          "device_sn": "xxxxxxxxx",
+          "enabled": true,
+          "end_time": 2145916800,
+          "group_id": 2896,
+          "license_id": 240330,
+          "name": "Unlocking for XXX Area",
+          "type": 0,
+          "user_id": "xxxxxxxxx",
+          "user_only": false
+        }
+      },
+      {
+        "circle_unlock": {
+          "height": 500,
+          "latitude": 22.60309,
+          "longitude": 113.947815,
+          "radius": 1581
+        },
+        "common_fields": {
+          "begin_time": 1696948115,
+          "device_sn": "xxxxxxxxx",
+          "enabled": false,
+          "end_time": 2145916800,
+          "group_id": 2896,
+          "license_id": 240331,
+          "name": "Unlocking for XXX Circular Area",
+          "type": 1,
+          "user_id": "xxxxxxxxx",
+          "user_only": false
+        }
+      },
+      {
+        "common_fields": {
+          "begin_time": 1696948115,
+          "device_sn": "xxxxxxxxx",
+          "enabled": false,
+          "end_time": 2145916800,
+          "group_id": 2896,
+          "license_id": 240332,
+          "name": "Unlocking for China Country/Region",
+          "type": 2,
+          "user_id": "xxxxxxxxx",
+          "user_only": false
+        },
+        "country_unlock": {
+          "country_number": 156,
+          "height": 500
+        }
+      },
+      {
+        "common_fields": {
+          "begin_time": 1696948115,
+          "device_sn": "xxxxxxxxx",
+          "enabled": false,
+          "end_time": 2145916800,
+          "group_id": 2896,
+          "license_id": 240333,
+          "name": "Unlocking for XXX Altitude",
+          "type": 3,
+          "user_id": "xxxxxxxxx",
+          "user_only": false
+        },
+        "height_unlock": {
+          "height": 500
+        }
+      },
+      {
+        "common_fields": {
+          "begin_time": 1696948115,
+          "device_sn": "xxxxxxxxx",
+          "enabled": false,
+          "end_time": 2145916800,
+          "group_id": 2896,
+          "license_id": 240334,
+          "name": "Unlocking for XXX Polygon Area",
+          "type": 4,
+          "user_id": "xxxxxxxxx",
+          "user_only": false
+        },
+        "polygon_unlock": {
+          "points": [
+            {"latitude": 22.55403932, "longitude": 113.90488828},
+            {"latitude": 22.55520018, "longitude": 113.92180215},
+            {"latitude": 22.54656858, "longitude": 113.92051272}
+          ]
+        }
+      },
+      {
+        "common_fields": {
+          "begin_time": 1696948115,
+          "device_sn": "xxxxxxxxx",
+          "enabled": false,
+          "end_time": 2145916800,
+          "group_id": 2896,
+          "license_id": 240335,
+          "name": "Unlocking for XXX Power",
+          "type": 5,
+          "user_id": "xxxxxxxxx",
+          "user_only": false
+        },
+        "power_unlock": {}
+      },
+      {
+        "common_fields": {
+          "begin_time": 1696948115,
+          "device_sn": "xxxxxxxxx",
+          "enabled": false,
+          "end_time": 2145916800,
+          "group_id": 2896,
+          "license_id": 240336,
+          "name": "Unlocking for XXX RID",
+          "type": 6,
+          "user_id": "xxxxxxxxx",
+          "user_only": false
+        },
+        "rid_unlock": {
+          "level": 1
+        }
+      }
+    ],
+    "result": 0
+  },
+  "gateway": "",
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655
+}
+```
+
+**[B]** — second `unlock_license_list` call with `device_model_domain: 3` to query the dock's server-approved set. Envelope identical to [A] with `device_model_domain: 3`. **[B-reply]** — same shape as [A-reply] with `device_model_domain: 3` echoed.
+
+**[C]** — service `unlock_license_update` on `thing/product/{gateway_sn}/services`, **online mode** (`data: {}` — no `file`; dock pulls directly from FlySafe):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {},
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655
+}
+```
+
+> Body-variant note: online mode omits `file` entirely. DJI's source only shows the populated `file` form below ([D]); an empty `data: {}` is the cloud-side representation of the "no file → online fallback" behaviour described in [`unlock_license_update.md`](../mqtt/dock-to-cloud/services/unlock_license_update.md).
+
+**[D]** — service `unlock_license_update`, **offline mode** (populated `file` struct — dock downloads and verifies MD5):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "file": {
+      "fingerprint": "xxxx",
+      "url": "https://xx.oss-cn-hangzhou.aliyuncs.com/xx.kmz?Expires=xx&OSSAccessKeyId=xxx&Signature=xxx"
+    }
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655
+}
+```
+
+The `services_reply` for both [C] and [D] carries only `{ result: 0 }` (no `license_id` echo — see [`unlock_license_update.md`](../mqtt/dock-to-cloud/services/unlock_license_update.md)).
+
+**[E]** — service `unlock_license_switch` on `thing/product/{gateway_sn}/services`:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "enable": true,
+    "license_id": 240330
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655
+}
+```
+
+**[E-reply]** — `services_reply` (echoes `license_id` so concurrent toggles correlate):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "license_id": 240330,
+    "result": 0
+  },
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1234567890123
+}
+```
+
+Field legend (non-obvious enums):
+
+- `device_model_domain` — `0` Aircraft (already-imported licenses on the aircraft) · `3` Dock (licenses approved for the dock on the FlySafe website).
+- `consistence` — `true` device-side licenses match server-approved set · `false` sync needed (trigger `unlock_license_update`).
+- `common_fields.type` — `0` Authorization zone · `1` Custom circular area · `2` Country/region · `3` Altitude limit · `4` Custom polygon area · `5` Power · `6` RID. Selects which sibling sub-struct is populated (`area_unlock` / `circle_unlock` / `country_unlock` / `height_unlock` / `polygon_unlock` / `power_unlock` / `rid_unlock`).
+- `rid_unlock.level` — `1` EU RID · `2` China RID.
+- `country_unlock.country_number` — ISO-3166-1 numeric (e.g., `156` = China).
+- `common_fields.begin_time` / `end_time` — **second-level** UNIX timestamps (not ms).
+- `common_fields.user_only` — `true` = license active only when the specified DJI account is logged in.
+- `common_fields.enabled` — mirrors the last `unlock_license_switch.enable` state (read-only status).
+- `unlock_license_switch.enable` — `true` / `1` enable · `false` / `0` disable.
 
 ## Sequence — Custom-flight-area sync
 
@@ -80,33 +311,143 @@ sequenceDiagram
     note over cloud,oss: Operator draws / edits a CFA on the web map
     cloud ->> cloud: build geofence_{fileMD5}.json
     cloud ->> oss: upload object
-    cloud ->> dock: services<br/>method: flight_areas_update<br/>{} (trigger resync)
+    cloud ->> dock: services / flight_areas_update   [A]
     dock -->> cloud: services_reply { result: 0 }
 
-    dock ->> cloud: requests<br/>method: flight_areas_get<br/>{}
-    cloud -->> dock: requests_reply<br/>{ output: { files: [ { name, url, checksum (sha256), size } ] } }
+    dock ->> cloud: requests / flight_areas_get   [B]
+    cloud -->> dock: requests_reply / flight_areas_get   [B-reply]
     dock ->> oss: GET url (pre-signed)
     oss -->> dock: geofence_*.json
     dock ->> dock: verify SHA-256
 
     alt local versions already match
-        dock ->> cloud: events<br/>method: flight_areas_sync_progress<br/>{ status: "synchronized", file }
+        dock ->> cloud: events / flight_areas_sync_progress   [C]
         cloud -->> dock: events_reply { result: 0 }
     else sync needed
         dock ->> drone: push area data
         drone -->> dock: aircraft progress
-        dock ->> cloud: events<br/>method: flight_areas_sync_progress<br/>{ status: "synchronizing", file }
+        dock ->> cloud: events / flight_areas_sync_progress   [D]
         cloud -->> dock: events_reply { result: 0 }
-        dock ->> cloud: events<br/>method: flight_areas_sync_progress<br/>{ status: "synchronized" } <br/>(or "fail"/"switch_fail" with reason)
+        dock ->> cloud: events / flight_areas_sync_progress   [E]
         cloud -->> dock: events_reply { result: 0 }
     end
 
     note over drone,cloud: Once loaded — continuous telemetry
     loop In-flight
         drone ->> dock: per-area distance + inside/outside
-        dock ->> cloud: events<br/>method: flight_areas_drone_location<br/>{ drone_locations: [{ area_id, area_distance, is_in_area }, ...] }
+        dock ->> cloud: events / flight_areas_drone_location   [F]
     end
 ```
+
+Payloads (verbatim from Phase 4f method docs — DJI source):
+
+**[A]** — service `flight_areas_update` on `thing/product/{gateway_sn}/services` (trigger resync; `data: null` — command carries no parameters):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": null,
+  "method": "flight_areas_update",
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655
+}
+```
+
+`services_reply` returns `{ "result": 0 }` acknowledging receipt only — not sync completion (see [`flight_areas_update.md`](../mqtt/dock-to-cloud/services/flight_areas_update.md)).
+
+**[B]** — dock-initiated request `flight_areas_get` on `thing/product/{gateway_sn}/requests` (`data: null`):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": null,
+  "method": "flight_areas_get",
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655
+}
+```
+
+**[B-reply]** — `requests_reply` on `thing/product/{gateway_sn}/requests_reply` with the file manifest:
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "output": {
+      "files": [
+        {
+          "checksum": "sha256",
+          "name": "geofence_xxx.json",
+          "size": 500,
+          "url": "https://xx.oss-cn-hangzhou.aliyuncs.com/xx.json?Expires=xx&OSSAccessKeyId=xxx&Signature=xxx"
+        }
+      ]
+    },
+    "result": 0
+  },
+  "method": "flight_areas_get",
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 1654070968655
+}
+```
+
+An empty `output.files[]` signals the cloud currently has no CFAs for this device — the dock clears local state.
+
+**[C]** — event `flight_areas_sync_progress` on `thing/product/{gateway_sn}/events`, **local-match fast path** (`status: "synchronized"` immediately; `need_reply: 1`):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "file": {
+      "checksum": "sha256",
+      "name": "geofence_xxx.json"
+    },
+    "reason": 0,
+    "status": "synchronized"
+  },
+  "method": "flight_areas_sync_progress",
+  "need_reply": 1,
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 16540709686556
+}
+```
+
+**[D]** — event `flight_areas_sync_progress`, **in-progress push** — same envelope as [C] with `status: "synchronizing"`. See [`flight_areas_sync_progress.md`](../mqtt/dock-to-cloud/events/flight_areas_sync_progress.md) for the full status / reason enums.
+
+**[E]** — event `flight_areas_sync_progress`, **terminal push** — same envelope; `status` is one of `synchronized` / `fail` / `switch_fail`. On `fail` / `switch_fail`, `reason` is populated (integer 1–13; see enum below).
+
+`events_reply` for [C] / [D] / [E]: `{ "data": { "result": 0 }, ... }`.
+
+**[F]** — event `flight_areas_drone_location` on `thing/product/{gateway_sn}/events` (`need_reply: 0` — fire-and-forget):
+
+```json
+{
+  "bid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "data": {
+    "drone_locations": [
+      {
+        "area_distance": 100.11,
+        "area_id": "d275c4e1-d864-4736-8b5d-5f5882ee9bdd",
+        "is_in_area": true
+      }
+    ]
+  },
+  "method": "flight_areas_drone_location",
+  "need_reply": 0,
+  "tid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx",
+  "timestamp": 16540709686556
+}
+```
+
+Field legend (non-obvious enums):
+
+- `flight_areas_sync_progress.status` — `wait_sync` queued · `synchronizing` in progress · `synchronized` finished OK · `fail` sync failed (`reason` populated) · `switch_fail` enabling the new area set failed after sync (`reason` populated).
+- `flight_areas_sync_progress.reason` — `1` parse-file-info failed · `2` get-aircraft-file-info failed · `3` cloud download failed · `4` link flip failed · `5` file transfer failed · `6` disable failed · `7` delete CFA failed · `8` load job-area data on aircraft failed · `9` enable failed · `10` dock enhanced image transmission cannot be turned off · `11` aircraft startup failed · `12` checksum verification failed · `13` sync timeout. DJI's success example sends `reason: 0` — not a documented enum value; treat as informational.
+- `drone_locations[].area_id` — matches the `name`-stem of the loaded file (`geofence_{fileMD5}.json`) / ID embedded in the file.
+- `drone_locations[].area_distance` — meters to the nearest area boundary (positive regardless of inside/outside).
+- `drone_locations[].is_in_area` — `true` inside · `false` outside.
+- Example `timestamp` `16540709686556` is 14-digit (DJI source typo). Canonical MQTT timestamps in the corpus are 13-digit epoch-ms — cloud should emit/accept 13-digit.
 
 ## Step-by-step — FlySafe
 
