@@ -14,7 +14,7 @@ Two parallel cohorts, four device roles per cohort (dock / aircraft / RC / aircr
 |---|---|---|
 | Dock gateway | [DJI Dock 3](dock3.md) | [DJI Dock 2](dock2.md) |
 | Aircraft — via dock gateway | [M4D](m4d.md), [M4TD](m4td.md) | [M3D](m3d.md), [M3TD](m3td.md) |
-| RC gateway | [RC Plus 2 Enterprise](rc-plus-2.md) *(pending 6c)* | [RC Pro Enterprise](rc-pro.md) *(pending 6c)* |
+| RC gateway | [RC Plus 2 Enterprise](rc-plus-2.md) | [RC Pro Enterprise](rc-pro.md) |
 | Aircraft — via RC gateway | [M4D](m4d.md), [M4TD](m4td.md) (shared pilot base: [`_aircraft-pilot-base.md`](_aircraft-pilot-base.md)) | [M3D](m3d.md), [M3TD](m3td.md) (shared pilot base: [`_aircraft-pilot-base.md`](_aircraft-pilot-base.md)) |
 
 Out-of-scope devices that appear in DJI enum values (Dock 1, M30 / M30T, M300 / M350 RTK, M400, Mavic 3 Enterprise, plain RC) are noted in enum tables on the per-device docs for completeness but do not get their own property doc.
@@ -187,11 +187,33 @@ Of the ~56 aircraft-level properties in total, **the dock-path exposes 17 that t
 
 ### 4.3 RC-level properties
 
-### 4.3 RC-level properties
+Every RC-gateway property reported on `thing/product/{rc_sn}/osd` or `thing/product/{rc_sn}/state`. RC Pro Enterprise pairs with M3D / M3TD (Dock 2 cohort); RC Plus 2 Enterprise pairs with M4D / M4TD (Dock 3 cohort). `✓` = present in that RC's property list. Blank = not reported by that RC.
 
-*(Pending Phase 6c. RC Plus 2 Enterprise, RC Pro Enterprise catalog.)*
+Neither RC exposes any writable (`rw`) gateway-level properties — every row below is `r`. The `property/set` topic on each RC serial is still used, but only to route pilot-path writes to the paired aircraft (see [`rc-plus-2.md`](rc-plus-2.md) §3, [`rc-pro.md`](rc-pro.md) §3, and [`_aircraft-pilot-base.md`](_aircraft-pilot-base.md) §3).
 
-The RC Plus 2 Enterprise and RC Pro Enterprise are gateways (`{gateway_sn}`-owning); their properties are distinct from the aircraft-level properties above. The RC emits RC-level state (battery, connection, firmware) on its own topics; when it is relaying an aircraft, the aircraft's SN is the `{device_sn}` for the aircraft's properties.
+| Property | Semantic family | RC Pro | RC Plus 2 | Push | Notes |
+|---|---|---|---|---|---|
+| `live_capacity` | Livestream | ✓ | ✓ | state | Gateway-level streaming capability. Shape-identical across RCs (nested aircraft → camera → video-stream tree). |
+| `live_status` | Livestream | ✓ | ✓ | state | Per-stream state. `»video_quality` enum **differs** — RC Pro 5-value `{Adaptive, Smooth, Standard, High, Ultra-high}`; RC Plus 2 4-value `{Auto, Smooth, HD, Ultra HD}`. Cloud implementations must branch on RC cohort. |
+| `country` | Metadata | ✓ | | osd | **RC Pro only.** Country area code (`text`). |
+| `capacity_percent` | Battery | ✓ | ✓ | osd | RC battery percent 0–100. |
+| `height` | Position / RTK | ✓ | ✓ | osd | Ellipsoid height. |
+| `dongle_infos` | Comm | ✓ | ✓ | state | 4G dongle / eSIM inventory. `»esim_activate_state` is 2-value (`{Not activated, Activated}`) on both RCs — narrower than Dock 3's 3-value form. `»telecom_operator` uses Dock-2-style short labels (`Mobile`, `Telecommunications`) on both RCs. |
+| `wireless_link` | Comm | ✓ | ✓ | osd | 10-field struct — SDR and 4G link state, signal quality, frequency bands. Sub-field descriptions copy-paste dock wording on both RCs (cosmetic). |
+| `firmware_version` | Firmware | ✓ | ✓ | state | 64-char text. |
+| `latitude` | Position / RTK | ✓ | ✓ | osd | `double`, `[-90, 90]`. |
+| `longitude` | Position / RTK | ✓ | ✓ | osd | `double`, `[-180, 180]`. |
+| `cloud_control_auth` | Topology | ✓ | ✓ | state | Cloud authorization list. **New in v1.15 for RC Pro** (absent from v1.11 canonical); present on RC Plus 2 at first release. |
+| `drc_state` | DRC | | ✓ | osd | **RC Plus 2 only.** `enum_int {0: Not connected, 1: Connecting, 2: Connected}` — RC Plus 2 publishes DRC link state at the gateway level; RC Pro does not (DRC lifecycle on RC Pro cohort is observed via Phase 4h services). |
+
+**Summary of unique properties per RC:**
+
+| RC | OSD | State | Total top-level | Writable |
+|---|---|---|---|---|
+| RC Pro Enterprise | 6 (`country`, `capacity_percent`, `height`, `wireless_link`, `latitude`, `longitude`) | 5 (`live_capacity`, `dongle_infos`, `live_status`, `firmware_version`, `cloud_control_auth`) | 11 | 0 |
+| RC Plus 2 Enterprise | 6 (`capacity_percent`, `height`, `wireless_link`, `latitude`, `longitude`, `drc_state`) | 5 (`live_capacity`, `dongle_infos`, `live_status`, `firmware_version`, `cloud_control_auth`) | 11 | 0 |
+
+Both RCs share 10 top-level properties. Each RC has 1 unique top-level property (RC Pro: `country`; RC Plus 2: `drc_state`) — neither is a superset. The plain-RC (non-Enterprise) sibling file [`DJI_Cloud/DJI_CloudAPI_RC-Properties.txt`](../../DJI_Cloud/DJI_CloudAPI_RC-Properties.txt) is byte-equivalent to the RC Pro Enterprise file; it is out-of-scope per [`/CLAUDE.md`](../../CLAUDE.md) and not given its own property doc.
 
 ## 5. Open questions affecting this area
 
@@ -223,4 +245,11 @@ Phase 6b (aircraft) sources:
 
 M4D / M4TD have no v1.11 counterpart (both postdate v1.11.3).
 
-Phase 6c (RC) sources are listed in the per-device docs when that sub-phase lands.
+Phase 6c (RC) sources:
+
+| Source | Version | Role |
+|---|---|---|
+| [`DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`](../../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt) | v1.15 | RC Plus 2 Enterprise primary (625 lines). No v1.11 counterpart — RC Plus 2 Enterprise postdates v1.11.3. |
+| [`DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`](../../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt) | v1.15 | RC Pro Enterprise primary (68 lines). |
+| [`Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md`](../../Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md) | v1.11.3 | RC Pro Enterprise drift cross-check. v1.11 carries 10 top-level properties; v1.15 adds `cloud_control_auth`. |
+| [`DJI_Cloud/DJI_CloudAPI_RC-Properties.txt`](../../DJI_Cloud/DJI_CloudAPI_RC-Properties.txt) | v1.15 | Plain-RC sibling (out-of-scope). Byte-equivalent to the RC Pro Enterprise file; documented only as an inconsistency note in [`rc-pro.md`](rc-pro.md) §4. |

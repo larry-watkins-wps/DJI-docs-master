@@ -6,6 +6,81 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 6c close, ready for final Phase 6 review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3, 4, 5 complete and committed. Phase 6 (Device properties) — **6a + 6b + 6c landed**.
+- **Sub-phase 6c content-complete** — RC Plus 2 Enterprise + RC Pro Enterprise gateway-level catalogs. Final Phase 6 review gate is the only remaining Phase 6 item.
+- **Phase 7 (WPML + livestream protocols) is next** after the gate.
+
+### What 6c produced
+
+- [`device-properties/rc-plus-2.md`](device-properties/rc-plus-2.md) — RC Plus 2 Enterprise full catalog. **11 top-level properties** (6 OSD + 5 state), **0 writable**. Source [`DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`](../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt) (625 lines; column-per-row layout). 5 DJI-source inconsistencies flagged (dock-text leakage in `wireless_link` descriptions + Dock-2-style telecom-operator labels + 2-value `esim_activate_state` + 4-value `video_quality` + no example payload). §5 drift vs RC Pro — 3 rows: adds `drc_state`, absent `country`, `video_quality` enum swap. No v1.11 counterpart.
+- [`device-properties/rc-pro.md`](device-properties/rc-pro.md) — RC Pro Enterprise full catalog. **11 top-level properties** (6 OSD + 5 state), **0 writable**. Source [`DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`](../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt) (68 lines; tab-separated row-per-line layout) + v1.11 canonical [`Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md`](../Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md). 5 inconsistencies flagged (same cosmetic dock-text leakage as RC Plus 2 + near-equivalence with out-of-scope plain-RC file). §5 v1.11 → v1.15 drift — single row: adds `cloud_control_auth`. No other v1.11 drift.
+- Extended [`device-properties/README.md`](device-properties/README.md) §4.3 — 12-row RC coverage table + unique-property summary + plain-RC sibling note. Added §6 6c provenance rows for both RCs + v1.11 canonical + out-of-scope plain-RC file.
+- Updated 4i pilot-to-cloud shells:
+  - [`mqtt/pilot-to-cloud/osd/README.md`](mqtt/pilot-to-cloud/osd/README.md) — removed "pending 6c" markers, added per-RC OSD property enumeration (RC Plus 2: 6 OSD including `drc_state`; RC Pro: 6 OSD including `country`).
+  - [`mqtt/pilot-to-cloud/state/README.md`](mqtt/pilot-to-cloud/state/README.md) — removed "pending 6c" markers on RC pointers.
+  - [`mqtt/pilot-to-cloud/property-set/README.md`](mqtt/pilot-to-cloud/property-set/README.md) — **corrected** the 4i speculative RC writable list. The shell had guessed RC Plus 2 owned "SIM-slot selection, DRC-mode preferences, livestream toggles" as writable, and RC Pro as a "subset of RC Plus 2". Both wrong — neither RC owns any writable gateway property. Corrected table + explicit correction note in a new subsection. Same flavor of correction as the 6a Dock 2/3 property-set correction (which fixed a 7-entry guess down to 3 actual writable properties).
+- Updated corpus [`README.md`](README.md) TOC.
+- Updated [`TODO.md`](TODO.md) 6c section.
+
+### Design decisions locked at 6c drafting
+
+Carried into Phase 10 device-annexes if relevant:
+
+1. **Each RC gets a standalone catalog** — the two RCs are not delta-of-each-other (they swap `drc_state` ↔ `country`), so `rc-pro.md` → `rc-plus-2.md` delta treatment was rejected in favor of two full catalogs + drift tables. Matches the dock pattern: dock2.md full catalog, dock3.md full catalog + drift-vs-Dock-2 table.
+2. **RC Plus 2 drift table references RC Pro** (cohort sibling) rather than v1.11 (nonexistent). RC Pro drift table references v1.11 (additive: adds `cloud_control_auth`) plus brief cross-ref to RC Plus 2 §5.
+3. **Plain RC sibling file kept out of scope** — [`DJI_CloudAPI_RC-Properties.txt`](../DJI_Cloud/DJI_CloudAPI_RC-Properties.txt) is byte-equivalent to the RC Pro Enterprise file at the catalog level. Documented in `rc-pro.md` §4 (inconsistency note) + §7 (provenance) as a cross-check, not as a separate device doc. Same pattern as plain-RC callouts in 6a's out-of-scope policy.
+4. **"Zero writable" as explicit finding** — each RC doc §3 states "None" rather than omitting the section, and explains that the `property/set` topic on the RC serial is still used (for aircraft-targeted writes). Avoids reader confusion since the wire topic exists even with zero RC-owned writable keys.
+5. **4i property-set correction is inline** — put a dated "Correction — 4i speculative list (2026-04-19, 6c)" subsection in the shell rather than silently replacing the earlier wrong text. Keeps the audit trail of what changed and why, matching how 6a handled the speculative 7-entry Dock writable list.
+
+### DJI-source inconsistencies noted during 6c
+
+Carry into Phase 9 workflow authoring; none rise to OQ level:
+
+- **`wireless_link` sub-field descriptions leak dock wording on both RCs** — `»dongle_number` = "Number of Dongles on the aircraft"; `»link_workmode` = "Dock's video transmission link mode". Cosmetic extract defect shared across dock / RC / aircraft property files; DJI's shared gateway-property template.
+- **`dongle_infos.»esim_infos.»telecom_operator` + `dongle_infos.»sim_info.»telecom_operator` use Dock-2-style short labels** (`"Mobile"`, `"Telecommunications"`) on both RCs, versus Dock-3-style fully-qualified labels. Codes stable; same label drift as dock3.md §4.
+- **`dongle_infos.»esim_activate_state` is 2-value on both RCs** (`{0: Not activated, 1: Activated}`) vs Dock 3's 3-value form (`{0: Unknown, 1: Not activated, 2: Activated}`). RC never emits code `2`; narrower-than-Dock-3 parsing is fine.
+- **`live_status.»video_quality` 4-value vs 5-value enum incompatibility** between RC Plus 2 and RC Pro. Cloud implementations emitting / parsing this field must branch on RC cohort. Not a source defect; a genuine cohort delta.
+- **No OSD example in either source file** — both extracts are property-list-only. Cloud implementations assume the shared pilot-to-cloud envelope from Phase 4i shells.
+- **Plain-RC sibling file is byte-equivalent to RC Pro Enterprise** at the catalog level. Documented as a cross-check finding; plain RC is out-of-scope and does not get a per-device doc.
+
+No new OQ entries.
+
+### Phase 6 completion summary
+
+After 6c, the full Phase 6 surface is:
+
+| Doc | Top-level properties | Writable |
+|---|---|---|
+| [`dock2.md`](device-properties/dock2.md) | 48 (36 OSD + 12 state) | 3 |
+| [`dock3.md`](device-properties/dock3.md) | 49 (37 OSD + 12 state) | 3 |
+| [`_aircraft-pilot-base.md`](device-properties/_aircraft-pilot-base.md) | 42 (34 OSD + 8 state) | 3 |
+| [`m3d.md`](device-properties/m3d.md) | 42 dock-path (24 OSD + 18 state) + baseline pilot-path | 6 dock-path (baseline 3 pilot-path) |
+| [`m3td.md`](device-properties/m3td.md) | thermal-variant annex of M3D | — |
+| [`m4d.md`](device-properties/m4d.md) | 42 dock-path + baseline + 7 M4D pilot extensions | 6 dock-path + 3 M4D pilot |
+| [`m4td.md`](device-properties/m4td.md) | thermal-variant annex of M4D | — |
+| [`rc-plus-2.md`](device-properties/rc-plus-2.md) | 11 (6 OSD + 5 state) | 0 |
+| [`rc-pro.md`](device-properties/rc-pro.md) | 11 (6 OSD + 5 state) | 0 |
+
+Plus the master matrix [`README.md`](device-properties/README.md) with §4.1 (dock gateway), §4.2 (aircraft), §4.3 (RC) coverage tables.
+
+**Writable surface totals** (wire-level, gateway-grouped):
+
+- Dock-path writable (landing on `thing/product/{dock_sn}/property/set`): 3 dock-gateway + 6 aircraft = 9 keys (M3D and M4D share 6 writable aircraft keys with cohort-specific enum / text drift).
+- Pilot-path writable (landing on `thing/product/{rc_sn}/property/set`): 3 aircraft baseline (all cohorts) + 3 M4D-only extensions = 6 keys on M4D cohort; 3 keys on M3D cohort. **Zero RC-owned writable keys.**
+
+### Remaining phases after Phase 6
+
+- Phase 7 — WPML + livestream protocols. Sources: `DJI_Cloud/DJI_CloudAPI_WPML-*.txt` (multiple WPML extracts) + `Cloud-API-Doc/` canonical. Four WPML files (`wpml/overview.md`, `template-kml.md`, `waylines.md`, `common-elements.md`) + four livestream files (`rtmp.md`, `gb28181.md`, `webrtc.md`, `agora.md`). No cross-dependency on transport catalogs — can start immediately after Phase 6 review gate.
+- Phase 8 — HMS codes + error codes.
+- Phase 9 — Workflows (depends on Phases 3–5 transport catalogs; those are done).
+- Phase 10 — Device annexes + final review. Per-device quirks that didn't fit the property catalogs (e.g., RC-level SIM-slot selection mechanics, DRC authorization semantics on RC Pro where the gateway doesn't publish `drc_state`).
+
+---
+
 ## 2026-04-19 — handoff at Phase 6b close, ready for review gate
 
 ### State of play

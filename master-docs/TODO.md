@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 6b landed 2026-04-19 (aircraft: M3D, M3TD, M4D, M4TD + shared pilot-path baseline). Phase 6c (RCs) is next.
+**Current phase**: Phase 6c landed 2026-04-19 (RCs: RC Plus 2 Enterprise, RC Pro Enterprise). Final Phase 6 review gate pending. Phase 7 (WPML + livestream protocols) is next after gate.
 
 ---
 
@@ -266,12 +266,14 @@ Each sub-phase has its own review gate. Design decisions locked at 6a kickoff (2
 
 ### Sub-phase 6c — RC properties (RC Plus 2 Enterprise, RC Pro Enterprise)
 
-- [ ] `device-properties/rc-plus-2.md` (gateway-level, from `DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`, 625 lines).
-- [ ] `device-properties/rc-pro.md` (gateway-level, from `DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`, 68 lines).
-- [ ] Update 4i pilot-to-cloud shells to link the real Phase 6 docs.
-- [ ] Extend master matrix README §4.3 (RC-level coverage table).
-- [ ] Update corpus `README.md`.
-- [ ] Append to `RESUME-NOTES.md`.
+Actual shape confirmed 2026-04-19: each RC carries 11 top-level properties (6 OSD + 5 state). **Both are fully read-only at the gateway level** — no `accessMode: rw` properties on either RC. The two RCs are not delta-of-each-other: RC Pro has `country` (absent on RC Plus 2); RC Plus 2 has `drc_state` (absent on RC Pro). `live_status.»video_quality` enums are incompatible (RC Pro 5-value vs RC Plus 2 4-value).
+
+- [x] [`device-properties/rc-plus-2.md`](device-properties/rc-plus-2.md) — RC Plus 2 Enterprise full catalog. 11 top-level properties (6 OSD + 5 state), 0 writable. 5 DJI-source inconsistencies flagged. §5 drift vs RC Pro (3 rows: `drc_state` add, `country` absent, `video_quality` enum swap). No v1.11 counterpart.
+- [x] [`device-properties/rc-pro.md`](device-properties/rc-pro.md) — RC Pro Enterprise full catalog. 11 top-level properties (6 OSD + 5 state), 0 writable. 5 DJI-source inconsistencies flagged (includes near-equivalence note vs out-of-scope plain-RC file). §5 v1.11 → v1.15 drift (adds `cloud_control_auth`; no other changes) plus vs-RC-Plus-2 summary.
+- [x] Update 4i pilot-to-cloud shells — [`osd/`](mqtt/pilot-to-cloud/osd/README.md), [`state/`](mqtt/pilot-to-cloud/state/README.md), [`property-set/`](mqtt/pilot-to-cloud/property-set/README.md). Corrected the 4i `property-set` shell's speculative writable list — actual RC writable surface is **zero** (not SIM-slot / DRC-preferences / livestream-toggles as the shell guessed).
+- [x] Extend master matrix README §4.3 — 12-row RC coverage table + unique-property summary + out-of-scope plain-RC note.
+- [x] Update corpus [`README.md`](README.md).
+- [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md).
 - [ ] **Final Phase 6 review gate** (closes the whole Phase 6).
 
 ## Phase 7 — Auxiliary specs (WPML + livestream protocols)
