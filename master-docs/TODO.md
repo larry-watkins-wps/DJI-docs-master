@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 7 content-complete 2026-04-19. Phase 7 review gate pending user approval. Phase 8 (HMS codes + error codes) is next.
+**Current phase**: Phase 7 closed 2026-04-19. Phase 8 (HMS codes + error codes) is next.
 
 ---
 
@@ -296,7 +296,7 @@ Livestream protocols:
 
 - [x] Update corpus [`README.md`](README.md).
 - [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md).
-- [ ] **Review gate** — pending user approval 2026-04-19.
+- [x] **Review gate** closed 2026-04-19. Landing commit `03a5006` (Phase 7 — WPML + livestream protocols, 10 docs + session handoff).
 
 ## Phase 8 — Codes (HMS + error codes)
 
