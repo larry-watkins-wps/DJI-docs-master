@@ -6,6 +6,127 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 8 close, ready for review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3, 4, 5, 6, 7 complete and committed. **Phase 8 (HMS codes + error codes) content-complete.**
+- Phase 8 review gate is the only remaining Phase 8 item.
+- **Phase 9 (Workflows) is next** after the review gate. Depends on Phases 3–5 transport catalogs (done) + Phase 7 WPML + Phase 8 codes (both done).
+
+### What Phase 8 produced
+
+Single-drop phase per PLAN.md — no sub-phase split. Total: **17 content files + 3 generator artifacts + 1 README table update**. Reproducible generator pipeline lives under [`_build/`](_build/).
+
+**HMS codes** ([`hms-codes/`](hms-codes/README.md) — 16 files, 1,769 alarm entries):
+
+- [`hms-codes/README.md`](hms-codes/README.md) — master index + first-byte-prefix catalog table + CN source-defect disclosure + `HMS.json` cross-reference to the [Phase 4f `events/hms.md`](mqtt/dock-to-cloud/events/hms.md) event definition.
+- 14 per-prefix files — one per observed first byte of the `alarmId` hex value:
+  - [`0x11-payload-general.md`](hms-codes/0x11-payload-general.md) (45 codes) — payload general faults, most reference `%component_index`.
+  - [`0x12-battery-station.md`](hms-codes/0x12-battery-station.md) (37 codes) — battery-station activation and restart guidance.
+  - [`0x14-payload-imu.md`](hms-codes/0x14-payload-imu.md) (52 codes) — payload IMU temperature / calibration.
+  - [`0x15-mmwave-radar.md`](hms-codes/0x15-mmwave-radar.md) (39 codes) — mmWave-radar temperature and operation.
+  - [`0x16-flight-control.md`](hms-codes/0x16-flight-control.md) (**921 codes** — 52% of catalog) — flight-control system. Sub-sectioned by second byte: `00` FC · `01` sensor · `02` tachometer · `03` accelerometer · `04` barometer · `05` GNSS · `06` compass · `07` RTK · `08` motors/ESC · `09` battery · `0A` registration · `10` takeoff readiness · `11` thermal/accessory · `20` USB/ext · `30` BDS · `40`–`4A` internal subsystems (abstract-data, DSP, DBus, intelligent-flight-modes, landing/wayline, fusion/hall/RTK, positioning, planner, control loops) · `67` Power Line Follow.
+  - [`0x17-transmission.md`](hms-codes/0x17-transmission.md) (16 codes) — image transmission & RC link.
+  - [`0x19-system-overload.md`](hms-codes/0x19-system-overload.md) (52 codes) — CPU / memory / network overload.
+  - [`0x1A-vision-sensors.md`](hms-codes/0x1A-vision-sensors.md) (170 codes) — vision sensor faults across all positions.
+  - [`0x1B-navigation-tracking.md`](hms-codes/0x1B-navigation-tracking.md) (138 codes) — navigation + Target Acquisition.
+  - [`0x1C-camera.md`](hms-codes/0x1C-camera.md) (167 codes) — camera overheating, errors, SD-card full, EIS/H20-specific.
+  - [`0x1D-gimbal.md`](hms-codes/0x1D-gimbal.md) (45 codes) — gimbal stuck, calibration, overload.
+  - [`0x1E-psdk-payload.md`](hms-codes/0x1E-psdk-payload.md) (28 codes) — third-party PSDK payload + DJI searchlight + speaker.
+  - [`0x1F-cellular-lte.md`](hms-codes/0x1F-cellular-lte.md) (56 codes) — LTE transmission + DJI Cellular Dongle.
+  - [`0x20-takeoff-tags.md`](hms-codes/0x20-takeoff-tags.md) (2 codes) — "Remove before takeoff" + control-stick centered.
+- [`hms-codes/outliers.md`](hms-codes/outliers.md) (1 entry) — the literal `unknown` alarmId with generic fallback tip.
+
+**Curated CN→EN translations**: 531 entries — DJI leaked Chinese developer-debug strings under `tipEn`. Stored in [`_build/_translations.json`](_build/_translations.json); rendered inline with trailing **+** marker; CN originals preserved verbatim under collapsible `CN source` blocks within each affected second-byte subsection. Translation style: DJI's typical user-facing warning voice for user-level strings; literal technical translation for dev-debug strings (with internal symbols like `DBus topic gimbal_state`, `ap_fusion`, `circular_tracking` kept as code spans).
+
+**Error codes** ([`error-codes/`](error-codes/README.md) — 1 file, 448 codes):
+
+- [`error-codes/README.md`](error-codes/README.md) — single-doc per TODO.md. Preamble explains the `ABCDEF` format (source `A` = 3/5 device-side, 4/6 Pilot 2; module `BC`; local `DEF`). Grouped tables per BC module across 20 buckets (`312`–`514`). Module labels cross-referenced with DJI-Cloud-API-Demo enum classes (`FirmwareErrorCodeEnum` / `WaylineErrorCodeEnum` / `LogErrorCodeEnum` / `CommonErrorEnum` / `DebugErrorCodeEnum` / `ControlErrorCodeEnum` / `LiveErrorCodeEnum` / `DrcStatusErrorEnum`).
+
+**v1.11 → v1.15 error-code drift**: Fully additive. 5 new codes in v1.15 (`321788`, `327022`, `341002`, `514155`, `514168`); 0 dropped. Documented in `error-codes/README.md` §4.
+
+**Reproducibility artifacts** ([`_build/`](_build/)):
+
+- [`_build/_translations.json`](_build/_translations.json) — 531 curated CN→EN translations keyed by alarmId.
+- [`_build/generate_hms_codes.py`](_build/generate_hms_codes.py) — reads HMS.json + translations, emits 14 per-prefix files + README + outliers. Re-runnable after source refresh.
+- [`_build/generate_error_codes.py`](_build/generate_error_codes.py) — reads HMS-Codes.txt + v1.11 drift source, emits the single error-codes README. Re-runnable.
+
+PLAN.md mentions "Sanity-check script optional future polish" — these two generators are the materialization of that intent.
+
+**Corpus updates**:
+
+- [`README.md`](README.md) — TOC rows filled in for `hms-codes/` and `error-codes/`.
+- [`TODO.md`](TODO.md) — Phase 8 checklist fully checked with drop-down details; "current phase" banner advanced to "Phase 8 content-complete, review gate pending; Phase 9 next".
+- `OPEN-QUESTIONS.md` — **no new entries.** All Phase 8 source defects (CN-in-`tipEn`, filename mismatch, full-width-paren use, `unknown` fallback, uppercase-X outlier) are local DJI source defects that do not require clarification.
+
+### Design decisions locked at Phase 8 drafting
+
+Carried into Phase 9 / 10 where relevant:
+
+1. **Single-drop phase** per PLAN.md framing. Reproducible pipeline makes sub-phasing unnecessary — any fix-up or source-refresh is a script re-run, not a re-draft.
+2. **HMS layout = 14 files by first-byte prefix + sub-sectioned 0x16**. Keeps a 1:1 mapping with the DJI wire-level identifier while giving the 921-entry flight-control file a navigable internal structure. Alternatives (monolithic, per-second-byte physical split, cross-prefix functional grouping) were rejected.
+3. **CN-in-`tipEn` policy — curate + mark + preserve**. DJI shipped ~30% of alarms with CN under the English field. We translate to English (flagged **+**), keep the CN verbatim in a collapsible callout under each subsection, and document the defect in the master README. This follows the "English-only corpus, flag translated passages" directive while preserving the audit trail per "real payloads only, no fabrication."
+4. **Full-width parens normalize to ASCII**. 167 tips use U+FF08/FF09 `（ ）` (Chinese full-width) around otherwise-English content — pure copy defect. Generator normalizes to `(` `)` silently; not worth a per-entry callout.
+5. **Error-codes = single file grouped by BC module**. TODO.md says "`error-codes/README.md` with grouped table" — single doc per that spec. BC module is DJI's own wire-level grouping (the second and third digits of `ABCDEF`), so partition aligns with DJI convention.
+6. **Source-filename irony preserved as documentation**. The source file [`DJI_CloudAPI-HMS-Codes.txt`](../DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt) is named "HMS-Codes" but contains general API error codes — DJI's own preamble explicitly says HMS alarm descriptions are **not** in this file. The corpus's `error-codes/README.md` §6 documents this mismatch so future readers aren't confused.
+7. **`_build/` stays tracked in-repo, not gitignored**. The generator scripts + translations are first-class corpus artifacts — they let anyone regenerate the Phase 8 output from the two primary sources. PLAN.md's "Sanity-check script optional future polish" is satisfied.
+
+### DJI-source inconsistencies noted during Phase 8
+
+Carry into Phase 9 workflow authoring; none rise to OQ level:
+
+**HMS**:
+
+- **531 entries carry CJK-ideograph content in `tipEn`** — DJI leaked Chinese developer-debug strings under the English copy key. Concentrated in 0x16 second-byte ranges 0x40 (abstract-data topics), 0x41 (DSP interaction), 0x42 (DBus topics), 0x43 (intelligent flight modes — tracking, QuickShots, MasterShots, Hyperlapse, APAS, OA), 0x46 (fusion/hall/RTK), 0x47 (positioning + compass calibration — compass-cal entries are user-facing), 0x49 (planner + global map), 0x4A (control loops). Handled per policy above.
+- **`unknown` alarmId** — a literal non-hex entry with generic fallback tip. Preserved as outlier.
+- **`0X1B033001`** — uppercase-`X` casing (all other IDs use `0x`). Preserved verbatim, filed under `0x1B`.
+- **167 entries use full-width Chinese parens** around otherwise-English content. Normalized to ASCII in the catalog.
+- **Prefix-byte taxonomy is inferred, not DJI-documented**. Master README flags this explicitly — the per-file "inferred domain" label is a corpus convenience, not a DJI-authored claim.
+
+**Error codes**:
+
+- **Source filename mismatch** — [`DJI_CloudAPI-HMS-Codes.txt`](../DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt) actually holds general API error codes; HMS alarms are in [`HMS.json`](../DJI_Cloud/HMS.json). DJI's own preamble line 5 clarifies this.
+- **Source digits `4` and `6` (Pilot 2) are undocumented with codes** — the `ABCDEF` format allows A = 3/4/5/6 but v1.15 extracts only carry `3xxxxx` and `5xxxxx` codes. Pilot-2 `4xxxxx` / `6xxxxx` codes would come from Pilot-specific sources not in this repo.
+- **Substitution placeholders persist** — `{dock_org_name}` and similar template variables appear in tip text (e.g., `312015`). Cloud implementations must substitute these from their own context; DJI does not document the substitution contract.
+- **Modules `341` and `386` have 1 code each** — these are likely experimental or partially-deployed; preserved as-is.
+
+No new OQ entries.
+
+### Phase 8 completion summary
+
+| File | Entries | Scope |
+|---|---|---|
+| [`hms-codes/README.md`](hms-codes/README.md) | — | master index + policy |
+| [`hms-codes/0x16-flight-control.md`](hms-codes/0x16-flight-control.md) | 921 | flight-control subsystem |
+| [`hms-codes/0x1A-vision-sensors.md`](hms-codes/0x1A-vision-sensors.md) | 170 | vision sensors |
+| [`hms-codes/0x1C-camera.md`](hms-codes/0x1C-camera.md) | 167 | camera |
+| [`hms-codes/0x1B-navigation-tracking.md`](hms-codes/0x1B-navigation-tracking.md) | 138 | navigation & target acquisition |
+| [`hms-codes/0x1F-cellular-lte.md`](hms-codes/0x1F-cellular-lte.md) | 56 | cellular |
+| [`hms-codes/0x14-payload-imu.md`](hms-codes/0x14-payload-imu.md) | 52 | payload IMU |
+| [`hms-codes/0x19-system-overload.md`](hms-codes/0x19-system-overload.md) | 52 | system overload |
+| [`hms-codes/0x11-payload-general.md`](hms-codes/0x11-payload-general.md) | 45 | payload general |
+| [`hms-codes/0x1D-gimbal.md`](hms-codes/0x1D-gimbal.md) | 45 | gimbal |
+| [`hms-codes/0x15-mmwave-radar.md`](hms-codes/0x15-mmwave-radar.md) | 39 | mmWave radar |
+| [`hms-codes/0x12-battery-station.md`](hms-codes/0x12-battery-station.md) | 37 | battery station |
+| [`hms-codes/0x1E-psdk-payload.md`](hms-codes/0x1E-psdk-payload.md) | 28 | PSDK payload |
+| [`hms-codes/0x17-transmission.md`](hms-codes/0x17-transmission.md) | 16 | transmission |
+| [`hms-codes/0x20-takeoff-tags.md`](hms-codes/0x20-takeoff-tags.md) | 2 | takeoff tags |
+| [`hms-codes/outliers.md`](hms-codes/outliers.md) | 1 | non-hex outlier |
+| [`error-codes/README.md`](error-codes/README.md) | 448 | general API error codes |
+| [`_build/_translations.json`](_build/_translations.json) | 531 keys | CN→EN translations |
+| [`_build/generate_hms_codes.py`](_build/generate_hms_codes.py) | — | HMS generator |
+| [`_build/generate_error_codes.py`](_build/generate_error_codes.py) | — | error-codes generator |
+
+Total Phase 8 output: **17 content files + 3 pipeline artifacts**, **1,769 HMS alarm entries + 448 error codes = 2,217 codes documented**.
+
+### Remaining phases after Phase 8
+
+- Phase 9 — Workflows. Dependencies now all satisfied: Phases 3 (HTTP), 4 (MQTT), 5 (WebSocket) transport catalogs done; Phase 7 WPML + livestream-protocols available to cite for wayline-upload / livestream-start workflows; Phase 8 codes available for error-path callouts in each workflow. Expected output ~11 workflow docs per PLAN.md §Phase 9.
+- Phase 10 — Device annexes + final corpus review.
+
+---
+
 ## 2026-04-19 — handoff at Phase 7 close, ready for review gate
 
 ### State of play

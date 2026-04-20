@@ -1,0 +1,693 @@
+# Error codes
+
+DJI Cloud API general error-code reference. These are command-response and task-status codes returned in HTTP bodies, MQTT `services_reply.result`, and event-payload `result` / `error` fields — distinct from the HMS alarm codes in [`hms-codes/`](../hms-codes/README.md).
+
+**448 codes total** across 20 function modules, drawn from [`DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt`](../../DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt). (The source file is mis-named; DJI's own preamble states that HMS alarm descriptions are **not** in this file — they live in [`HMS.json`](../../DJI_Cloud/HMS.json), covered by [`hms-codes/`](../hms-codes/README.md).)
+
+## 1. Format
+
+Every error code is a **six-digit decimal number** in the form `ABCDEF`:
+
+| Segment | Width | Meaning |
+|---|---|---|
+| `A` | 1 digit | Error source. `3` or `5` = device side (dock or aircraft); `4` or `6` = DJI Pilot 2. |
+| `BC` | 2 digits | Function module. See §3 for the full list. |
+| `DEF` | 3 digits | Module-specific code. No global meaning. |
+
+Source authority: [`DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt`](../../DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt) (v1.15) — the "First Digit (A) Error Source" table maps source codes `3`, `4`, `5`, `6` to either Device Side (`3` / `5`) or DJI Pilot 2 (`4` / `6`). v1.15 carries only `3` and `5` codes; Pilot-2 `4` / `6` codes are not present in this extract.
+
+## 2. How codes reach the cloud
+
+1. **HTTP** — response envelope `{code, message, data}` where `code != 0` carries the error value. See [`http/README.md §4`](../http/README.md).
+2. **MQTT services_reply** — the `data.result` field of `thing/product/{gateway_sn}/services_reply`. See [`mqtt/README.md §5`](../mqtt/README.md).
+3. **MQTT events with `need_reply: 1`** — the `data.result` field of the event payload itself. The cloud mirrors the value back in its `_reply`.
+4. **DRC / Low-latency channels** — `result` field on `drc/down` responses and `drc/up` heartbeats; see [`mqtt/dock-to-cloud/drc/`](../mqtt/dock-to-cloud/drc/).
+
+## 3. Catalog — grouped by function module
+
+### 312xxx — Firmware upgrade
+
+Dock / aircraft firmware update flow.
+
+10 codes.
+
+| Code | Description |
+|---|---|
+| `312014` | Updating device firmware. Wait until update completed |
+| `312015` | Unable to update device firmware. Dock ({dock_org_name}) busy. Try again when dock is idle |
+| `312016` | Update failed. Dock and aircraft transmission error. Restart dock and aircraft and try again |
+| `312022` | Failed to power on aircraft, or aircraft not connected. Check if aircraft is inside dock, battery installed, and dock and aircraft linked |
+| `312023` | Failed to push driving rods back into place. Unable to update aircraft firmware. Check if emergency stop button is pressed down or driving rods are stuck |
+| `312027` | Failed to update firmware. Aircraft not detected inside dock |
+| `312028` | Failed to update firmware. Device restarted during update |
+| `312029` | Restarting device. Unable to update firmware. Wait until restart completed |
+| `312030` | Aircraft enhanced transmission enabled. Failed to update firmware. Disable enhanced transmission and try again |
+| `312704` | Device battery level too low. Wait until device is charged to above 20% and try again |
+
+### 314xxx — Wayline task — distribution
+
+Wayline file transfer from cloud to dock to aircraft, and task-preparation handshake.
+
+24 codes.
+
+| Code | Description |
+|---|---|
+| `314000` | Operation not supported. Check device status |
+| `314001` | Failed to distribute task. Try again later |
+| `314002` | Failed to distribute task. Try again later |
+| `314003` | Flight route file format not supported. Check file |
+| `314005` | Failed to distribute task. Try again later or restart dock and try again |
+| `314006` | Failed to initiate aircraft. Restart dock and try again |
+| `314007` | Failed to distribute flight route file from dock to aircraft. Restart dock and try again |
+| `314008` | Aircraft task preparation timed out. Restart dock and try again |
+| `314009` | Failed to initiate aircraft. Restart dock and try again |
+| `314010` | Unable to perform task. Restart dock and try again |
+| `314011` | Dock system error. Unable to obtain task result |
+| `314012` | Aircraft task preparation failed. Unable to perform task. Restart dock and try again |
+| `314013` | Failed to distribute task. Dock unable to obtain flight route file and perform task. Try again later |
+| `314014` | Dock system error. Failed to perform task. Try again later |
+| `314015` | Failed to distribute AI-Spot Check flight route from dock to aircraft. Unable to perform task. Try again later or restart dock and try again |
+| `314016` | Failed to process flight route file. Unable to perform task. Check file |
+| `314017` | Failed to process flight route file. Check file and try again |
+| `314018` | Aircraft RTK positioning error. Unable to perform task. Try again later or restart dock and try again |
+| `314019` | Failed to converge aircraft RTK data. Unable to perform task. Try again later or restart dock and try again |
+| `314020` | Aircraft not in the middle of landing pad or aircraft heading incorrect. Unable to perform task. Check aircraft position and heading |
+| `314021` | Aircraft RTK positioning error. Unable to perform task. Try again later or restart dock and try again |
+| `314024` | Failed to distribute entry/exit route. Try again later or restart dock and try again |
+| `314025` | RTK convergence timed out. Cancel task manually |
+| `314200` | Task failed. Dock network disconnected. Aircraft automatically returned to home. Make sure network is connected and try again |
+
+### 315xxx — Wayline task — dock communication
+
+Dock ↔ cloud and dock ↔ aircraft command-distribution faults during wayline execution.
+
+36 codes.
+
+| Code | Description |
+|---|---|
+| `315000` | Dock communication error. Restart dock and try again |
+| `315001` | Dock communication error. Power on aircraft remotely and wait for 1 min before distributing task again |
+| `315002` | Dock communication error. Restart dock and try again |
+| `315003` | Dock communication error. Restart dock and try again |
+| `315004` | Task failed. Wait until both docks are in idle status and distribute task again |
+| `315005` | Dock communication error. Restart dock and try again |
+| `315006` | Dock communication error. Restart dock and try again |
+| `315007` | Dock communication error. Update dock firmware to latest version or restart dock and try again |
+| `315008` | RTK calibration method inconsistent between docks for takeoff and landing. Make sure the same calibration method is used and connection is stable |
+| `315009` | Dock communication error. Restart dock and try again |
+| `315010` | Unable to stop task. Try again later. Contact DJI Support if issue persists |
+| `315011` | Unable to stop task. Try again later. Contact DJI Support if issue persists |
+| `315012` | Unable to stop task. Try again later. Contact DJI Support if issue persists |
+| `315013` | Failed to distribute task. Try again later. Contact DJI Support if issue persists |
+| `315014` | Unable to set Home Point for current task type |
+| `315015` | Failed to set Home Point. Try again later. Contact DJI Support if issue persists |
+| `315016` | Failed to distribute task. Try again later. Contact DJI Support if issue persists |
+| `315017` | Failed to distribute task. Try again later. Contact DJI Support if issue persists |
+| `315018` | Task failed. Wait until both docks are in idle status and distribute task again |
+| `315019` | Unable to perform multi-dock task due to suboptimal deployment location. Select another dock and try again |
+| `315050` | Dock system error. Restart dock and try again |
+| `315051` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315052` | RTK data not converged. Dock location not calibrated. Wait and try again |
+| `315053` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315054` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315055` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315056` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315057` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315058` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315059` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315060` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315061` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315062` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315063` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315064` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+| `315065` | Task failed. Restart dock and distribute task again. Contact DJI Support if issue persists |
+
+### 316xxx — Wayline task — aircraft configuration
+
+Aircraft-side parameter-configuration and readiness faults before / during wayline execution.
+
+48 codes.
+
+| Code | Description |
+|---|---|
+| `316001` | Failed to configure aircraft parameters. Restart dock and try again |
+| `316002` | Failed to configure aircraft parameters. Restart dock and try again |
+| `316003` | Failed to configure aircraft parameters. Restart dock and try again |
+| `316004` | Failed to configure aircraft parameters. Restart dock and try again |
+| `316005` | Failed to converge aircraft RTK data. Unable to perform task. Restart dock and try again |
+| `316006` | Task timed out. Aircraft lost or unable to land on dock because dock cover closed or driving rods pulled back. Check aircraft status on-site |
+| `316007` | Failed to initiate aircraft. Restart dock and try again |
+| `316008` | Dock failed to obtain aircraft flight control. Unable to perform task. Make sure flight control not locked by remote controller |
+| `316009` | Aircraft battery level lower than 30%. Unable to perform task. It is recommended to charged battery up to 50% before trying again |
+| `316010` | Aircraft not detected. Unable to perform task. Check if aircraft is inside dock and linked to dock, or restart dock and try again |
+| `316011` | Aircraft landed on incorrect location. Check if aircraft should be manually placed on dock deployment site |
+| `316012` | Aircraft task preparation failed. Unable to perform task. Restart dock and try again |
+| `316013` | Aircraft task preparation failed. Unable to perform task. Restart dock and try again |
+| `316014` | Aircraft task preparation failed. Unable to perform task. Restart dock and try again |
+| `316015` | Aircraft location calibrated by RTK device is far from dock. Unable to perform task. Restart dock and try again |
+| `316016` | Aircraft landing on dock timed out. Aircraft and dock may be disconnected. Check livestream view to see if aircraft landed on dock |
+| `316017` | Obtaining number of aircraft media files timed out. Aircraft and dock may be disconnected. Check livestream view to see if aircraft landed on dock |
+| `316018` | Task performance timed out. Aircraft and dock may be disconnected. Check livestream view to see if aircraft landed on dock |
+| `316019` | Dock system error. Unable to perform task. Try again later |
+| `316020` | Aircraft RTK signal source error. Try again later |
+| `316021` | Checking aircraft RTK signal source timed out. Try again later |
+| `316022` | Aircraft unable to return to home. Check if aircraft is powered on, aircraft and dock are connected, and try again |
+| `316023` | Aircraft controlled by Controller B and unable to return to home. Control aircraft from Controller B or power off remote controller and try again |
+| `316024` | Aircraft failed to return to home. Check if aircraft has taken off and try again |
+| `316025` | Failed to configure aircraft parameters. Try again later or restart dock and try again |
+| `316026` | Dock emergency stop button pressed down. Unable to perform task. Release button and try again |
+| `316027` | Setting aircraft parameters timed out. Try again later or restart dock and try again |
+| `316029` | Dock emergency stop button pressed down. Aircraft flying to alternate landing site. Make sure aircraft has safely landed and place aircraft inside dock |
+| `316032` | Obtaining battery data timed out. Try again later or restart aircraft and try again |
+| `316033` | Battery approaching cycle count limit. Task stopped to ensure flight safety. Changing battery recommended |
+| `316034` | Unable to take off. Aircraft and dock firmware versions do not match. Update firmware and try again |
+| `316035` | Failed to distribute entry/exit route. Make sure firmware is up to date and distribute task again. Contact DJI support if issue persists |
+| `316050` | Aircraft landed outside of dock because of low battery level. Make sure aircraft has landed safely and place aircraft inside dock |
+| `316051` | Task error. Aircraft landed outside of dock. Make sure aircraft has safely landed and place aircraft inside dock |
+| `316052` | Task error. Aircraft flying to alternate landing site. Make sure aircraft safely lands on-site and place aircraft inside dock |
+| `316053` | Aircraft has been manually landed by pilot. Make sure aircraft has safely landed and place aircraft inside dock |
+| `316100` | Failed to obtain camera info. Try again |
+| `316101` | Failed to switch to Single Shot mode. Try again |
+| `316102` | Failed to disable watermark. Try again |
+| `316103` | Failed to switch to average metering mode. Try again |
+| `316104` | Failed to switch to wide-angle camera. Try again |
+| `316105` | Failed to save photo storage settings. Try again |
+| `316106` | Failed to set infrared camera zoom ratio. Try again |
+| `316107` | Failed to set photo resolution to 4K. Try again |
+| `316108` | Failed to set photo format as JPEG. Try again |
+| `316109` | Failed to disable dewarp. Try again |
+| `316110` | Failed to open mechanical shutter. Try again |
+| `316111` | Failed to set focus mode. Try again |
+
+### 317xxx — Media — aircraft storage
+
+Aircraft media-file enumeration and storage-format operations.
+
+7 codes.
+
+| Code | Description |
+|---|---|
+| `317001` | Failed to obtain number of aircraft media files. Restart dock and try again |
+| `317002` | Failed to format aircraft storage. Make sure aircraft is powered on and connected to dock and camera can be detected. Or restart aircraft and try again |
+| `317003` | Failed to format aircraft storage. Restart aircraft and try again |
+| `317004` | Failed to format media files. Try again later or restart dock and try again |
+| `317005` | Aircraft video recording terminated unsuccessfully, media files for this flight mission may not be able to be uploaded |
+| `317006` | Unable to format. Wait until media files are downloaded and try again |
+| `317007` | Failed to obtain number of media files. Try again later. If there are media files collected by current flight but issue persists, contact DJI Support |
+
+### 319xxx — Dock task lifecycle
+
+Dock-state gating (idle / busy / uploading / initializing) and task cancellation.
+
+40 codes.
+
+| Code | Description |
+|---|---|
+| `319001` | Unable to perform task. Dock is performing task or uploading issue logs. Wait until task is complete or logs uploaded and try again |
+| `319002` | Dock system error. Restart dock and try again |
+| `319003` | Dock system error. Distribute task again |
+| `319004` | Performing task timed out. Task automatically stopped |
+| `319005` | Communication error between cloud and dock. Unable to perform task |
+| `319006` | Failed to cancel task. Task in progress |
+| `319007` | Failed to edit task. Task in progress |
+| `319008` | Dock and cloud time not synced. Dock unable to perform task |
+| `319009` | Failed to distribute task. Try again later or restart dock and try again |
+| `319010` | Dock firmware version too early. Unable to perform task. Update dock to latest version and try again |
+| `319015` | Initializing dock. Unable to perform task. Wait until initialization is complete |
+| `319016` | Dock performing other task. Unable to perform current task |
+| `319017` | Dock processing media files captured in last task. Unable to perform current task. Try again later |
+| `319018` | Unable to perform task. Dock uploading issue logs. Try again later |
+| `319019` | Unable to perform task. Dock obtaining issue logs. Try again later |
+| `319020` | Failed to pause flight task. Try again later |
+| `319021` | Failed to disable Live Flight Controls. Try again later |
+| `319022` | FlyTo task failed. Try again later |
+| `319023` | Failed to stop FlyTo task. Try again later |
+| `319024` | Takeoff failed. Try again later |
+| `319025` | Task in preparation. Dock unable to perform task distributed from cloud. Try again later |
+| `319026` | Aircraft battery level lower than set value. Unable to perform task. Wait until charging completes and try again |
+| `319027` | Insufficient storage on dock or aircraft. Unable to perform task. Wait until media files are uploaded to cloud and try again |
+| `319028` | Updating custom flight area... |
+| `319029` | Updating offline maps... |
+| `319030` | Operation failed. No aircraft control |
+| `319031` | Flight control error. Refresh page and try again |
+| `319032` | FlyTo task failed. Try again later |
+| `319033` | Keyboard commands failed. Try again later |
+| `319034` | Keyboard commands failed. Try again later |
+| `319035` | Failed to pause. Try again later |
+| `319036` | Device in remote debugging mode. Try again later |
+| `319037` | Device in on-site debugging mode. Try again later |
+| `319038` | Updating device. Try again later |
+| `319042` | Failed to resume flight. Try again later |
+| `319043` | Failed to cancel RTH. Try again later |
+| `319044` | Task completed. Unable to resume |
+| `319045` | Aircraft paused. Operate aircraft by keyboard commands |
+| `319046` | Task completed or paused. Unable to pause |
+| `319999` | Dock system error. Restart dock and try again |
+
+### 321xxx — Flight task execution
+
+In-flight task errors — route limits, obstacle detection, GEO zones, signal loss.
+
+32 codes.
+
+| Code | Description |
+|---|---|
+| `321000` | Task error. Try again later or restart dock and try again |
+| `321004` | Failed to process flight route file. Unable to perform task. Check file |
+| `321005` | Missing breakpoint info in flight route. Dock unable to perform task |
+| `321257` | Task in progress. Failed to start task again |
+| `321258` | Unable to stop task. Check aircraft status |
+| `321259` | Task not started. Unable to stop task |
+| `321260` | Task not started. Unable to pause task |
+| `321513` | Unable to perform task. Flight route altitude greater than aircraft max flight altitude |
+| `321514` | Failed to perform task. Flight route start or end point in buffer zone or exceeds distance limit |
+| `321515` | Unable to perform task. Aircraft will fly across GEO Zone |
+| `321516` | Flight altitude too low. Task stopped |
+| `321517` | Obstacle detected. Task stopped. To ensure flight safety, do not resume task from breakpoint |
+| `321519` | Aircraft approached GEO Zone or reached max distance and automatically returned to home. Unable to complete task |
+| `321523` | Failed to take off. Try again later. Contact DJI Support if issue persists |
+| `321524` | The preparation before takeoff of the aircraft has failed, possibly due to the aircraft's inability to locate or gear error. Please check the status of the aircraft |
+| `321528` | Approaching boundary of custom flight area. Flight task paused |
+| `321529` | Unable to reach FlyTo destination. Task paused. FlyTo destination inside Restricted Zone or obstacle area. Adjust route and try again |
+| `321530` | Task paused. Failed to plan flight route |
+| `321531` | Failed to execute entry/exit route. Contact DJI support |
+| `321532` | Failed to execute entry/exit route. Contact DJI support |
+| `321533` | Failed to execute entry/exit route. Contact DJI support |
+| `321769` | Aircraft satellite positioning signal weak. Unable to perform task. Restart dock and try again |
+| `321770` | Aircraft flight mode error. Unable to perform task. Restart dock and try again |
+| `321771` | Aircraft Home Point not set. Unable to perform task. Restart dock and try again |
+| `321772` | Aircraft battery level lower than 30%. Unable to perform task. It is recommended to charged battery up to 50% before trying again |
+| `321773` | Aircraft battery level low and returned to home. Unable to complete task |
+| `321775` | Aircraft signal lost when performing task. Failed to complete task |
+| `321776` | Failed to converge aircraft RTK data. Unable to perform task. Restart dock and try again |
+| `321777` | Aircraft not hovering. Unable to start task |
+| `321778` | Unable to perform task. Aircraft controlled by Controller B, and propellers started |
+| `321784` | Aircraft returned to home during task due to strong wind |
+| `321788` | Mission failed due to signal interference, causing an abnormal return-home |
+
+### 322xxx — Flight task — stop / abort
+
+Task termination reasons (manual stop, cloud-takeover, user RTH command).
+
+5 codes.
+
+| Code | Description |
+|---|---|
+| `322281` | Task failed. Task stopped manually or abnormally during flight |
+| `322282` | Task stopped. Aircraft control obtained by cloud user or remote controller |
+| `322283` | RTH command sent by user. Aircraft unable to complete task |
+| `322539` | Breakpoint info error. Dock unable to perform task |
+| `322563` | Failed to generate flight route. Check if vision sensor is stained or restart aircraft and try again. Contact DJI Support if issue persists |
+
+### 324xxx — Remote log upload
+
+Dock / aircraft log compression, listing, and upload to cloud.
+
+10 codes.
+
+| Code | Description |
+|---|---|
+| `324012` | Compressing logs timed out. Too many logs selected. Unselect some logs and try again |
+| `324013` | Failed to obtain device log list. Try again later |
+| `324014` | Device log list is empty. Refresh page or restart dock and try again |
+| `324015` | Aircraft powered off or not connected. Unable to obtain log list. Make sure aircraft is inside dock. Remotely power on aircraft and try again |
+| `324016` | Insufficient dock storage space. Failed to compress logs. Clear space or try again later |
+| `324017` | Failed to compress logs. Unable to obtain logs of selected aircraft. Refresh page or restart dock and try again |
+| `324018` | Failed to obtaining logs and submit issue report. Try again later or restart dock and try again |
+| `324019` | Due to network anomalies at the airport, the log upload has failed. Please retry later. If this issue persists, please contact your agent or DJI Support for network troubleshooting. |
+| `324021` | Failed to export log. Dock power supply off or restarted. Try again later |
+| `324030` | Failed to upload media files due to reasons such as dock network or aircraft image transmission error |
+
+### 325xxx — Common command
+
+Cloud-command parameter and dispatch errors shared across device interactions.
+
+11 codes.
+
+| Code | Description |
+|---|---|
+| `325001` | Cloud command parameter error. Device unable to execute command |
+| `325003` | Command failed. Try again |
+| `325004` | Device command request timed out. Try again |
+| `325005` | Dock unable to respond to current task. Try again later |
+| `325006` | Dock in task preparation status. Try again later |
+| `325007` | Dock is performing task. Try again later |
+| `325008` | Dock is processing task output. Try again later |
+| `325009` | Dock is exporting logs to cloud. Try again later |
+| `325010` | Dock is updating custom flight area. Try again later |
+| `325011` | Dock is updating offline map. Try again later |
+| `325012` | Aircraft not connected. Try again later |
+
+### 326xxx — Cellular / SIM / eSIM
+
+DJI Cellular Dongle state, SIM / eSIM activation, and 4G/LTE transmission.
+
+13 codes.
+
+| Code | Description |
+|---|---|
+| `326002` | No DJI Cellular Dongle on aircraft |
+| `326003` | No SIM card in DJI Cellular Dongle of aircraft |
+| `326004` | Updating DJI Cellular Dongle of aircraft required. Otherwise, features will be unavailable |
+| `326005` | Operation failed. Check 4G signal or contact network provider to check data allowance and APN settings |
+| `326006` | Failed to change enhanced transmission status. Try again later |
+| `326008` | No DJI Cellular Dongle in dock |
+| `326009` | No SIM card in DJI Cellular Dongle of dock |
+| `326010` | Updating DJI Cellular Dongle of dock required. Otherwise, features will be unavailable |
+| `326103` | Activating eSIM. Try again later |
+| `326104` | Switching network provider. Try again later |
+| `326105` | Switching DJI Cellular Dongle mode. Try again later |
+| `326106` | DJI Cellular Dongle error. Restart device and try again. Contact DJI Support if issue persists |
+| `326107` | Click Devices > Dock > Device Maintenance to activate eSIM of DJI Cellular Dongle or insert SIM card and try again |
+
+### 327xxx — Live Flight Controls
+
+Cloud-initiated live flight operations — parameter-set, control-authority, livestream, speaker, panorama.
+
+70 codes.
+
+| Code | Description |
+|---|---|
+| `327000` | Failed to set parameters. Try again later |
+| `327001` | Failed to set parameters. Try again later |
+| `327002` | Failed to obtain control. Try again later |
+| `327003` | Failed to obtain control. Try again later |
+| `327004` | Failed to drag livestream view. Try again later |
+| `327005` | Failed to center livestream view around clicked point |
+| `327006` | Failed to take photo |
+| `327007` | Failed to start recording |
+| `327008` | Failed to stop recording |
+| `327009` | Failed to switch camera modes |
+| `327010` | Failed to zoom in/out with zoom camera |
+| `327011` | Failed to zoom in/out with IR camera |
+| `327012` | Failed to obtain control. Try again later |
+| `327013` | Failed to set parameters. Try again later |
+| `327014` | Gimbal reached movement limit |
+| `327015` | Failed to start livestream. Refresh livestream view or reopen device status window |
+| `327016` | Failed to set signal lost action. Try again |
+| `327017` | Failed to set FlyTo altitude. Try again |
+| `327018` | Failed to change FlyTo mode. Try again |
+| `327019` | Failed to face PinPoint in current status |
+| `327020` | Panorama stopp failed，Command timed out |
+| `327022` | Panoramic shooting stopped — not supported in the current state |
+| `327050` | Broadcast not supported in current device status |
+| `327051` | Failed to download audio file |
+| `327052` | Failed to switch operating modes of speaker |
+| `327053` | Failed to upload audio file |
+| `327054` | Failed to play audio |
+| `327055` | Failed to set work mode |
+| `327056` | Failed to upload text |
+| `327057` | Failed to stop playing |
+| `327058` | Failed to set play mode |
+| `327059` | Failed to set volume |
+| `327060` | Failed to set widget value |
+| `327061` | Failed to send text value |
+| `327062` | Failed to switch system languages |
+| `327063` | Failed to obtain device function list |
+| `327064` | Failed to obtain device configuration file |
+| `327065` | Failed to obtain device photos |
+| `327066` | Failed to compress device file |
+| `327067` | Failed to upload device file |
+| `327068` | Failed to upload audio file. MD5 checksum error |
+| `327069` | Failed to upload audio file |
+| `327070` | Failed to upload audio file. Abnormal termination |
+| `327071` | Failed to upload TTS file. MD5 checksum error |
+| `327072` | Failed to upload TTS file |
+| `327073` | Failed to upload TTS file. Abnormal termination |
+| `327074` | Replay failed |
+| `327075` | Speaker encoding failed |
+| `327201` | Taking panorama failed |
+| `327202` | Panorama stopped |
+| `327203` | Panorama not supported on current device |
+| `327204` | System busy.Panorama not allowed |
+| `327205` | Request failed.Panorama not allowed |
+| `327206` | Aircraft not in flight. Unable to take panorama |
+| `327207` | Getting control failed. Panorama stopped |
+| `327208` | Unknown camera error. Unable to start panorama |
+| `327209` | Camera response timed out. Panorama stopped |
+| `327210` | Panorama not allowed |
+| `327211` | Insufficient storage. Panorama stopped |
+| `327212` | Aircraft moving. Unable to take panorama |
+| `327213` | Gimbal moving. Unable to take panorama |
+| `327214` | Control stick moved. Panorama stopped |
+| `327215` | Max altitude limit reached. Panorama stopped |
+| `327216` | Max distance reached. Panorama stopped |
+| `327217` | Gimbal stuck. Panorama stopped |
+| `327218` | Taking photo failed. Panorama stopped |
+| `327219` | Stitching panorama failed |
+| `327220` | Loading calibration parameters failed. Panorama stopped |
+| `327221` | Adjusting camera parameters failed. Panorama stopped |
+| `327500` | Failed to defog lens. Try again later |
+
+### 328xxx — CAAC real-name registration
+
+Registration-status gating introduced for Chinese-market aircraft.
+
+2 codes.
+
+| Code | Description |
+|---|---|
+| `328051` | CAAC registration is not completed. Connect to remote controller and complete registration based on instructions before flight |
+| `328052` | CAAC registration is canceled. Connect to remote controller and complete registration based on instructions before flight |
+
+### 336xxx — FlyTo command
+
+FlyTo-destination dispatch and command-response handling.
+
+15 codes.
+
+| Code | Description |
+|---|---|
+| `336000` | Failed to send FlyTo command. Try again |
+| `336001` | Aircraft data error. Unable to respond to command |
+| `336002` | Aircraft GPS signal weak |
+| `336003` | Aircraft positioning error. Unable to respond to command |
+| `336004` | Failed to plan FlyTo task |
+| `336005` | Home Point not updated |
+| `336006` | Aircraft signal lost. FlyTo task exited |
+| `336017` | Unable to complete task with current aircraft battery level |
+| `336018` | FlyTo mode changed |
+| `336019` | FlyTo altitude exceeds limit. Altitude automatically adjusted |
+| `336513` | FlyTo destination in Restricted Zone |
+| `336514` | FlyTo destination exceeds max flight distance |
+| `336515` | FlyTo destination in Restricted Zone |
+| `336516` | FlyTo destination exceeds max flight altitude |
+| `336517` | FlyTo destination is below min flight altitude |
+
+### 337xxx — Takeoff / FlyTo destination
+
+Takeoff-readiness and FlyTo-destination-validation errors.
+
+16 codes.
+
+| Code | Description |
+|---|---|
+| `337025` | Unable to take off |
+| `337026` | FlyTo destination error. Try again |
+| `337027` | Aircraft speed setting error. Try again |
+| `337028` | Aircraft version error. Check aircraft version |
+| `337029` | Aircraft unable to respond to current task. Try again later |
+| `337030` | Clearance altitude for FlyTo task is too low |
+| `337537` | Reached Restricted Zone |
+| `337538` | Reached aircraft max flight distance |
+| `337539` | Reached Restricted Zone |
+| `337540` | Aircraft reached max flight altitude or altitude limit in Altitude Zone |
+| `337541` | Reached aircraft min flight altitude |
+| `337542` | Failed to take off. Try again |
+| `337543` | FlyTo destination may be within obstacle area. Check surrounding environment |
+| `337544` | Obstacle detected. Check surrounding environment |
+| `337545` | FlyTo task planning error. Try again |
+| `337546` | Reached custom flight area boundary |
+
+### 338xxx — Aircraft communication
+
+Aircraft ↔ dock communication-layer faults.
+
+23 codes.
+
+| Code | Description |
+|---|---|
+| `338001` | Unable to perform task. Aircraft communication error. Restart aircraft and dock and try again |
+| `338002` | Unable to perform task. Aircraft communication error. Restart aircraft and dock and try again |
+| `338003` | Unable to perform task. Aircraft communication error. Restart aircraft and dock and try again |
+| `338004` | Unable to perform task. Aircraft communication error. Restart aircraft and dock and try again |
+| `338005` | Unable to perform task. Distance between docks must not exceed 15 km |
+| `338006` | Unable to perform task. Make sure unlocking license is applied for the area where aircraft lands and dock is not in custom Restricted Zone or outside custom flight area |
+| `338007` | Unable to perform task. Dock altitude higher than altitude limit in Altitude Zone. Aircraft will not be able to land on dock. Apply for unlocking license and try again |
+| `338008` | Unable to perform task. Dock altitude higher than max flight altitude. Aircraft unable to land on dock. Adjust flight altitude limit and try again |
+| `338009` | Unable to perform task. GPS signal weak. Restart aircraft and try again |
+| `338010` | Unable to perform task. Aircraft positioning error. Restart aircraft and try again |
+| `338011` | Task failed. Dock for landing is outside of flight geography volume. Plan task and try again |
+| `338017` | Unable to perform task. Aircraft data update error. Restart aircraft and try again |
+| `338018` | Unable to perform task. Failed to update aircraft data. Restart aircraft and try again |
+| `338019` | Unable to perform task. Planning RTH route to selected dock. Restart aircraft and try again |
+| `338020` | Unable to perform task. Aircraft unable to land on selected dock based on planned route. Select another dock and try again |
+| `338021` | Unable to perform task. Battery level insufficient for aircraft to land on selected dock. Charge aircraft and try again |
+| `338049` | Control stick moved. FlyTo task exited |
+| `338050` | Aircraft responds to command to end task. FlyTo task exited |
+| `338051` | Aircraft battery level low and returning to home. FlyTo task exited |
+| `338052` | Aircraft battery level low. Aircraft landing. FlyTo task exited |
+| `338053` | Crewed aircraft nearby. FlyTo task exited |
+| `338054` | Aircraft responds to task with higher priority. FlyTo task exited |
+| `338255` | Unable to perform task. Aircraft communication error. Restart aircraft and dock and try again |
+
+### 341xxx — Dock location convergence
+
+Dock positioning / RTK-convergence gating.
+
+1 code.
+
+| Code | Description |
+|---|---|
+| `341002` | Dock location has not converged. Please wait until the dock position converges before retrying |
+
+### 386xxx — Miscellaneous task error
+
+Catch-all task fault with no dedicated module.
+
+1 code.
+
+| Code | Description |
+|---|---|
+| `386535` | Task error. Try again later or restart dock and try again |
+
+### 513xxx — Livestream
+
+Camera livestream start / stop, quality and lens / camera selection.
+
+14 codes.
+
+| Code | Description |
+|---|---|
+| `513002` | Livestream failed. Camera does not exist or camera type error |
+| `513003` | Camera livestream in progress. Do not start livestream again |
+| `513005` | Livestream failed. Livestream definition setting error |
+| `513006` | Failed to start livestream. Refresh and try again |
+| `513008` | Livestream failed. Image transmission data on device is abnormal |
+| `513010` | Livestream failed. Device unable to connect to network |
+| `513011` | Operation failed. Livestream not enabled |
+| `513012` | Livestream failed. Device livestream in progress. Switching lens not supported |
+| `513013` | Livestream failed. Video transmission protocol not supported |
+| `513014` | Livestream failed. Livestream parameter error or incomplete |
+| `513015` | Livestream error. Network lags. Please refresh and retry |
+| `513016` | Livestream error. Video decoding failed |
+| `513017` | Livestream paused. Wait until aircraft file download is completed |
+| `513099` | Livestream failed. Try again later |
+
+### 514xxx — Dock operations & DRC
+
+Dock commands (maintenance, cover, charging, remote debugging, rain sensor) and DRC-mode MQTT connection lifecycle.
+
+70 codes.
+
+| Code | Description |
+|---|---|
+| `514100` | Dock error. Restart dock and try again |
+| `514101` | Failed to push driving rods into place. Make sure landing pad is clear of obstacles and aircraft heading is the same as arrow direction, or restart dock and try again |
+| `514102` | Failed to pull driving rods back. Make sure landing pad is clear of obstacles or restart dock and try again |
+| `514103` | Aircraft battery level lower than 30%. Unable to perform task. It is recommended to charged battery up to 50% before trying again |
+| `514104` | Failed to charge battery. Restart dock and try again |
+| `514105` | Failed to stop charging battery. Restart dock and try again |
+| `514106` | Aircraft battery error. Restart dock and try again |
+| `514107` | Failed to open dock cover. Make sure dock cover is clear of obstacles or restart dock and try again |
+| `514108` | Failed to close dock cover. Make sure dock cover is clear of obstacles or restart dock and try again |
+| `514109` | Failed to power on aircraft. Check if aircraft is inside dock, aircraft battery level is sufficient. Restart dock and try again |
+| `514110` | Failed to power off aircraft. Restart dock and try again |
+| `514111` | Propeller error in slow motion mode. Restart dock and try again |
+| `514112` | Propeller error in slow motion mode. Restart dock and try again |
+| `514113` | Connection error between driving rod and aircraft. Check if aircraft is inside dock, driving rods are stuck, or charging connector is stained or damaged |
+| `514114` | Failed to obtain aircraft battery status. Restart dock and try again |
+| `514116` | Unable to perform operation. Dock is executing other command. Try again later |
+| `514117` | Dock cover is open or not fully closed. Restart dock and try again |
+| `514118` | Driving rods pulled back or not pushed into place. Restart dock and try again |
+| `514120` | Dock and aircraft disconnected. Restart dock and try again or relink dock and aircraft |
+| `514121` | Emergency stop button pressed down. Release button |
+| `514122` | Failed to obtain aircraft charging status. Restart dock and try again |
+| `514123` | Aircraft battery level too low. Unable to power on aircraft |
+| `514124` | Failed to obtain aircraft battery information. Unable to perform task. Restart dock and try again |
+| `514125` | Aircraft battery level almost full. Unable to start charging. Charge battery when battery level is lower than 95% |
+| `514134` | Heavy rainfall. Unable to perform task. Try again later |
+| `514135` | Unable to perform task. Wind speed too high. Try again later |
+| `514136` | Dock power supply error. Unable to perform task. Resume power supply and try again |
+| `514137` | Environment temperature lower than -20° C (-4°F). Unable to perform task. Try again later |
+| `514138` | Maintaining aircraft battery. Unable to perform task. Wait until maintenance is complete |
+| `514139` | Failed to maintain aircraft battery. No maintenance required |
+| `514140` | Failed to maintain aircraft battery. No maintenance required |
+| `514141` | Dock system error. Restart dock and try again |
+| `514142` | Connection error between driving rod and aircraft before takeoff. Check if aircraft is inside dock, driving rods are stuck, or charging connector is stained or damaged |
+| `514143` | Driving rods pulled back or not pushed into place. Try again later or restart dock and try again |
+| `514144` | Dock cover is open or not fully closed. Try again later or restart dock and try again |
+| `514145` | Dock in on-site debugging mode. Unable to perform current operation or task. Disconnect dock from remote controller and try again |
+| `514146` | Dock in remote debugging mode. Unable to perform task. Exit debugging mode and try again |
+| `514147` | Unable to start remote debugging or perform task. Updating device firmware. Wait until update is complete |
+| `514148` | Task in progress. Dock unable to enter remote debugging mode or perform task again. Wait until current task is complete and try again |
+| `514149` | Dock system error. Unable to perform task. Restart dock and try again |
+| `514150` | Restarting device. Unable to perform task. Wait until restart is complete |
+| `514151` | Updating device firmware. Unable to restart device. Wait until update is complete |
+| `514153` | Dock exited remote debugging mode. Unable to perform current operation |
+| `514154` | Failed to obtain internal circulation supply vent temperature. Try again later |
+| `514155` | Aircraft is outside of dock. Unable to perform flight mission. Please return aircraft to the airport |
+| `514156` | Aircraft is outside of dock. Make sure aircraft has safely landed and place aircraft inside dock |
+| `514157` | Failed to power on. Wireless charging module busy. Restart dock and try again |
+| `514158` | Unable to take off. Dock RTK error. Restart dock and try again |
+| `514159` | Task failed. Aircraft detected in dock for landing. Make sure there is no aircraft inside the dock and try again |
+| `514162` | Failed to connect aircraft and dock. Close dock cover or restart dock and try again |
+| `514163` | Battery error. Make sure battery is inserted properly or restart aircraft and try again |
+| `514164` | Failed to restart device. Try again later. Contact DJI Support if issue persists |
+| `514165` | Failed to restart device. Try again later. Contact DJI Support if issue persists |
+| `514168` | Dock is not calibrated. The dock cannot execute flight missions. Please calibrate the dock |
+| `514170` | Initializing dock. Unable to perform operation. Wait until initialization completes |
+| `514171` | Cloud command parameter error. Dock unable to execute command |
+| `514172` | Unable to power off aircraft. Bluetooth disconnected. Restart aircraft and dock remotely or reconnect on-site and try again |
+| `514173` | Unable to perform task. Ambient temperature lower than 5° C and rainfall intensity is moderate rain or heavier, which may result in propellers being frozen |
+| `514174` | Failed to charge aircraft. Dock cover open or not properly closed. Close dock cover and try again |
+| `514180` | Failed to disable AC cooling or heating. Try again later |
+| `514181` | Failed to enable AC cooling. Try again later |
+| `514182` | Failed to enable AC heating. Try again later |
+| `514183` | Failed to enable AC dehumidifying. Try again later |
+| `514184` | Ambient temperature below 0° C (32°F). Unable to enable AC cooling |
+| `514185` | Ambient temperature above 45° C (115°F). Unable to enable AC heating |
+| `514300` | Gateway error. |
+| `514301` | Request timed out. Disconnected. |
+| `514302` | Network certificate error. Connection failed. |
+| `514303` | Network error. Disconnected. |
+| `514304` | Request rejected. Connection failed. |
+
+## 4. v1.11 → v1.15 drift
+
+v1.15 is **fully additive** relative to v1.11: every v1.11 code is retained, and v1.15 introduces 5 new codes:
+
+| Code | Module | Description (v1.15) |
+|---|---|---|
+| `321788` | 321xxx (Flight task execution) | Mission failed due to signal interference, causing an abnormal return-home |
+| `327022` | 327xxx (Live Flight Controls) | Panoramic shooting stopped — not supported in the current state |
+| `341002` | 341xxx (Dock location convergence) | Dock location has not converged. Please wait until the dock position converges before retrying |
+| `514155` | 514xxx (Dock operations & DRC) | Aircraft is outside of dock. Unable to perform flight mission. Please return aircraft to the airport |
+| `514168` | 514xxx (Dock operations & DRC) | Dock is not calibrated. The dock cannot execute flight missions. Please calibrate the dock |
+
+v1.11 source: [`Cloud-API-Doc/docs/en/71.error-code.md`](../../Cloud-API-Doc/docs/en/71.error-code.md). Per [`OPEN-QUESTIONS.md` OQ-001](../OPEN-QUESTIONS.md#oq-001--source-version-mismatch-between-cloud-api-doc-v1113-and-dji_cloud-v115), v1.15 is authoritative and v1.11 is retained for drift cross-check only.
+
+## 5. DJI-Cloud-API-Demo enum cross-reference
+
+The DJI-Cloud-API-Demo reference implementation (v1.10, deprecated 2025-04-10) groups error codes into feature-module Java enum classes. These are not primary for the corpus (v1.15 `DJI_Cloud/` is primary per OQ-001), but the enum names provide useful semantic labels for BC modules:
+
+| Enum class | BC modules covered | Path |
+|---|---|---|
+| `FirmwareErrorCodeEnum` | `312xxx` | [`cloud-sdk/.../firmware/FirmwareErrorCodeEnum.java`](../../DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/cloudapi/firmware/FirmwareErrorCodeEnum.java) |
+| `WaylineErrorCodeEnum` | `314xxx`, `321xxx`, `322xxx` | [`cloud-sdk/.../wayline/WaylineErrorCodeEnum.java`](../../DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/cloudapi/wayline/WaylineErrorCodeEnum.java) |
+| `LogErrorCodeEnum` | `324xxx` | [`cloud-sdk/.../log/LogErrorCodeEnum.java`](../../DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/cloudapi/log/LogErrorCodeEnum.java) |
+| `CommonErrorEnum` | `314000`, `325001` | [`cloud-sdk/.../common/CommonErrorEnum.java`](../../DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/common/CommonErrorEnum.java) |
+| `DebugErrorCodeEnum` | `326xxx` | [`cloud-sdk/.../debug/DebugErrorCodeEnum.java`](../../DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/cloudapi/debug/DebugErrorCodeEnum.java) |
+| `ControlErrorCodeEnum` | `327xxx` | [`cloud-sdk/.../control/ControlErrorCodeEnum.java`](../../DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/cloudapi/control/ControlErrorCodeEnum.java) |
+| `LiveErrorCodeEnum` | `513xxx` (and bare `13xxx` enum values that prepend source digit `5` on the wire) | [`cloud-sdk/.../livestream/LiveErrorCodeEnum.java`](../../DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/cloudapi/livestream/LiveErrorCodeEnum.java) |
+| `DrcStatusErrorEnum` | `514300`–`514304` (DRC-mode MQTT errors) | [`cloud-sdk/.../control/DrcStatusErrorEnum.java`](../../DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/cloudapi/control/DrcStatusErrorEnum.java) |
+
+## 6. Notes on source file naming
+
+The v1.15 source file is named `DJI_CloudAPI-HMS-Codes.txt` but its contents are the general API error-code reference, **not** HMS alarm codes. DJI's own preamble (line 5 of the source) reads: "The error code description of HMS can not be directly obtained through the error code. Developer needs to complete the concatenation of the 'Copy Key' according to the rules introduced in the HMS Function. Search the error code description in the [hms.json](../../DJI_Cloud/HMS.json) based on the 'Copy Key'." HMS alarm codes have their own catalog at [`hms-codes/`](../hms-codes/README.md).
+
+## Sources
+
+- Primary — [`DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt`](../../DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt) (v1.15 authoritative, 448 codes).
+- Drift cross-check — [`Cloud-API-Doc/docs/en/71.error-code.md`](../../Cloud-API-Doc/docs/en/71.error-code.md) (v1.11, 443 codes).
+- Reference — the 7 `*ErrorCodeEnum.java` files in `DJI-Cloud-API-Demo/cloud-sdk/` (v1.10, deprecated).

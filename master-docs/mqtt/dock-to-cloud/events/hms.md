@@ -1,6 +1,6 @@
 # `hms` — Health Management System warning push
 
-Event pushed by the dock carrying a batch of Health Management System (HMS) warnings. Each entry names a warning code, a module, a severity level, and a `{component_index, sensor_index}` pair that the cloud uses to look up human-readable copy in the bundled `hms.json` dictionary. Code enumeration itself is Phase 8 scope (`hms-codes/`); this doc covers only how HMS warnings are transported over MQTT.
+Event pushed by the dock carrying a batch of Health Management System (HMS) warnings. Each entry names a warning code, a module, a severity level, and a `{component_index, sensor_index}` pair that the cloud uses to look up human-readable copy in the bundled `hms.json` dictionary. The full warning-code catalog lives in [`hms-codes/`](../../../hms-codes/README.md); this doc covers only how HMS warnings are transported over MQTT.
 
 Part of the Phase 4 MQTT catalog. Shared conventions (envelope) live in [`../../README.md`](../../README.md).
 
@@ -22,7 +22,7 @@ Part of the Phase 4 MQTT catalog. Shared conventions (envelope) live in [`../../
 | `list[].level` | enum int | `0` = Notification; `1` = Reminder; `2` = Warning. |
 | `list[].module` | enum int | Event module. `0` = Flight mission; `1` = Device management; `2` = Media; `3` = HMS. |
 | `list[].in_the_sky` | enum int | `0` = aircraft on the ground; `1` = aircraft in the sky. |
-| `list[].code` | string | Warning code. Hex form like `0x16100083`. Full catalog in Phase 8 (`hms-codes/`). |
+| `list[].code` | string | Warning code. Hex form like `0x16100083`. Full catalog in [`hms-codes/`](../../../hms-codes/README.md) (1,769 alarms across 14 first-byte prefixes). |
 | `list[].device_type` | string | Device type emitting the warning. Format `{domain}-{type}-{subtype}`. See DJI Product Support reference. |
 | `list[].imminent` | enum int | `0` = not imminent (persistent condition); `1` = imminent (transient — e.g., wind spike will clear when wind drops). |
 | `list[].args` | struct | Parameters used to resolve the warning copy. |
@@ -58,7 +58,7 @@ Part of the Phase 4 MQTT catalog. Shared conventions (envelope) live in [`../../
 
 ## Relationship to other methods
 
-- Warning-code catalog lives in `DJI_Cloud/HMS.json` (structured) and `DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt` (prose). To be curated in Phase 8 (`hms-codes/`).
+- Warning-code catalog lives in [`DJI_Cloud/HMS.json`](../../../../DJI_Cloud/HMS.json) (structured) — curated in [`hms-codes/`](../../../hms-codes/README.md). Note: [`DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt`](../../../../DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt) is misnamed; despite the "HMS" label, its content is the general API error-code reference (not HMS alarms) — documented in [`error-codes/README.md`](../../../error-codes/README.md).
 - This event is the sole MQTT vehicle for HMS fault transport — no request/service pairing exists.
 - Full HMS event-handling choreography will be documented in Phase 9 workflow `workflows/hms-event-reporting.md`.
 

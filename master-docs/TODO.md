@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 7 closed 2026-04-19. Phase 8 (HMS codes + error codes) is next.
+**Current phase**: Phase 8 content-complete 2026-04-19. Review gate pending. Phase 9 (Workflows) is next.
 
 ---
 
@@ -300,16 +300,20 @@ Livestream protocols:
 
 ## Phase 8 — Codes (HMS + error codes)
 
+Single-drop phase (no sub-phases). HMS codes + error codes delivered together. Reproducible generator pipeline under [`_build/`](_build/) — [`_translations.json`](_build/_translations.json) + two Python generators consume [`DJI_Cloud/HMS.json`](../DJI_Cloud/HMS.json) and [`DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt`](../DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt) and emit the catalog on re-run.
+
 HMS codes:
-- [ ] Inspect `DJI_Cloud/HMS.json` to determine natural category partition
-- [ ] Propose categories to user
-- [ ] Generate one `hms-codes/<category>.md` per category
+- [x] Inspect [`DJI_Cloud/HMS.json`](../DJI_Cloud/HMS.json) structure — 1,769 entries; distribution by first-byte prefix identified 14 natural buckets (0x11 payload / 0x12 battery station / 0x14 payload IMU / 0x15 mmWave / 0x16 flight-control 921× / 0x17 transmission / 0x19 system-overload / 0x1A vision / 0x1B navigation / 0x1C camera / 0x1D gimbal / 0x1E PSDK payload / 0x1F cellular / 0x20 takeoff tags), plus 1 non-hex outlier (`unknown`).
+- [x] Propose recommended layout to user (14 per-prefix files + README + outliers; 0x16 sub-sectioned by second byte for navigability). **Approved** 2026-04-19.
+- [x] **531 CJK-in-`tipEn` entries translated.** DJI leaked Chinese developer-debug strings under the "English" copy key. Curated EN translations stored in [`_build/_translations.json`](_build/_translations.json); display flagged with trailing **+**; CN source preserved verbatim under collapsible blocks.
+- [x] Generate 14 per-prefix files + [`hms-codes/README.md`](hms-codes/README.md) + [`hms-codes/outliers.md`](hms-codes/outliers.md) via [`_build/generate_hms_codes.py`](_build/generate_hms_codes.py). All 1,769 entries preserved verbatim.
 
 Error codes:
-- [ ] Catalog error codes from `DJI-Cloud-API-Demo/` error definitions + `Cloud-API-Doc/`
-- [ ] `error-codes/README.md` with grouped table
+- [x] Catalog 448 codes from [`DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt`](../DJI_Cloud/DJI_CloudAPI-HMS-Codes.txt) (v1.15 authoritative — the filename mentions "HMS" but DJI's preamble clarifies the content is general API error codes, NOT HMS alarms). 20 function modules. v1.11 → v1.15 drift: 5 new codes (`321788`, `327022`, `341002`, `514155`, `514168`), 0 dropped.
+- [x] [`error-codes/README.md`](error-codes/README.md) — single doc with grouped tables per BC module + format explanation (`ABCDEF` = source + module + local) + cross-reference to DJI-Cloud-API-Demo enum classes (`FirmwareErrorCodeEnum` / `WaylineErrorCodeEnum` / `LogErrorCodeEnum` / `CommonErrorEnum` / `DebugErrorCodeEnum` / `ControlErrorCodeEnum` / `LiveErrorCodeEnum` / `DrcStatusErrorEnum`). Generator: [`_build/generate_error_codes.py`](_build/generate_error_codes.py).
 
-- [ ] Update corpus `README.md`
+- [x] Update corpus [`README.md`](README.md).
+- [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md).
 - [ ] **Review gate**
 
 ## Phase 9 — Workflows
