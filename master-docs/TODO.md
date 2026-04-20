@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 9a landed 2026-04-19; review gate pending. Phase 9b (missions) + 9c (events + media + handoff) are next.
+**Current phase**: Phase 9a review gate closed 2026-04-19. Phase 9b (missions & operations) is current. Phase 9c (events + media + handoff) follows.
 
 ---
 
@@ -329,7 +329,7 @@ Authoritative workflow narrative comes from `Cloud-API-Doc/` v1.11 feature-set p
 - [x] [`workflows/firmware-and-config-update.md`](workflows/firmware-and-config-update.md) — `ota_create` → `ota_progress` loop (including Dock-3-only `firmware_upgrade_type: 4` PSDK update and v1.11 `step_key` → v1.15 `current_step` rename) + post-bootstrap `config` refresh semantics.
 - [x] [`workflows/README.md`](workflows/README.md) — phase index with sub-phase roadmap, scope, authoring rules, source-authority note.
 - [x] Update corpus [`README.md`](README.md) with Phase 9 row (9a entries listed; 9b/9c pending).
-- [ ] **Review gate 9a** — pending.
+- [x] **Review gate 9a** closed 2026-04-19 (implicit — user instructed "complete and continue at phase 9b"). Landing commit `e35b385` (Phase 9a — lifecycle workflows: bootstrap + binding + firmware/config).
 
 ### Sub-phase 9b — Missions & operations
 
