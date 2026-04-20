@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 8 closed 2026-04-19. Phase 9 (Workflows) is next.
+**Current phase**: Phase 9a landed 2026-04-19; review gate pending. Phase 9b (missions) + 9c (events + media + handoff) are next.
 
 ---
 
@@ -318,21 +318,34 @@ Error codes:
 
 ## Phase 9 — Workflows
 
-Workflows are written once per choreography and call out dock-generation-specific variations inline (not a separate doc per dock generation, unless the divergence is large enough to warrant it).
+**Scope decision (2026-04-19):** Phase 9 sub-phased into 9a / 9b / 9c because the 11-doc surface is too broad for a single review gate. Docs landed per sub-phase; each sub-phase ends at its own review gate. Workflow format per PLAN.md directive: numbered sequence with actor / direction / transport / topic-or-endpoint / intent + Mermaid sequence diagram, and payload bodies linked to the Phase 3/4/5 canonical catalogs rather than duplicated.
 
-- [ ] `workflows/dock-bootstrap-and-pairing.md` (Dock 2 + Dock 3 variants)
-- [ ] `workflows/device-binding.md`
-- [ ] `workflows/firmware-and-config-update.md`
-- [ ] `workflows/wayline-upload-and-execution.md`
-- [ ] `workflows/live-flight-controls-drc.md`
-- [ ] `workflows/livestream-start-stop.md`
-- [ ] `workflows/hms-event-reporting.md`
-- [ ] `workflows/flysafe-custom-flight-area-sync.md`
-- [ ] `workflows/airsense-events.md`
-- [ ] `workflows/media-upload-from-dock.md`
-- [ ] `workflows/remote-control-handoff.md` (RC Plus 2 Enterprise and RC Pro Enterprise)
-- [ ] Update corpus `README.md`
-- [ ] **Review gate**
+Authoritative workflow narrative comes from `Cloud-API-Doc/` v1.11 feature-set pages — these are the only DJI-authored choreography sources. Per [OQ-001 resolution](OPEN-QUESTIONS.md#oq-001--source-version-mismatch-between-cloud-api-doc-v1113-and-dji_cloud-v115), v1.15 is the wire authority and Cloud-API-Doc is drift-only, but DJI never shipped v1.15 feature-set prose; the corpus cites Cloud-API-Doc for narrative, v1.15 DJI_Cloud for wire-level claims.
+
+### Sub-phase 9a — Lifecycle (bootstrap, binding, firmware/config)
+
+- [x] [`workflows/dock-bootstrap-and-pairing.md`](workflows/dock-bootstrap-and-pairing.md) — MQTT connect → `config` (License) → `airport_bind_status` → `airport_organization_get` → `airport_organization_bind` → first `update_topo`. Dock 2 + Dock 3 (identical payloads).
+- [x] [`workflows/device-binding.md`](workflows/device-binding.md) — topology lifecycle (`update_topo` pair/unpair full-snapshot), OSD at 0.5 Hz, `state` on change, `property/set` (writable surface: 3 dock-gateway + 6 aircraft dock-path + 3/6 aircraft pilot-path + 0 RC), Pilot-2 WebSocket change-signal fan-out → HTTP topology read-back. All in-scope cohorts.
+- [x] [`workflows/firmware-and-config-update.md`](workflows/firmware-and-config-update.md) — `ota_create` → `ota_progress` loop (including Dock-3-only `firmware_upgrade_type: 4` PSDK update and v1.11 `step_key` → v1.15 `current_step` rename) + post-bootstrap `config` refresh semantics.
+- [x] [`workflows/README.md`](workflows/README.md) — phase index with sub-phase roadmap, scope, authoring rules, source-authority note.
+- [x] Update corpus [`README.md`](README.md) with Phase 9 row (9a entries listed; 9b/9c pending).
+- [ ] **Review gate 9a** — pending.
+
+### Sub-phase 9b — Missions & operations
+
+- [ ] `workflows/wayline-upload-and-execution.md` — Pilot-HTTPS wayline upload (Phase 3 wayline endpoints) + `flighttask_prepare` → `flighttask_execute` + `flighttask_progress` (+ `flighttask_resource_get`, `flighttask_undo`) + immediate/timed/conditional task variants + breakpoint recovery.
+- [ ] `workflows/live-flight-controls-drc.md` — `flight_authority_grab` / `payload_authority_grab` → `drc_mode_enter` → stick / drone-control DRC stream + `heart_beat` + `delay_info_push` + `hsi_info_push` + `osd_info_push`; dock DRC (Phase 4c + 4e-2) and pilot DRC (Phase 4h).
+- [ ] `workflows/livestream-start-stop.md` — `live_start_push` / `live_stop_push` per protocol (RTMP / GB28181 / WebRTC / Agora per Phase 7); pilot-side JSBridge `type` enum translation.
+- [ ] **Review gate 9b**.
+
+### Sub-phase 9c — Events, media & handoff
+
+- [ ] `workflows/hms-event-reporting.md` — `hms` event emission (Phase 4f) + code lookup via Phase 8 [`hms-codes/`](hms-codes/README.md).
+- [ ] `workflows/flysafe-custom-flight-area-sync.md` — `unlock_license_switch`/`update`/`list` + `flight_areas_get` / `flight_areas_update` + `flight_areas_drone_location` + `flight_areas_sync_progress`.
+- [ ] `workflows/airsense-events.md` — `airsense_warning` (Phase 4f).
+- [ ] `workflows/media-upload-from-dock.md` — `file_upload_callback` (Phase 4d) + `storage_config_get` + Phase 3 media + storage endpoints + STS credential handshake.
+- [ ] `workflows/remote-control-handoff.md` — RC Plus 2 + RC Pro `cloud_control_auth_request` / `cloud_control_auth_notify` / `cloud_control_release` (Phase 4h) + DRC cross-ref.
+- [ ] **Final Phase 9 review gate**.
 
 ## Phase 10 — Device annexes + final review
 

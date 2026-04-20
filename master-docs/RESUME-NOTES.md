@@ -6,6 +6,75 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 9a close, ready for review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3, 4, 5, 6, 7, 8 complete and committed. **Phase 9a (Lifecycle workflows) content-complete.**
+- Phase 9a review gate is the only remaining 9a item.
+- **Phase 9b (Missions & operations: wayline, DRC, livestream) is next** after the review gate. Phase 9c (events + media + handoff) follows 9b.
+
+### What Phase 9a produced
+
+Sub-phase 9a covers the three lifecycle workflows — cold-start pairing, ongoing topology / telemetry lifecycle, and maintenance (firmware + config refresh). **4 files landed** (3 workflow docs + phase README).
+
+**Workflow docs** ([`workflows/`](workflows/README.md)):
+
+- [`workflows/dock-bootstrap-and-pairing.md`](workflows/dock-bootstrap-and-pairing.md) — cold-start sequence for Dock 2 + Dock 3. MQTT CONNECT → [`config`](mqtt/dock-to-cloud/requests/config.md) (License) → [`airport_bind_status`](mqtt/dock-to-cloud/requests/airport_bind_status.md) → [`airport_organization_get`](mqtt/dock-to-cloud/requests/airport_organization_get.md) (only if unbound) → [`airport_organization_bind`](mqtt/dock-to-cloud/requests/airport_organization_bind.md) (only if unbound) → first [`update_topo`](mqtt/dock-to-cloud/status/update_topo.md). Mermaid sequence tracks DJI's own [`10.dock-access-to-cloud.md`](../Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/10.dock-access-to-cloud.md) v1.11 feature-set page. Variants section covers already-bound startup path, License-verification failure, binding partial failure, and Dock 2 ↔ Dock 3 parity. Error path table cross-references Phase 8 error codes.
+- [`workflows/device-binding.md`](workflows/device-binding.md) — ongoing lifecycle for all in-scope cohorts (dock-path + pilot-path). Four ongoing duties: (1) `update_topo` on pair/unpair with full-snapshot semantics, (2) OSD push at 0.5 Hz, (3) `state` push on change, (4) cloud-initiated `property/set` with Phase 6-validated writable surface (3 dock-gateway + 6 aircraft dock-path + 3 aircraft pilot-path baseline + 3 M4D-only pilot-path extensions + 0 RC). Dual Mermaid diagrams for dock-path and pilot-path, with pilot-path showing the WebSocket change-signal fan-out to Pilot 2 → HTTP topology read-back. Tracks DJI's [`20.dock-device-management.md`](../Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/20.dock-device-management.md).
+- [`workflows/firmware-and-config-update.md`](workflows/firmware-and-config-update.md) — two maintenance choreographies bundled per PLAN.md. Firmware section tracks DJI's [`80.firmware-upgrade.md`](../Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/80.firmware-upgrade.md) — `ota_create` → `ota_progress` loop with terminal-state enum + `bid`-based correlation + priority rule (standard > consistency) + Dock-3-only `firmware_upgrade_type: 4` PSDK update + v1.11 `step_key` → v1.15 `current_step` rename. Config section describes post-bootstrap `config` refresh semantics and the dock-disconnect-reconnect cycle required for cloud-side App rotation (no cloud-push equivalent exists).
+- [`workflows/README.md`](workflows/README.md) — phase-level index with scope, sub-phase roadmap (9a / 9b / 9c), catalog of landed + pending docs, authoring rules, and source-authority note explaining the Cloud-API-Doc + DJI_Cloud dual-citation pattern.
+
+**Corpus updates**:
+
+- [`README.md`](README.md) — TOC row filled in for `workflows/` with 9a entries listed and 9b/9c pending.
+- [`TODO.md`](TODO.md) — Phase 9 scope decision documented; 9a checklist fully checked with doc-level scope callouts; 9b/9c sub-phase checklists seeded with planned doc scopes. "Current phase" banner advanced.
+- `OPEN-QUESTIONS.md` — **no new entries.** No DJI-source defects encountered during 9a authoring that rise to OQ level.
+
+### Design decisions locked at 9a drafting
+
+Carried forward into 9b / 9c:
+
+1. **Phase 9 sub-phased into 9a / 9b / 9c** — 11-doc surface too broad for a single review gate. Matches the Phase 4 / Phase 6 sub-phasing pattern. Split themes: lifecycle (9a), missions (9b), events+media+handoff (9c). Each sub-phase has its own review gate.
+2. **Workflow doc template**: `Scope` table → `Overview` → `Actors` table → `Sequence` (Mermaid) → `Step-by-step` (numbered) → `Variants` → `Error paths` → `Provenance`. `Preconditions` / `Postconditions` sections used on docs where startup state matters (bootstrap). Dual-diagram pattern used on device-binding for dock-path vs pilot-path; single-diagram pattern otherwise.
+3. **Mermaid sequence diagrams** per [feedback memory](_memory/MEMORY.md) and matching DJI's own feature-set convention. Inline topic + method annotations in `<br/>`-separated form on each arrow.
+4. **Choreography only — no schema duplication.** Every payload body links to a Phase 3 / 4 / 5 catalog entry. Workflow docs show method names + key field names in sequence-diagram annotations but never full JSON bodies (the Phase 4 catalogs already have the full verbatim examples).
+5. **DJI source-authority note** added to `workflows/README.md` explaining the dual-citation pattern: Cloud-API-Doc v1.11 for narrative (authoritative choreography source; no v1.15 equivalent exists), DJI_Cloud v1.15 for wire-level claims. Per [OQ-001 resolution](OPEN-QUESTIONS.md#oq-001--source-version-mismatch-between-cloud-api-doc-v1113-and-dji_cloud-v115), v1.15 is wire-authoritative and Cloud-API-Doc is drift-only for wire — but feature-set prose falls outside the wire contract, so the v1.11 pages remain cited for their choreography content.
+6. **Variants section covers cohort divergence inline, not separate docs.** Per PLAN.md directive. 9a encountered only mild divergences — Dock 3 `firmware_upgrade_type: 4` enum addition, pilot-path OSD property asymmetry already documented in Phase 6b. No workflow required a per-cohort split so far.
+7. **Error path table cross-links Phase 8.** Each workflow's `Error paths` table cites specific BC modules or demo enum classes (e.g., `FirmwareErrorCodeEnum` = BC module 312) to give implementers a direct bridge from observed error codes to Phase 8 lookup.
+8. **Phase 4 forward-references already pointing at workflows/**. Phase 4a docs (`config.md`, `airport_organization_bind.md`, `airport_bind_status.md`) had forward pointers like `workflows/dock-bootstrap-and-pairing.md` — those links now resolve. Phase 9b / 9c will land filenames the Phase 4 catalogs already reference.
+
+### DJI-source inconsistencies noted during 9a
+
+Carry forward into 9b / 9c; none rise to OQ level:
+
+- **No v1.15 feature-set prose.** DJI's v1.15 shipped wire-level method extracts (`DJI_Cloud/*.txt`) only; no narrative / sequence-diagram equivalent of `Cloud-API-Doc/docs/en/30.feature-set/` pages. Handled per the dual-citation pattern.
+- **`step_key` → `current_step` rename** (v1.11 → v1.15) on `ota_progress` already documented in [`mqtt/dock-to-cloud/events/ota_progress.md`](mqtt/dock-to-cloud/events/ota_progress.md); surfaced in the firmware workflow doc.
+- **`firmware_upgrade_type: 4`** Dock-3-only enum value already documented in Phase 4e-1; surfaced in firmware workflow doc.
+- **Feature-set Mermaid is RC-cohort-incomplete.** DJI's v1.11 Dock feature-set pages use `DJI Pilot 2` + `DJI Dock` + `Cloud Server` as the standard trio; they don't diagram the RC-as-gateway / aircraft-as-subdevice topology (the pilot-to-cloud variant). The corpus's `device-binding.md` adds a dedicated pilot-path Mermaid block to cover that gap, sourced from the v1.15 pilot-to-cloud wire material + Phase 6c RC property surfaces.
+
+### Handoff to 9b
+
+**9b sources**:
+
+- Wayline: [`Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/50.dock-wayline-management.md`](../Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/50.dock-wayline-management.md) (authoritative flow narrative with two Mermaid sequences — immediate/timed vs conditional) + [`60.pilot-wayline-management.md`](../Cloud-API-Doc/docs/en/30.feature-set/10.pilot-feature-set/60.pilot-wayline-management.md) (pilot-side) + v1.15 `[DJI_Cloud/DJI_CloudAPI-Dock3-WaylineManagement.txt]` + `[DJI_CloudAPI-Dock2-Wayline-Management.txt]` + Phase 3 HTTP wayline endpoints + Phase 4b catalog.
+- DRC: [`100.drc.md`](../Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/100.drc.md) (dock) + [`90.drc.md`](../Cloud-API-Doc/docs/en/30.feature-set/10.pilot-feature-set/90.drc.md) (pilot) + v1.15 Live-Flight-Controls + Remote-Control (Phase 4c + 4e-2 + 4h).
+- Livestream: [`30.dock-livestream.md`](../Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/30.dock-livestream.md) + [`30.pilot-livestream.md`](../Cloud-API-Doc/docs/en/30.feature-set/10.pilot-feature-set/30.pilot-livestream.md) + Phase 4d + Phase 7 livestream-protocols docs.
+
+**Method inventory (for planning)**:
+
+- Wayline: Phase 4b 21 methods + Phase 3 6 wayline HTTP endpoints = 27 referenced methods. Plus Phase 3 storage/sts-credential handshake.
+- DRC: Phase 4c 42 methods (9 events + 30 services + 7 drc) + Phase 4e-2 53 Remote-Control methods + Phase 4h 20 pilot DRC variants. DRC doc will cite the authority + mode-enter sequence and a representative slice of the drc-family services; it should not reiterate every camera/gimbal setter.
+- Livestream: Phase 4d 6 methods + Phase 4h pilot livestream + Phase 7 4 protocol docs.
+
+**Estimated 9b output**: 3 workflow docs, each 300–500 lines given the richer sequence coverage (conditional / timed / breakpoint variants on wayline; authority → DRC → HSI/OSD push on DRC; per-protocol URL construction on livestream).
+
+### Remaining phases after Phase 9
+
+- Phase 10 — Device annexes + final corpus review.
+
+---
+
 ## 2026-04-19 — handoff at Phase 8 close, ready for review gate
 
 ### State of play
