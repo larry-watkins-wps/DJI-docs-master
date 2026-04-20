@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 6c landed 2026-04-19 (RCs: RC Plus 2 Enterprise, RC Pro Enterprise). Final Phase 6 review gate pending. Phase 7 (WPML + livestream protocols) is next after gate.
+**Current phase**: Phase 6 content-complete 2026-04-19. Final Phase 6 review gate closed. Phase 7 (WPML + livestream protocols) is current.
 
 ---
 
@@ -249,7 +249,7 @@ Each sub-phase has its own review gate. Design decisions locked at 6a kickoff (2
 - [x] Update 4i dock-to-cloud shells ([`mqtt/dock-to-cloud/osd/`](mqtt/dock-to-cloud/osd/README.md), [`state/`](mqtt/dock-to-cloud/state/README.md), [`property-set/`](mqtt/dock-to-cloud/property-set/README.md)) to link the real Phase 6 docs. Corrected the 4i property-set shell's speculative writable-property list — actual Dock 2/3 writable surface is just 3 properties (`silent_mode`, `user_experience_improvement`, `air_transfer_enable`), not the 7 the 4i shell guessed.
 - [x] Update corpus [`README.md`](README.md).
 - [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md) with a 6a close handoff.
-- [ ] **Review gate 6a**
+- [x] **Review gate 6a** closed 2026-04-19 (implicit — user instructed "Continue at 6b"). Landing commit `0715951` (Phase 6a master matrix + Dock 2 + Dock 3).
 
 ### Sub-phase 6b — Aircraft properties (M3D, M3TD, M4D, M4TD)
 
@@ -274,7 +274,7 @@ Actual shape confirmed 2026-04-19: each RC carries 11 top-level properties (6 OS
 - [x] Extend master matrix README §4.3 — 12-row RC coverage table + unique-property summary + out-of-scope plain-RC note.
 - [x] Update corpus [`README.md`](README.md).
 - [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md).
-- [ ] **Final Phase 6 review gate** (closes the whole Phase 6).
+- [x] **Final Phase 6 review gate** closed 2026-04-19. Landing commit `bed52f8` (Phase 6c — RC Plus 2 Enterprise + RC Pro Enterprise + session handoff). Phase 6 content-complete.
 
 ## Phase 7 — Auxiliary specs (WPML + livestream protocols)
 
