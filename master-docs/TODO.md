@@ -17,8 +17,8 @@ Cross-session source of truth. Update checkboxes as work completes. Before endin
 - [x] `.gitignore` (narrow — build outputs, IDE, OS, vendored tools)
 - [x] `.gitattributes` (LF normalization)
 - [x] `git init` on main
-- [ ] **Review gate**: user confirms final plan + layout
-- [ ] Initial commit (snapshot of source dirs + setup files)
+- [x] **Review gate** closed (implicit — user directed Phase 1 start). Reconciled 2026-04-19.
+- [x] Initial commit landed. Commit `f6a63eb` (chore: initialize repo with setup, plan, memory, and source snapshot). Reconciled 2026-04-19.
 
 ## Phase 1 — Architecture overview *(complete)*
 
@@ -85,7 +85,7 @@ Re-scoped 2026-04-18 to cover WaylineManagement only (the original 4b-plus-Live-
 - [x] Draft 2 request docs: `flighttask_progress_get`, `flighttask_resource_get`.
 - [x] Update `mqtt/dock-to-cloud/README.md` with events/services/requests sections.
 - [x] Update `mqtt/README.md` and corpus `README.md`.
-- [ ] **Review gate 4b**
+- [x] **Review gate 4b** closed (implicit — user instructed "Continue at 4c"). Landing commit `7742419` (Phase 4b — WaylineManagement, 21 methods). Reconciled 2026-04-19.
 
 ### Sub-phase 4c — Live-Flight-Controls (dock-to-cloud)
 
@@ -115,7 +115,7 @@ Estimated 3500–4200 lines of doc output — at the edge of a single-drop budge
 - [x] Update `mqtt/dock-to-cloud/README.md` with 4d-sourced entries under events/services/requests and mark 4d landed in the sub-phase status table.
 - [x] Update `mqtt/README.md` + corpus `README.md` with the new method count (77 total).
 - [x] Append to `RESUME-NOTES.md` with a 4d-close handoff entry.
-- [ ] **Review gate 4d**
+- [x] **Review gate 4d** closed (implicit — user instructed "Continue at 4e"). Landing commit `debf5f8` (Phase 4d — LiveStream + Media-Management, 9 methods). Reconciled 2026-04-19.
 
 ### Sub-phase 4e — Firmware-Upgrade + Remote-Log + Remote-Debugging + Remote-Control (dock-to-cloud)
 
@@ -132,7 +132,7 @@ Re-scoped 2026-04-19 after enumeration — the four source files together contai
 - [x] Update `mqtt/dock-to-cloud/README.md` with 4e-1 rows (events + services) and mark 4e-1 landed in the sub-phase status table.
 - [x] Update `mqtt/README.md` + corpus `README.md` (method count 119).
 - [x] Append to `RESUME-NOTES.md` with a 4e-1 close handoff entry.
-- [ ] **Review gate 4e-1**
+- [x] **Review gate 4e-1** closed (implicit — user instructed "Continue at 4e-2"). Landing commit `b5c81e3` (Phase 4e-1 — Firmware-Upgrade + Remote-Log + Remote-Debugging, 42 methods). Reconciled 2026-04-19.
 
 #### Sub-phase 4e-2 — Remote-Control (dock-to-cloud)
 
@@ -157,7 +157,7 @@ Source: `DJI_Cloud/DJI_CloudAPI-Dock3-Remote-Control.txt` (4611 lines) + `DJI_Cl
 - [x] Update `mqtt/dock-to-cloud/README.md` with 4e-2 rows (grouped by sub-area) and the filing-convention note.
 - [x] Update `mqtt/README.md` + corpus `README.md` (method count 172).
 - [x] Append to `RESUME-NOTES.md` with a 4e-2 / Phase 4e close handoff entry.
-- [ ] **Review gate 4e** (closes the whole 4e sub-phase).
+- [x] **Review gate 4e** closed (implicit — user instructed "Continue at 4f"). Landing commit `f196c0b` (Phase 4e-2 — Remote-Control, 53 methods + Phase 4e close). Closes the whole 4e sub-phase. Reconciled 2026-04-19.
 
 ### Sub-phase 4f — FlySafe + Custom-Flight-Area + AirSense + HMS (dock-to-cloud)
 

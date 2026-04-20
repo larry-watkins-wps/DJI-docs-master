@@ -8,7 +8,7 @@ Resolution notes stay in the entry after it is closed — do not delete resolved
 
 ## OQ-001 — Source version mismatch between `Cloud-API-Doc/` (v1.11.3) and `DJI_Cloud/` (v1.15)
 
-**Status**: open — policy captured in `SOURCES.md`; individual content choices resolved inline as encountered.
+**Status**: **resolved 2026-04-19** — corpus is v1.15-only. v1.11 `Cloud-API-Doc/` material is retained in-repo solely for drift cross-check; it is no longer primary for any content, even where it agrees with v1.15.
 
 **Raised**: 2026-04-18, during Phase 1 source survey.
 
@@ -21,14 +21,15 @@ The v1.11 markdown set has zero matches for `Dock 3`, `Dock3`, `Matrice 4`, `M4D
 
 **Why it matters.** The authority ranking in `SOURCES.md` originally listed `Cloud-API-Doc/` as authoritative #1 and `DJI_Cloud/` as derived #3. That ranking is correct for the v1.11 feature surface but inverted for anything that only exists in v1.15 (which is the entire in-scope device set).
 
-**Resolution policy** (see `SOURCES.md`):
+**Resolution (2026-04-19)** — user directed: **the corpus documents v1.15 only**. `DJI_Cloud/` v1.15 extracts are the sole primary source. `Cloud-API-Doc/` v1.11 is retained only as a drift-cross-check corpus — useful to note what changed between versions, but never primary for any claim in the corpus. Simplified policy:
 
-1. For content present in both sets, `Cloud-API-Doc/` wins on formatting fidelity (the v1.15 extract is plain text and may have lost tables, code blocks, or inline structure).
-2. For content specific to Dock 3 / M4D / M4TD / RC-Plus-2-Enterprise-with-M4D, the v1.15 extracts in `DJI_Cloud/*.txt` are the primary written source. Where the extract appears to have dropped structure, the live site at `developer.dji.com` (v1.15+) is the fallback cross-check via browser automation or Playwright (see `DJI_Cloud/scrape_api_reference.py`).
-3. When a statement is drawn from the v1.15 extract and has no counterpart in `Cloud-API-Doc/`, cite the `DJI_Cloud/*.txt` file explicitly. When the two sets agree on generic architecture, citing `Cloud-API-Doc/` is sufficient.
-4. If a conflict is found between v1.11 and v1.15 (not just silence), log it as a new `OQ-###` entry and ask.
+1. **All primary content cites `DJI_Cloud/`** (v1.15 extracts). When a v1.15 extract appears to have dropped table structure or inline formatting, verify against the live site at `developer.dji.com` and cite both — not against `Cloud-API-Doc/`.
+2. **`Cloud-API-Doc/` is for drift tables only.** Per-device docs already follow this pattern (dock2.md §5, m3d.md §5, rc-pro.md §5) — v1.11 values appear in "v1.11 → v1.15 drift" columns, and v1.15 always wins on every conflict.
+3. **No action on existing corpus.** Phases 0–6 already cite v1.15 as authoritative in practice; this resolution just formalizes the policy. Phase 7+ proceeds on the same basis.
 
-**Remaining open thread.** As of 2026-04-18 the `DJI_Cloud/` extraction covers the entire `/api-reference/` section of the live site (87 files after the Dock 2 cohort scope expansion — see `SOURCES.md` §3). Pages outside `/api-reference/` — overview, product-support, release-notes, tutorials, quick-start, feature-set, debug — are **not** in the extraction set. If a later phase needs one of those, fetch from the live site (or extend `scrape_api_reference.py`'s URL inventory). No action required now.
+Drift between v1.11 and v1.15 that is **not** captured in an existing drift table is treated as uninteresting (v1.15 wins without commentary). Drift that flips semantics (enum values removed/renamed, types changed) is still logged as a fresh OQ and flagged for user decision — but since all such drift encountered through 6c has been additive or cosmetic, there are no live cases.
+
+`SOURCES.md` authority ranking updated 2026-04-19 to reflect this policy.
 
 ---
 
@@ -53,7 +54,7 @@ The v1.11 markdown set has zero matches for `Dock 3`, `Dock3`, `Matrice 4`, `M4D
 
 ## OQ-003 — MQTT QoS, retain, and clean-session settings are not specified in DJI's published documentation
 
-**Status**: open — gap to close before Phase 4 per-topic catalog entries claim specific QoS values.
+**Status**: **resolved 2026-04-19** — demo-code scan complete. DJI's own reference implementation uses QoS 1 for all cloud-side subscriptions, QoS 0 for the default outbound, QoS 2 specifically for `services_reply`, and never sets the `retain` flag. See findings below. Corpus policy locked: DJI documentation is silent on the wire, the demo provides the only DJI-authored evidence, and per-topic catalog entries cite the demo where applicable.
 
 **Raised**: 2026-04-18, during Phase 2 MQTT-conventions drafting.
 
@@ -64,16 +65,29 @@ The v1.11 markdown set has zero matches for `Dock 3`, `Dock3`, `Matrice 4`, `M4D
 - QoS 2 on the high-frequency `osd` topic is excessive and drives broker CPU up.
 - `retain=true` on `status` preserves last-known topology across broker restarts — DJI's behavior on this flag affects cold-start correctness for third-party implementations.
 
-**Where the evidence likely lives.**
-1. `[DJI-Cloud-API-Demo/]` (deprecated, v1.10) — the Java/Spring client code explicitly passes QoS to the MQTT library when subscribing and publishing. Scanning `cloud-sdk/` and `sample/` for `MqttQoS`, `.qos(`, `setQos(`, `setRetained(` will expose DJI's own defaults.
-2. Live packet capture against a real Dock or RC — out of scope for the corpus phase.
+**Demo-code scan findings (2026-04-19).** Scanned `[DJI-Cloud-API-Demo/cloud-sdk/]` for `MqttQoS`, `setQos`, `.qos(`, `setRetained`, and `retain`/`qos` in `.java` files. Complete evidence inventory:
 
-**Proposed resolution.**
-- Phase 4 per-topic catalog entries must not cite QoS or `retain` values unless they can cite a specific source. When captured from the demo, cite as e.g. `[DJI-Cloud-API-Demo/cloud-sdk/.../FooHandler.java:42]`.
-- If no demo evidence supports a topic's QoS, the Phase 4 entry states "not specified by DJI" and links back to this OQ.
-- Do not attempt to reverse-engineer values; either cite or omit.
+| Setting | Value | Source | Notes |
+|---|---|---|---|
+| Inbound channel adapter QoS (all subscribed topics by default) | **1** | `[DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/mqtt/MqttConfiguration.java:54]` → `adapter.setQos(1)` | The cloud subscribes to every inbound topic at QoS 1. This is `MqttPahoMessageDrivenChannelAdapter`'s default subscription QoS for topics added via the inbound `inboundTopic` config or via `IMqttTopicService.subscribe(String...)`. |
+| Dynamic subscription QoS (multi-topic overload) | **1** | `[MqttTopicServiceImpl.java:34]` → `subscribe(topic, 1)` | When code calls `subscribe(String... topics)` with no explicit QoS, each topic is added at QoS 1. A QoS-specifying overload `subscribe(String topic, int qos)` exists at `:39` but no caller in the demo passes a value other than 1. |
+| Outbound default QoS | **0** | `[MqttConfiguration.java:73]` → `messageHandler.setDefaultQos(0)` + `[MqttGatewayPublish.java:31]` → `DEFAULT_QOS = 0` | Every outbound publish that does not explicitly pass a QoS value goes out at QoS 0. This is the cloud → device direction — services commands, property-set writes, and any request-family call. |
+| `services_reply` outbound QoS | **2** | `[MqttGatewayPublish.java:72]` → `this.publish(headers.get(MqttHeaders.RECEIVED_TOPIC) + TopicConst._REPLY_SUF, 2, response)` | Hardcoded override — `publishReply()` sends at QoS 2. This is the only non-default outbound QoS in the demo. Applied to any reply topic ending in `_reply` that the cloud sends in response to device-initiated requests. |
+| `retain` flag | **never set** | — | No occurrences of `setRetained`, `retained(`, or any `retain` configuration in the demo. Paho default is `retain=false`. The demo relies entirely on live publish/subscribe with no broker-side retention. |
+| Clean-session | **not inspected** | — | Scan did not cover `MqttPahoClientFactory` configuration; the Spring bean wiring was out of the pattern-match. Safe default for a Paho client is `cleanSession=true` unless overridden. Not blocking any Phase 4 catalog entry. |
 
-**Remaining open thread.** When Phase 4 starts, scan `DJI-Cloud-API-Demo/` for `MqttQoS` / `.qos(` / `setQos(` / `setRetained(` and compile a table of observed QoS per topic. Update this entry with findings and close if the coverage is complete for the in-scope topics.
+**Interpretation.** The demo is the cloud-side server. It tells us:
+- What the **cloud subscribes at** (QoS 1 for all inbound topics).
+- What the **cloud publishes at** (QoS 0 default, QoS 2 for `_reply`).
+- The **cloud never sets retain**.
+
+MQTT delivery QoS is `min(pub_qos, sub_qos)`. If the cloud subscribes at QoS 1, the effective QoS of device-originated messages is capped at 1. If devices publish at QoS 0, messages can be dropped silently. If devices publish at QoS ≥1, delivery is reliable at QoS 1. **Device-side publish QoS remains unspecified by DJI** — the demo code covers only the cloud side — but the cloud's QoS-1 subscribe establishes what the cloud expects, and since the deployed DJI stack works against this demo, device publish QoS must be ≥1 for the reliability-sensitive families (services, services_reply, events with `need_reply: 1`). For best-effort families (`osd`, `state`), device publish at QoS 0 is plausible and would match the reply pattern.
+
+**Policy locked.** Phase 4 per-topic catalog entries that need to state a QoS should cite the demo using the table above. For entries that do not cite a QoS, reading is: the demo evidence applies by default (QoS 1 subscribe, QoS 0 publish out, QoS 2 reply out, retain=false). Phase 9 workflows may surface any QoS-sensitive choreography; carry this evidence forward.
+
+**Remaining open thread**: device-side publish QoS is not directly observed. Only a live packet capture or device-SDK code inspection would close that gap, and neither is in scope. The cloud-side evidence above is sufficient to implement a working server — which is the corpus's purpose.
+
+**Caveat.** The demo is v1.10.0 (deprecated 2025-04-10). No v1.15-era DJI reference server-side code exists in this repo to corroborate whether these QoS choices have changed post-v1.10. In the absence of a newer source, the v1.10 demo remains DJI's only authored evidence.
 
 ---
 

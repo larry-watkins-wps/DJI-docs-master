@@ -381,9 +381,19 @@ Observed transport signals:
 
 ## 8. QoS, retain, clean session
 
-DJI's published documentation does **not** specify QoS, `retain`, or clean-session settings per topic. The MQTT-concept page (`[Cloud-API-Doc/docs/en/10.overview/40.basic-concept/20.mqtt.md]`) covers all three QoS levels generically but does not state which DJI uses for which topic family. Neither topic-definition extract (`[DJI_Cloud/DJI_CloudAPI-TopicDefinitions.txt]`, `[DJI_Cloud/DJI_CloudAPI-PilotToCloud-Topic-Definition.txt]`) pins these values either.
+DJI's **documentation** does not specify QoS, `retain`, or clean-session settings per topic. Per [`OQ-003`](../OPEN-QUESTIONS.md#oq-003--mqtt-qos-retain-and-clean-session-settings-are-not-specified-in-djis-published-documentation) (resolved 2026-04-19), the only DJI-authored evidence is the deprecated reference server at `[DJI-Cloud-API-Demo/]` (v1.10.0, deprecated 2025-04-10). The demo-code scan produced the following cloud-side defaults:
 
-Tracked as [`OQ-003`](../OPEN-QUESTIONS.md#oq-003--mqtt-qos-retain-and-clean-session-settings-are-not-specified-in-djis-published-documentation). Phase 4 per-topic entries must not cite QoS or `retain` values unless a concrete source (the deprecated demo code, live packet capture) supports them.
+| Direction | QoS | Retain | Source |
+|---|---|---|---|
+| Cloud subscribes — all inbound topics | **1** | — | `[DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/mqtt/MqttConfiguration.java:54]` |
+| Cloud publishes — default (services, requests, property-set) | **0** | **false** (never set) | `[DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/mqtt/MqttConfiguration.java:73]` + `[.../MqttGatewayPublish.java:31]` |
+| Cloud publishes — `services_reply` and other `_reply` topics | **2** | **false** | `[DJI-Cloud-API-Demo/cloud-sdk/src/main/java/com/dji/sdk/mqtt/MqttGatewayPublish.java:72]` |
+
+**Device-side publish QoS is not directly observed** in the demo (the demo is the cloud-side server). Effective delivery QoS = `min(pub_qos, sub_qos)`. Since the cloud subscribes at QoS 1 and the DJI stack is known to work against this demo, device-side publish for reliability-sensitive families (`services`, `services_reply`, events with `need_reply: 1`) must be ≥1; for best-effort families (`osd`, `state`), QoS 0 is plausible.
+
+Clean-session was not observed in the pattern-scan — Paho client factory configuration was out of scope. Paho's default is `cleanSession=true` unless a `MqttConnectOptions` overrides it.
+
+Phase 4 per-topic entries reference this §8 rather than restating the evidence. New entries that need per-topic QoS can use this table as the source unless a topic-specific override is found in the demo.
 
 ## 9. Known documentation issue — pilot-to-cloud OSD example
 

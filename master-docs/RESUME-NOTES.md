@@ -6,6 +6,44 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — Phase 6 wrap-up: v1.15-only policy locked + OQ-003 resolved + TODO.md reconciled
+
+Brief housekeeping entry closing out the Phase 6 session. No new corpus content. Picked up after the `docs: close Phase 6 review gate` commit (`f4e9de4`).
+
+### What changed
+
+1. **OQ-001 resolved** — corpus documents **Cloud API v1.15 only**. [`Cloud-API-Doc/`](../Cloud-API-Doc/) (v1.11.3) is retained in-repo solely for `§5 drift` cross-check on the per-device docs — never primary. Policy in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md#oq-001--source-version-mismatch-between-cloud-api-doc-v1113-and-dji_cloud-v115) (resolution section) and [`SOURCES.md`](SOURCES.md) (authority ranking simplified, per-source entries updated). **No change to existing corpus content** — Phases 0–6 already followed this policy in practice; the resolution just formalizes it.
+
+2. **OQ-003 resolved** — scanned [`DJI-Cloud-API-Demo/`](../DJI-Cloud-API-Demo/) for MQTT QoS / retain evidence. Findings documented in [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md#oq-003--mqtt-qos-retain-and-clean-session-settings-are-not-specified-in-djis-published-documentation):
+   - Cloud subscribes all inbound topics at **QoS 1** (`MqttConfiguration.java:54`).
+   - Cloud publishes default at **QoS 0** (`MqttGatewayPublish.java:31`).
+   - Cloud publishes `_reply` topics at **QoS 2** (`MqttGatewayPublish.java:72`).
+   - Cloud **never sets `retain`** (Paho default `false`).
+   - Device-side publish QoS not directly observed (demo is cloud-side only).
+   - [`mqtt/README.md`](mqtt/README.md) §8 updated with the evidence table; Phase 4 per-topic entries can reference §8.
+
+3. **TODO.md reconciled** — 6 stale unchecked boxes ticked:
+   - Phase 0 `Review gate` + `Initial commit` — clearly closed since 24+ commits exist; reconciled with initial-commit pointer `f6a63eb`.
+   - Phase 4 sub-gates 4b / 4d / 4e-1 / 4e — all implicit-closed by subsequent sub-phases ("Continue at 4c/4e/4e-2/4f" pattern); marked with landing-commit pointers (`7742419`, `debf5f8`, `b5c81e3`, `f196c0b`).
+
+After this entry, every unchecked box in [`TODO.md`](TODO.md) belongs to Phase 7 / 8 / 9 / 10 or standing items — nothing pre-Phase-7 is in a partially-complete state.
+
+### What this doesn't change
+
+- Every doc already in the corpus was written with v1.15 as authoritative. No rewrites needed.
+- OQ-002 (pilot-to-cloud OSD copy-paste bug) stays **open** — it is DJI's own documentation bug, not a corpus-side decision. The corpus already works around it by citing per-aircraft property files for pilot-path OSD content. No action available on our side until DJI fixes the source.
+
+### Phase 7 kickoff
+
+Phase 7 is **WPML + livestream protocols**. Self-contained spec references; no cross-dependency on transport catalogs (those are done). Expected output ~8 docs:
+
+- `wpml/overview.md`, `template-kml.md`, `waylines.md`, `common-elements.md` — DJI WPML wayline file format.
+- `livestream-protocols/rtmp.md`, `gb28181.md`, `webrtc.md`, `agora.md` — per-protocol specifics.
+
+Sources (v1.15-only per OQ-001): `DJI_Cloud/DJI_CloudAPI_WPML-*.txt` (4 files) for WPML; livestream protocol details spread across dock and RC feature-set files ([`DJI_CloudAPI-Dock3-LiveStream.txt`](../DJI_Cloud/DJI_CloudAPI-Dock3-LiveStream.txt), [`DJI_CloudAPI-Dock2-Live-Stream.txt`](../DJI_Cloud/DJI_CloudAPI-Dock2-Live-Stream.txt), [`DJI_CloudAPI_RC-Pro-Enterprise-Live-Stream.txt`](../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Live-Stream.txt), [`DJI_CloudAPI_RC-Plus-2-Enterprise-Live-Stream.txt`](../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Live-Stream.txt), and any Agora/GB28181/WebRTC-specific overview pages in `DJI_Cloud/`).
+
+---
+
 ## 2026-04-19 — handoff at Phase 6c close, ready for final Phase 6 review gate
 
 ### State of play

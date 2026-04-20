@@ -4,28 +4,27 @@ All source directories live at the repo root alongside `master-docs/`. They are 
 
 ## Authority ranking
 
-The two DJI documentation sources in this repo are **different versions** of the Cloud API docs, not duplicates:
+**The corpus documents Cloud API v1.15 only.** The two DJI documentation sources in this repo are **different versions** of the Cloud API docs:
 
-- `Cloud-API-Doc/` is **Cloud API v1.11.3** (per `docs/en/00.index.md` release-notes header). It predates Dock 3 / Matrice 4 and has zero mentions of `Dock 3`, `M4D`, or `M4TD` in `docs/{en,cn}/`.
-- `DJI_Cloud/` is a **Cloud API v1.15** MHTML extraction (per every `DJI_CloudAPI-Dock3-*.txt`, `DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-*.txt`, and `DJI_CloudAPI_RC-Plus-2-Enterprise-*.txt` navigation header). It is the only written DJI source in this repo that covers the in-scope devices by name.
+- `DJI_Cloud/` is a **Cloud API v1.15** extraction (per every `DJI_CloudAPI-Dock3-*.txt`, `DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-*.txt`, and `DJI_CloudAPI_RC-Plus-2-Enterprise-*.txt` navigation header). This is the **sole primary source** for the corpus.
+- `Cloud-API-Doc/` is **Cloud API v1.11.3** (per `docs/en/00.index.md` release-notes header). It predates Dock 3 / Matrice 4 and has zero mentions of `Dock 3`, `M4D`, or `M4TD` in `docs/{en,cn}/`. Retained in-repo solely for **drift cross-check** in per-device `§5 drift` tables; never primary for corpus content.
 
-See [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) (OQ-001) for the full version-mismatch analysis.
+See [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) (OQ-001) for the full version-mismatch analysis and 2026-04-19 resolution.
 
 ### Ranking
 
-1. **`Cloud-API-Doc/`** (v1.11.3) — authoritative for content that exists in v1.11. Formatting fidelity preferred over the `DJI_Cloud/` extract when both cover the same material.
-2. **`DJI_Cloud/`** (v1.15 extraction) — authoritative written source for anything specific to **Dock 3, Matrice 4D, Matrice 4TD, RC paired with M4D**, and anything else introduced after v1.11. Derived from MHTML: tables and inline formatting may have been lost in extraction — verify table structure against the live site when a claim hinges on it.
-3. **`DJI-Cloud-API-Demo/`** — authoritative for wire behavior; **deprecated 2025-04-10** by DJI. Use as evidence of what payloads DJI themselves send, not as a structural template. Last release: Cloud API 1.10.0 (2024-04-07).
-4. **Live DJI developer site** (`developer.dji.com`, v1.15+) — Browser / Playwright fallback when the `DJI_Cloud/` extract appears to have lost structure, when checking for drift since the last scrape (2026-04-18), or when a page is not in the extraction set (e.g., release notes, tutorial-map content outside `/api-reference/`). Not stored in-repo outside of `DJI_Cloud/`; cite as `[developer.dji.com/...]` with the access date.
+1. **`DJI_Cloud/`** (v1.15 extraction) — **primary source for all corpus content.** Written v1.15 authority. Derived from MHTML and live-site scrape: tables and inline formatting may have been lost in extraction — verify table structure against the live site when a claim hinges on it.
+2. **Live DJI developer site** (`developer.dji.com`, v1.15+) — Browser / Playwright fallback when the `DJI_Cloud/` extract appears to have lost structure, when checking for drift since the last scrape (2026-04-18), or when a page is not in the extraction set (e.g., release notes, tutorial-map content outside `/api-reference/`). Not stored in-repo outside of `DJI_Cloud/`; cite as `[developer.dji.com/...]` with the access date.
+3. **`Cloud-API-Doc/`** (v1.11.3) — **drift-cross-check corpus only.** Cite only in per-device `§5 drift` tables and OQ entries where documenting a v1.11 → v1.15 change is the point. Never primary.
+4. **`DJI-Cloud-API-Demo/`** — authoritative for wire behavior; **deprecated 2025-04-10** by DJI. Use as evidence of what payloads DJI themselves send, not as a structural template. Last release: Cloud API 1.10.0 (2024-04-07). See [`OPEN-QUESTIONS.md`](OPEN-QUESTIONS.md) OQ-003 for the MQTT QoS / retain evidence this source provides.
 5. **`dji_cloud_dock3/`** — non-authoritative third-party; reference only. Any fact derived from here must be flagged and corroborated against sources #1–#4 before inclusion.
 
 ### Conflict resolution
 
-- When #1 and #2 both cover the same topic and agree, cite #1.
-- When #1 is silent and #2 covers the topic (typical for Dock 3 / M4D / M4TD content), cite #2.
-- When #1 and #2 **disagree** on the same topic (version drift in the wire contract), log as a new entry in `OPEN-QUESTIONS.md` and ask before writing.
-- When #2 appears to have dropped a table or structure, cross-check against #4 (live site) and cite both.
-- #3 corroborates wire behavior; it never overrides #1 or #2 on what DJI documents.
+- When `DJI_Cloud/` (v1.15) covers a topic, cite #1 and stop. Do not consult `Cloud-API-Doc/` for "agreement" — v1.15 is authoritative.
+- When `DJI_Cloud/` appears to have dropped a table or structure, cross-check against #2 (live site) and cite both.
+- When `Cloud-API-Doc/` v1.11 and `DJI_Cloud/` v1.15 **differ** and the difference is worth documenting (e.g., enum extension, label refinement), record it in the relevant per-device `§5 drift` table with v1.15 as the authoritative value. Drift that flips semantics (enum values removed, types changed) is still logged as a fresh `OQ-###` — but practice through 6c shows all drift to date has been additive or cosmetic.
+- #4 (demo) corroborates wire behavior; it never overrides #1 on what DJI documents. The demo is v1.10.0 so any divergence from v1.15 is expected and does not imply a problem with the corpus.
 - #5 never wins against #1–#4.
 
 ---
@@ -36,7 +35,7 @@ Layout: `docs/{cn,en}/` — bilingual Markdown docs tree.
 
 **Origin**: Official DJI SDK Cloud API documentation repository.
 **Version in repo**: **Cloud API v1.11.3** (per `docs/en/00.index.md` release-notes header).
-**Use as**: Primary source of truth for API surface, topic definitions, device properties, and workflows **that exist in v1.11**. Does not cover Dock 3, Matrice 4D, Matrice 4TD, or anything introduced after v1.11 — see `DJI_Cloud/` for those.
+**Use as**: **Drift cross-check only.** Per OQ-001's 2026-04-19 resolution, the corpus documents v1.15; v1.11 material is retained in-repo solely to populate `§5 drift` tables on the per-device docs (`dock2.md` §5, `m3d.md` §5, `rc-pro.md` §5) and to support future drift audits. Never primary for any corpus claim. Does not cover Dock 3, Matrice 4D, Matrice 4TD, RC Plus 2 Enterprise, or anything introduced after v1.11 — see `DJI_Cloud/` for those.
 **Preference**: Default to `docs/en/`. Use `docs/cn/` only when the EN version is missing or ambiguous.
 
 ---
@@ -61,8 +60,8 @@ Contents: 87 `.txt` files plus `HMS.json` and two extraction scripts (`extract_m
   1. **MHTML capture → `extract_mhtml.py`** (original, hand-driven): the user saves pages as MHTML; the script converts to plain text and trims live-site page chrome using the `Github Edit open in new window` marker as a content boundary.
   2. **Live-site scrape → `scrape_api_reference.py`** (added 2026-04-18): Playwright headless Chromium renders each API Reference page and extracts the `.theme-default-content` container. Staged into `_scraped/`, deduped against existing filenames via normalized-slug matching, and then merged into `DJI_Cloud/`. Initial run pulled 43 pages covering sections not yet captured by the MHTML workflow (41 kept after manual dedupe; 2 were near-identical to pre-existing MHTML extracts under different names). A second run on 2026-04-18 with `--include-legacy` pulled 39 pages: 19 Dock 1, 19 Dock 2, 1 Dock 3 HMS (filled a Dock 3 coverage gap). Merged: 20 (all 19 Dock 2 + Dock 3 HMS), per the expanded scope (Dock 2 + M3D / M3TD + RC Pro Enterprise). **Dock 1 pages were scraped but discarded** — Dock 1 is out of scope and the staging directory was deleted after merge. Re-run `scrape_api_reference.py --include-legacy` to re-pull them if scope expands to include Dock 1 later.
 **Version extracted**: **Cloud API v1.15** for both pipelines (the MHTML and live scrape both hit the same v1.15+ site; the live scrape was 2026-04-18).
-**Use as**: The primary **written** DJI source for all in-scope devices — **Dock 2**, **Dock 3**, **M3D / M3TD**, **M4D / M4TD**, **RC Pro Enterprise**, **RC Plus 2 Enterprise** — plus out-of-scope device reference material (M30 / M30T, Matrice 400, Mavic 3 Enterprise, plain RC) captured alongside as a side-effect of the scrape. Covers the complete Pilot-to-Cloud surface (MQTT, HTTPS, WebSocket, JSBridge) and the full Dock-to-Cloud feature-set surface for Dock 2 and Dock 3. None of this material (for the in-scope devices) exists in `Cloud-API-Doc/` (v1.11).
-**Caveat**: Both pipelines are lossy in different ways. MHTML extracts may have lost table/code-block structure; the live scrape preserves structure but can mid-line-break text around external-link icons ("open in new window"). When a claim hinges on table structure or inline formatting, verify against the live site. When content exists in both `Cloud-API-Doc/` and `DJI_Cloud/`, prefer `Cloud-API-Doc/` for formatting fidelity.
+**Use as**: **Primary written source for the entire corpus.** Covers all in-scope devices — **Dock 2**, **Dock 3**, **M3D / M3TD**, **M4D / M4TD**, **RC Pro Enterprise**, **RC Plus 2 Enterprise** — plus out-of-scope device reference material (M30 / M30T, Matrice 400, Mavic 3 Enterprise, plain RC) captured alongside as a side-effect of the scrape. Covers the complete Pilot-to-Cloud surface (MQTT, HTTPS, WebSocket, JSBridge) and the full Dock-to-Cloud feature-set surface for Dock 2 and Dock 3.
+**Caveat**: Both pipelines are lossy in different ways. MHTML extracts may have lost table/code-block structure; the live scrape preserves structure but can mid-line-break text around external-link icons ("open in new window"). When a claim hinges on table structure or inline formatting, verify against the **live site** (source #2), not against `Cloud-API-Doc/` (which is a different version).
 **Writability**: This directory is treated as writable for the extraction workflows (the user owns these workflows and the scripts write here). No corpus documentation is written into this directory — only extractions.
 
 ### File coverage
