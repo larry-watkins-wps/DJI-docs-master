@@ -18,7 +18,7 @@ Phase 9 is sub-phased to keep each drop reviewable in isolation. Every sub-phase
 | Sub-phase | Theme | Docs | Status |
 |---|---|---|---|
 | **9a** | Lifecycle | bootstrap-pairing, device-binding, firmware+config | **Landed 2026-04-19** |
-| 9b | Missions & operations | wayline upload+execution, live flight / DRC, livestream start/stop | pending |
+| **9b** | Missions & operations | wayline upload+execution, live flight / DRC, livestream start/stop | **Landed 2026-04-19** |
 | 9c | Events, media & handoff | HMS event reporting, FlySafe + CFA sync, AirSense, media upload, RC handoff | pending |
 
 ## Catalog
@@ -31,13 +31,13 @@ Phase 9 is sub-phased to keep each drop reviewable in isolation. Every sub-phase
 | [`device-binding.md`](device-binding.md) | Ongoing topology lifecycle: `update_topo` on pair/unpair, OSD telemetry at 0.5 Hz, `state` change events, cloud-initiated `property/set`, and Pilot 2 change-signal fan-out via WebSocket. All cohorts (dock-path + pilot-path). |
 | [`firmware-and-config-update.md`](firmware-and-config-update.md) | Maintenance choreographies: firmware OTA (`ota_create` → `ota_progress` loop) and post-bootstrap `config` refresh. Dock 2 + Dock 3. |
 
-### Sub-phase 9b — Missions & operations (pending)
+### Sub-phase 9b — Missions & operations (landed)
 
-| Doc | Planned scope |
+| Doc | Scope |
 |---|---|
-| `wayline-upload-and-execution.md` | Pilot-HTTPS wayline file upload (Phase 3) + `flighttask_prepare` → `flighttask_execute` → `flighttask_progress` (Phase 4b) + immediate / timed / conditional task variants + breakpoint recovery. |
-| `live-flight-controls-drc.md` | Authority-grab (`flight_authority_grab`, `payload_authority_grab`) + `drc_mode_enter` → stick / drone-control DRC stream + heartbeat + delay push. Dock DRC (Phase 4c + 4e-2) and pilot DRC (Phase 4h). |
-| `livestream-start-stop.md` | `live_start_push` / `live_stop_push` per protocol (RTMP / GB28181 / WebRTC / Agora), pilot-side JSBridge coordination. Cross-references Phase 7 livestream-protocols docs. |
+| [`wayline-upload-and-execution.md`](wayline-upload-and-execution.md) | Pilot-HTTPS wayline file upload (Phase 3) + `flighttask_prepare` → `flighttask_execute` → `flighttask_progress` (Phase 4b) + immediate / timed / conditional task variants + breakpoint recovery + in-flight-wayline delivery (Dock 3) + RTH controls. |
+| [`live-flight-controls-drc.md`](live-flight-controls-drc.md) | Authority-grab (`flight_authority_grab`, `payload_authority_grab`) + `drc_mode_enter` → stick / drone-control DRC stream + heartbeat + HSI/OSD/delay push. Dock DRC (Phase 4c + 4e-2) and pilot DRC (Phase 4h). DRC 2.0 commander_flight_height semantics. |
+| [`livestream-start-stop.md`](livestream-start-stop.md) | `live_start_push` / `live_stop_push` per protocol (RTMP / GB28181 / WebRTC / Agora), mid-stream quality / lens / camera changes, pilot-side JSBridge coordination. Cohort × protocol matrix. Cross-references Phase 7 livestream-protocols docs. |
 
 ### Sub-phase 9c — Events, media & handoff (pending)
 

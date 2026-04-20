@@ -6,6 +6,70 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 9b close, ready for review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3, 4, 5, 6, 7, 8, 9a complete and committed. **Phase 9b (Missions & operations) content-complete.**
+- Phase 9a review gate closed 2026-04-19 (commit `f147d79`) before 9b work began.
+- Phase 9b review gate is the only remaining 9b item.
+- **Phase 9c (Events, media & handoff) is next** after the review gate. 5 docs per [PLAN.md](PLAN.md): `hms-event-reporting.md`, `flysafe-custom-flight-area-sync.md`, `airsense-events.md`, `media-upload-from-dock.md`, `remote-control-handoff.md`.
+
+### What Phase 9b produced
+
+**3 workflow docs** added to [`workflows/`](workflows/README.md):
+
+- [`workflows/wayline-upload-and-execution.md`](workflows/wayline-upload-and-execution.md) — dual-diagram (Pilot 2 upload path + MQTT execution path) + conditional-task sub-diagram. Covers Pilot-HTTPS authoring flow ([`duplicate-name`](http/wayline/duplicate-name.md) → [`sts-credential`](http/storage/sts-credential.md) → direct OSS PUT → [`upload-callback`](http/wayline/upload-callback.md)), Phase 4b 21-method execution surface (prepare / execute / progress / resource-get / undo / pause / recovery / stop + RTH trio + in-flight wayline family), immediate / timed / conditional task variants, breakpoint resume semantics (including the `rth_altitude`-replaces-`wpml:takeOffSecurityHeight` gotcha from DJI's feature-set page), simulated-flight caveats, and error paths cross-linked to BC module `517` (`WaylineErrorCodeEnum`).
+- [`workflows/live-flight-controls-drc.md`](workflows/live-flight-controls-drc.md) — dual-diagram (dock-path DRC + pilot-path consent-gated DRC). Phases: authority grab → `drc_mode_enter` (relay MQTT broker + JWT + OSD/HSI frequencies) → `drc/down` / `drc/up` control stream → exit. Dock-path Phase 4c 42 methods + Phase 4e-2 53 methods (carefully split: shared safety 3 · shared aircraft/camera 7 · Dock-2-only 6 · Dock-3-only night/IR/searchlight 7 · Dock-3-only speaker 6 · Dock-3-only PSDK 2 · Dock-3-only camera extras 2 · Dock-3-only AI identify 11 · state push on /drc/up 8 methods). Pilot-path Phase 4h 27 new docs (`cloud_control_auth_request` / `cloud_control_auth_notify` / `cloud_control_release` + 20 pilot DRC variants). DRC 2.0 `commander_flight_height` semantics (Phase 6b M4D-pilot-path-writable). Authority split differs: dock = separate flight + payload; pilot = unified.
+- [`workflows/livestream-start-stop.md`](workflows/livestream-start-stop.md) — triple-diagram (dock-path + pilot-server-initiated + pilot-app-initiated via JSBridge). `live_capacity` state announcement → `live_start_push` with `{url_type, url, video_id, video_quality}` → media plane (RTMP/GB28181/WHIP/Agora) → mid-stream `live_set_quality` / `live_lens_change` / `live_camera_change` → `live_stop_push`. Cohort × protocol matrix table: Dock 2 all 4; Dock 3 drops Agora; RC Plus 2 no Agora; RC Pro no WebRTC. Pilot-path verification (camera decoding + flight-control UI check). Agora `+`-in-token URL-encode-once rule.
+
+**Corpus updates**:
+
+- [`workflows/README.md`](workflows/README.md) — 9b sub-phase marked landed; 9b catalog table links 3 docs with per-doc scope summaries.
+- [`README.md`](README.md) — corpus TOC workflows row extended with 9b entries.
+- [`TODO.md`](TODO.md) — 9b checklist fully checked with doc-level scope callouts; review gate unchecked; current-phase banner advanced to "9b landed, review gate pending; 9c next".
+- `OPEN-QUESTIONS.md` — **no new entries.** No DJI-source defects during 9b drafting rose to OQ level.
+
+### Design decisions locked at 9b drafting
+
+Carried forward into 9c:
+
+1. **Diagram count per workflow scales with path-count × variant-count.** Wayline got 3 diagrams (upload, immediate/timed, conditional). DRC got 2 (dock-path + pilot-path — single sequence each because the control-stream inner loop is the same shape). Livestream got 3 (dock-path + pilot-server-initiated + pilot-app-initiated JSBridge). None of the 9b docs needed more than 3.
+2. **Dock 3 Remote-Control family documented via three-way split** (shared vs Dock-2-only vs Dock-3-only) with explicit counts per bucket. Avoids miscategorizing `drc_force_landing` (shared, not Dock-3-only) or `drc_camera_mode_switch` (Dock-2-only, not shared). Matches Phase 4e-2 authoring decision.
+3. **Pilot-path livestream has two launch modes** — server-triggered (MQTT `live_start_push`) and app-triggered (JSBridge `liveshareSetConfig`). Both documented because DJI's pilot feature-set page shows both and real implementations encounter both. Dock-path has no JSBridge equivalent since there's no Pilot 2 browser.
+4. **Phase 7 cross-cohort protocol matrix republished in livestream workflow** because it's load-bearing for `url_type` selection. Keeps the workflow self-contained for an operator reading in sequence.
+5. **Agora URL-encode-once callout surfaced** — Phase 7 `agora.md` already documents it; repeated in the livestream workflow error-paths table because it's a common implementation failure and cross-referencing Phase 7 isn't enough visibility.
+6. **Variants section covers cohort divergence inline**, per the 9a precedent. Wayline doc's "Pilot-side wayline authoring only" variant acknowledges manual flight without dock; DRC doc's "DRC 2.0" variant documents the `commander_flight_height` semantics; livestream doc's matrix variant documents per-cohort protocol gaps.
+7. **Error path tables cite specific BC modules** — wayline `517` `WaylineErrorCodeEnum`; DRC `514` `ControlErrorCodeEnum`; livestream `513` `LiveErrorCodeEnum`. Gives implementers the Phase 8 bridge.
+
+### DJI-source inconsistencies noted during 9b
+
+Carry into 9c; none rise to OQ level:
+
+- **Pilot-livestream feature-set narrates v1.11-era state** — says "Currently only Mavic 3 Enterprise Series model is supported" for pilot DRC, but v1.15 adds RC Plus 2 + M4D support (per Phase 4h + Phase 6b). The workflow doc cites both cohorts since v1.15 is wire-authoritative.
+- **`live_start_push` Dock 3 example uses `url_type: 0`** — invalid per the Dock 3 enum (which drops `0`). Already flagged in [Phase 4d `live_start_push.md`](mqtt/dock-to-cloud/services/live_start_push.md); workflow doc references the corrected enum.
+- **v1.11 dock-livestream feature-set omits pilot-path sequence detail** — pilot choreography comes from the pilot-feature-set page (four Mermaid sub-sequences: module load, server-triggered start, verification pass/fail, app-triggered start).
+- **`live_set_quality` bitrate tables diverge across v1.11 Dock 2 / v1.15 Dock 2 / v1.15 Dock 3** — already flagged in Phase 4d; workflow doc refers consumers to the device's run-time negotiation.
+- **No v1.11 feature-set coverage of in-flight wayline delivery** — documented via Phase 4b method docs only. Dock-3-primary family; workflow doc adds a §8 section pointing at the 5 `in_flight_wayline_*` entries.
+
+### Handoff to 9c
+
+**9c sources** (per [RESUME-NOTES entry for Phase 9a](#2026-04-19--handoff-at-phase-9a-close-ready-for-review-gate)):
+
+- HMS event reporting: Phase 4f [`events/hms.md`](mqtt/dock-to-cloud/events/hms.md) + Phase 8 [`hms-codes/`](hms-codes/README.md) 1,769-alarm catalog.
+- FlySafe + CFA: Phase 4f [`unlock_license_*`](mqtt/dock-to-cloud/services/) + [`flight_areas_get`](mqtt/dock-to-cloud/requests/flight_areas_get.md) / [`flight_areas_update`](mqtt/dock-to-cloud/services/flight_areas_update.md) + events [`flight_areas_drone_location`](mqtt/dock-to-cloud/events/flight_areas_drone_location.md) + [`flight_areas_sync_progress`](mqtt/dock-to-cloud/events/flight_areas_sync_progress.md). Feature-set pages: `Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/60.custom-flight-area.md` + `70.flysafe-unlock.md` (check filenames on kickoff).
+- AirSense: Phase 4f [`events/airsense_warning.md`](mqtt/dock-to-cloud/events/airsense_warning.md). Feature-set: `Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/90.airsense.md` (check filename).
+- Media upload: Phase 4d [`events/file_upload_callback.md`](mqtt/dock-to-cloud/events/file_upload_callback.md) + [`events/highest_priority_upload_flighttask_media.md`](mqtt/dock-to-cloud/events/highest_priority_upload_flighttask_media.md) + [`services/upload_flighttask_media_prioritize.md`](mqtt/dock-to-cloud/services/upload_flighttask_media_prioritize.md) + [`requests/storage_config_get.md`](mqtt/dock-to-cloud/requests/storage_config_get.md) + Phase 3 [`http/media/`](http/media/) + [`http/storage/sts-credential.md`](http/storage/sts-credential.md). Feature-set: `Cloud-API-Doc/docs/en/30.feature-set/20.dock-feature-set/40.dock-media-management.md` (check filename).
+- Remote control handoff: Phase 4h [`cloud_control_auth_request`](mqtt/pilot-to-cloud/services/cloud_control_auth_request.md) + [`cloud_control_auth_notify`](mqtt/pilot-to-cloud/events/cloud_control_auth_notify.md) + [`cloud_control_release`](mqtt/pilot-to-cloud/services/cloud_control_release.md) + cross-ref to DRC workflow for DRC-session handoff.
+
+**Estimated 9c output**: 5 workflow docs, average ~250 lines each (simpler choreographies than 9b — mostly single-path event streams). Total target: ~1,200 lines.
+
+### Remaining phases after Phase 9
+
+- Phase 10 — Device annexes + final corpus review.
+
+---
+
 ## 2026-04-19 — handoff at Phase 9a close, ready for review gate
 
 ### State of play

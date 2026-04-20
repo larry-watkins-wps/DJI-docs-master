@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 9a review gate closed 2026-04-19. Phase 9b (missions & operations) is current. Phase 9c (events + media + handoff) follows.
+**Current phase**: Phase 9b (missions & operations) landed 2026-04-19; review gate pending. Phase 9c (events + media + handoff) is next.
 
 ---
 
@@ -333,10 +333,13 @@ Authoritative workflow narrative comes from `Cloud-API-Doc/` v1.11 feature-set p
 
 ### Sub-phase 9b — Missions & operations
 
-- [ ] `workflows/wayline-upload-and-execution.md` — Pilot-HTTPS wayline upload (Phase 3 wayline endpoints) + `flighttask_prepare` → `flighttask_execute` + `flighttask_progress` (+ `flighttask_resource_get`, `flighttask_undo`) + immediate/timed/conditional task variants + breakpoint recovery.
-- [ ] `workflows/live-flight-controls-drc.md` — `flight_authority_grab` / `payload_authority_grab` → `drc_mode_enter` → stick / drone-control DRC stream + `heart_beat` + `delay_info_push` + `hsi_info_push` + `osd_info_push`; dock DRC (Phase 4c + 4e-2) and pilot DRC (Phase 4h).
-- [ ] `workflows/livestream-start-stop.md` — `live_start_push` / `live_stop_push` per protocol (RTMP / GB28181 / WebRTC / Agora per Phase 7); pilot-side JSBridge `type` enum translation.
-- [ ] **Review gate 9b**.
+- [x] [`workflows/wayline-upload-and-execution.md`](workflows/wayline-upload-and-execution.md) — Pilot-HTTPS wayline upload (Phase 3: `duplicate-name` + `sts-credential` + direct OSS PUT + `upload-callback` + `list` / `download` / `favorites-*`) + `flighttask_prepare` → `flighttask_execute` + `flighttask_progress` (+ `flighttask_resource_get`, `flighttask_undo` / `_stop` / `_pause` / `_recovery`) + immediate / timed / conditional task variants + breakpoint recovery (with `rth_altitude` replacing `wpml:takeOffSecurityHeight` caveat) + in-flight wayline delivery (Dock 3) + RTH auxiliary services + simulated flight.
+- [x] [`workflows/live-flight-controls-drc.md`](workflows/live-flight-controls-drc.md) — `flight_authority_grab` / `payload_authority_grab` → `drc_mode_enter` (relay-broker + frequencies) → stick / drone-control DRC stream + `heart_beat` + `delay_info_push` + `hsi_info_push` + `osd_info_push`; dock DRC (Phase 4c + 4e-2 — 42 + 53 methods, shared vs Dock-2-only vs Dock-3-only split) and pilot DRC (Phase 4h). Pilot-side consent flow (`cloud_control_auth_request` / `state is_cloud_control_auth` / `cloud_control_release`). DRC 2.0 `commander_flight_height` semantics.
+- [x] [`workflows/livestream-start-stop.md`](workflows/livestream-start-stop.md) — capability announcement (`live_capacity` via `state`) + `live_start_push` per protocol (RTMP / GB28181 / WebRTC / Agora per Phase 7) + mid-stream `live_set_quality` / `live_lens_change` / `live_camera_change` + `live_stop_push`. Cohort × protocol matrix (Dock 3 drops Agora; RC Pro drops WebRTC). Pilot-side JSBridge preload + server-triggered vs app-triggered variants. Agora `+`-in-token URL-encode-once rule cross-cited.
+- [x] Update [`workflows/README.md`](workflows/README.md) with 9b catalog + sub-phase status.
+- [x] Update corpus [`README.md`](README.md) with 9b entries.
+- [x] Append to [`RESUME-NOTES.md`](RESUME-NOTES.md) with 9b close handoff.
+- [ ] **Review gate 9b** — pending.
 
 ### Sub-phase 9c — Events, media & handoff
 
