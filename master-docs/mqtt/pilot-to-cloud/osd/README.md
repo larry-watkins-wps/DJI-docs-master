@@ -4,7 +4,7 @@ The OSD topic carries **high-frequency property push** — stable-frequency prop
 
 Part of the Phase 4 MQTT catalog. Shared conventions live in [`../../README.md`](../../README.md).
 
-This file is a **shell** — the actual property catalog lives in Phase 6 [`device-properties/`](../../../device-properties/) (pending).
+This file is a **shell** — the actual property catalog lives in Phase 6 [`device-properties/`](../../../device-properties/). Aircraft catalogs (landed in Phase 6b): [`m3d.md`](../../../device-properties/m3d.md), [`m3td.md`](../../../device-properties/m3td.md), [`m4d.md`](../../../device-properties/m4d.md), [`m4td.md`](../../../device-properties/m4td.md); pilot-path baseline: [`_aircraft-pilot-base.md`](../../../device-properties/_aircraft-pilot-base.md). RC catalogs pending Phase 6c.
 
 ---
 
@@ -20,16 +20,24 @@ On pilot-to-cloud, `{device_sn}` is:
 
 ## In-scope devices on the pilot-to-cloud path
 
-| Device | `device_sn` role | Property source | Phase 6 pointer (pending) |
+| Device | `device_sn` role | Property source | Phase 6 pointer |
 |---|---|---|---|
-| **RC Plus 2 Enterprise** | RC serial | [`DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt) | `device-properties/rc-plus-2.md` |
-| **RC Pro Enterprise** | RC serial | [`DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt) · v1.11 [`Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md`](../../../../Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md) | `device-properties/rc-pro.md` |
-| **M3D / M3TD** (when paired with RC Pro) | Aircraft serial | Same sources as [`../../dock-to-cloud/osd/README.md`](../../dock-to-cloud/osd/README.md) — aircraft OSD is payload-identical regardless of gateway | `device-properties/m3d.md`, `m3td.md` |
-| **M4D / M4TD** (when paired with RC Plus 2) | Aircraft serial | Same sources as [`../../dock-to-cloud/osd/README.md`](../../dock-to-cloud/osd/README.md) | `device-properties/m4d.md`, `m4td.md` |
+| **RC Plus 2 Enterprise** | RC serial | [`DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt) | [`device-properties/rc-plus-2.md`](../../../device-properties/rc-plus-2.md) *(pending 6c)* |
+| **RC Pro Enterprise** | RC serial | [`DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt) · v1.11 [`Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md`](../../../../Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md) | [`device-properties/rc-pro.md`](../../../device-properties/rc-pro.md) *(pending 6c)* |
+| **M3D / M3TD** (when paired with RC Pro) | Aircraft serial | [`_aircraft-pilot-base.md`](../../../device-properties/_aircraft-pilot-base.md) ← [`DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt) (generic baseline); v1.11 canonical [`Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/10.m3-series/00.properties.md`](../../../../Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/10.m3-series/00.properties.md) | [`device-properties/m3d.md`](../../../device-properties/m3d.md) §B, [`m3td.md`](../../../device-properties/m3td.md) |
+| **M4D / M4TD** (when paired with RC Plus 2) | Aircraft serial | [`_aircraft-pilot-base.md`](../../../device-properties/_aircraft-pilot-base.md) + M4D delta spec [`DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt) | [`device-properties/m4d.md`](../../../device-properties/m4d.md) §B, [`m4td.md`](../../../device-properties/m4td.md) |
 
-## Aircraft OSD is gateway-agnostic
+## Aircraft OSD is NOT gateway-agnostic — updated 6b
 
-The aircraft OSD topic (`thing/product/{aircraft_sn}/osd`) and its payload schema are identical whether the aircraft is paired with a dock or with an RC. Phase 6 aircraft property docs are the single source of truth; the pilot-to-cloud path just observes the same aircraft-sn-scoped topic.
+**Correction to earlier 4i language**: the aircraft OSD **topic name** is the same on both paths (`thing/product/{aircraft_sn}/osd`) but the **set of properties published** differs between dock-path and pilot-path. Phase 6b discovered (see [`m3d.md`](../../../device-properties/m3d.md) §B and [`m4d.md`](../../../device-properties/m4d.md) §B):
+
+- **Dock-path only** (published on OSD when a dock is relaying): `best_link_gateway`, `wireless_link_topo`, `flysafe_database_version`, `psdk_ui_resource`, `psdk_widget_values`, `distance_limit_status`, `rth_altitude`, `remaining_power_for_return_home`, and (for M3D/M3TD cohort) the `commander_*` trio and `offline_map_enable` / `current_rth_mode` / `rth_mode`.
+- **Pilot-path only**: `country`. M4D pilot-path additionally publishes `current_commander_flight_mode` which has no dock-path counterpart.
+- **Both paths**: all `cameras` / `{type-subtype-gimbalindex}` / position / attitude / battery / maintain / firmware properties — with occasional type drift (e.g., `latitude` is `double` on dock-path and `float` on pilot-path).
+
+The topic name and envelope are gateway-agnostic; the content is not. Phase 6 per-device docs capture the dock-path vs pilot-path split property-by-property.
+
+See [`../README.md` §Cohort conventions](../README.md#cohort-conventions) for the RC-to-aircraft pairing matrix.
 
 See [`../README.md` §Cohort conventions](../README.md#cohort-conventions) for the RC-to-aircraft pairing matrix.
 

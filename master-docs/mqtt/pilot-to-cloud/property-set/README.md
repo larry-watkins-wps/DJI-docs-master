@@ -4,7 +4,7 @@ The property-set topic carries **cloud-initiated writes** to writable device pro
 
 Part of the Phase 4 MQTT catalog. Shared conventions live in [`../../README.md`](../../README.md).
 
-This file is a **shell** — the catalog of writable properties (which keys are writable, their enums, write semantics) lives in Phase 6 [`device-properties/`](../../../device-properties/) (pending).
+This file is a **shell** — the catalog of writable properties (which keys are writable, their enums, write semantics) lives in Phase 6 [`device-properties/`](../../../device-properties/). Aircraft catalogs (landed in Phase 6b): [`m3d.md`](../../../device-properties/m3d.md) §3, [`m3td.md`](../../../device-properties/m3td.md), [`m4d.md`](../../../device-properties/m4d.md) §3, [`m4td.md`](../../../device-properties/m4td.md); pilot-path aircraft baseline: [`_aircraft-pilot-base.md`](../../../device-properties/_aircraft-pilot-base.md) §3. RC catalogs pending Phase 6c.
 
 ---
 
@@ -21,9 +21,12 @@ On pilot-to-cloud, `{gateway_sn}` is the **RC** serial. Even when the writable p
 
 | Device | Representative writable properties (see Phase 6 for full list) |
 |---|---|
-| **RC Plus 2 Enterprise** | Active SIM-slot selection, DRC-mode-related preferences, livestream config toggles. Per [`DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt). |
-| **RC Pro Enterprise** | Subset of RC Plus 2's writable set. Per [`DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt). |
-| **Aircraft (M3D/M3TD/M4D/M4TD)** | Same writable aircraft properties as the dock-to-cloud [`../../dock-to-cloud/property-set/README.md`](../../dock-to-cloud/property-set/README.md#in-scope-devices-on-the-dock-to-cloud-path) — writable via the RC gateway when paired with an RC. |
+| **RC Plus 2 Enterprise** | Active SIM-slot selection, DRC-mode-related preferences, livestream config toggles. Per [`DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt). Full list pending Phase 6c. |
+| **RC Pro Enterprise** | Subset of RC Plus 2's writable set. Per [`DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt). Full list pending Phase 6c. |
+| **Aircraft (M3D / M3TD)** | Pilot-path writable surface = baseline: `height_limit`, `night_lights_state`, `camera_watermark_settings` (9-field struct), and the `thermal_*` cluster on the `{type-subtype-gimbalindex}` payload struct. See [`_aircraft-pilot-base.md`](../../../device-properties/_aircraft-pilot-base.md) §3. |
+| **Aircraft (M4D / M4TD)** | Baseline writable surface **plus** `commander_flight_height`, `commander_flight_mode`, `commander_mode_lost_action` — the M4D FlyTo scheduling trio is writable over the pilot path. See [`m4d.md`](../../../device-properties/m4d.md) §3. |
+
+Note: dock-path writable aircraft properties (`obstacle_avoidance`, `distance_limit_status`, `rth_altitude`, `remaining_power_for_return_home`, `commander_*` on M3D) are not writable from the pilot path — that writable surface is dock-path exclusive.
 
 ## Envelope — set request and reply
 

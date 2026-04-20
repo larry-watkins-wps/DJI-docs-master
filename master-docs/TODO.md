@@ -2,7 +2,7 @@
 
 Cross-session source of truth. Update checkboxes as work completes. Before ending any session, reconcile this file against actual work done.
 
-**Current phase**: Phase 6a landed 2026-04-19 (master matrix + Dock 2 + Dock 3). Phase 6b (aircraft) is next.
+**Current phase**: Phase 6b landed 2026-04-19 (aircraft: M3D, M3TD, M4D, M4TD + shared pilot-path baseline). Phase 6c (RCs) is next.
 
 ---
 
@@ -253,14 +253,15 @@ Each sub-phase has its own review gate. Design decisions locked at 6a kickoff (2
 
 ### Sub-phase 6b — Aircraft properties (M3D, M3TD, M4D, M4TD)
 
-- [ ] `device-properties/_aircraft-pilot-base.md` — shared pilot-path aircraft property catalog (from `DJI_CloudAPI_Aircraft-Properties.txt`, ~250 rows).
-- [ ] `device-properties/m3d.md` — dock-path (from `DJI_CloudAPI_M3D_M3DT_Properties.txt`) + pilot-path (inherits `_aircraft-pilot-base.md` + M3D-specific deltas).
-- [ ] `device-properties/m3td.md` — M3TD-specific deltas (shared source with M3D at dock-path).
-- [ ] `device-properties/m4d.md` — dock-path (from `DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`) + pilot-path (from `DJI_CloudAPI_Matrice4-Enterprise-Properties.txt`).
-- [ ] `device-properties/m4td.md` — shared source with M4D at dock-path; deltas only.
-- [ ] Extend master matrix README §4.2 (aircraft-level coverage table).
-- [ ] Update corpus `README.md`.
-- [ ] Append to `RESUME-NOTES.md`.
+- [x] `device-properties/_aircraft-pilot-base.md` — shared pilot-path aircraft property catalog (34 OSD + 8 state top-level + `{type-subtype-gimbalindex}` struct, from `DJI_CloudAPI_Aircraft-Properties.txt`).
+- [x] `device-properties/m3d.md` — dock-path (42 top-level, from `DJI_CloudAPI_M3D_M3DT_Properties.txt`) + pilot-path (inherits `_aircraft-pilot-base.md`; M3-series has no M3D-specific pilot-path extensions in v1.11 canonical).
+- [x] `device-properties/m3td.md` — thermal-variant annex; same property catalog as M3D, difference expressed via `payload_index` enum.
+- [x] `device-properties/m4d.md` — dock-path (42 top-level, from `DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`) + pilot-path (baseline + 7 M4D-specific extensions from `DJI_CloudAPI_Matrice4-Enterprise-Properties.txt`: `offline_map_enable`, `current_rth_mode`, `rth_mode`, `commander_flight_height`, `commander_flight_mode`, `current_commander_flight_mode`, `commander_mode_lost_action` + `mode_code` enum extension to value 19).
+- [x] `device-properties/m4td.md` — thermal-variant annex.
+- [x] Extend master matrix README §4.2 (aircraft-level coverage table — 56-property-row grid across dock-path / pilot-path / M3 / M4 cohorts).
+- [x] Update 4i dock-to-cloud + pilot-to-cloud shells (`osd/`, `state/`, `property-set/`) to link the real Phase 6b docs.
+- [x] Update corpus `README.md`.
+- [x] Append to `RESUME-NOTES.md`.
 - [ ] **Review gate 6b**
 
 ### Sub-phase 6c — RC properties (RC Plus 2 Enterprise, RC Pro Enterprise)

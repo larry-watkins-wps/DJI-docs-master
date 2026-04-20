@@ -24,10 +24,10 @@ Same set as [`../osd/`](../osd/README.md#in-scope-devices-on-the-dock-to-cloud-p
 |---|---|---|
 | **DJI Dock 2** | [`DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock2-Properties.txt) | [`device-properties/dock2.md`](../../../device-properties/dock2.md) |
 | **DJI Dock 3** | [`DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-Dock3-DeviceProperties.txt) | [`device-properties/dock3.md`](../../../device-properties/dock3.md) |
-| **Matrice 3D (M3D)** | [`DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt) + shared aircraft | `device-properties/m3d.md` *(pending 6b)* |
-| **Matrice 3TD (M3TD)** | same as M3D | `device-properties/m3td.md` *(pending 6b)* |
-| **Matrice 4D (M4D)** | [`DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt) | `device-properties/m4d.md` *(pending 6b)* |
-| **Matrice 4TD (M4TD)** | same as M4D | `device-properties/m4td.md` *(pending 6b)* |
+| **Matrice 3D (M3D)** | [`DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt) | [`device-properties/m3d.md`](../../../device-properties/m3d.md) |
+| **Matrice 3TD (M3TD)** | same as M3D (co-documented) | [`device-properties/m3td.md`](../../../device-properties/m3td.md) |
+| **Matrice 4D (M4D)** | [`DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`](../../../../DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt) | [`device-properties/m4d.md`](../../../device-properties/m4d.md) |
+| **Matrice 4TD (M4TD)** | same as M4D (co-documented) | [`device-properties/m4td.md`](../../../device-properties/m4td.md) |
 
 ## Representative envelope
 

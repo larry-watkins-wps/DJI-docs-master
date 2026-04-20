@@ -6,6 +6,109 @@ Latest entry is at the top. Older entries kept below for audit traceability.
 
 ---
 
+## 2026-04-19 — handoff at Phase 6b close, ready for review gate
+
+### State of play
+
+- Phases 0, 1, 2, 3, 4, 5 complete and committed. Phase 6 (Device properties) — **6a + 6b landed**.
+- **Sub-phase 6b content-complete** — aircraft catalog for M3D, M3TD, M4D, M4TD + shared pilot-path baseline. Phase 6b review gate is the only remaining 6b item.
+- **Phase 6c (RCs) is next** — RC Plus 2 Enterprise + RC Pro Enterprise gateway-level catalogs.
+
+### What 6b produced
+
+- [`device-properties/_aircraft-pilot-base.md`](device-properties/_aircraft-pilot-base.md) — shared pilot-path aircraft baseline. 42 top-level (34 OSD + 8 state) + the `{type-subtype-gimbalindex}` per-payload struct with laser-ranging + thermal fields. Cites the full camera struct (wide / zoom exposure modes, 60-value shutter enum, ISO enum, etc.) inline to be self-contained. 3 writable properties (`height_limit`, `night_lights_state`, `camera_watermark_settings` struct) + the thermal cluster on the payload struct.
+- [`device-properties/m3d.md`](device-properties/m3d.md) — M3D dock-path catalog (42 top-level: 24 OSD + 18 state) + pilot-path section citing the base. Dock-path source [`DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt`](../DJI_Cloud/DJI_CloudAPI_M3D_M3DT_Properties.txt) (2,373 lines — biggest Phase 6 source). 6 writable dock-path properties. Dock-path adds `"10":"RTK fixed"` to `position_state.»quality` and extends `mode_code_reason` to value 23 vs the pilot-path baseline. v1.11 cross-check confirms schema stable (v1.15 adds `distance_limit_status` + `rth_altitude` as new top-level aircraft properties).
+- [`device-properties/m3td.md`](device-properties/m3td.md) — thermal-variant annex for M3D. Same property catalog; thermal variant distinguished at the `{domain-type-subtype}` device-model-key level, not at the property level.
+- [`device-properties/m4d.md`](device-properties/m4d.md) — M4D dock-path catalog (42 top-level, same shape as M3D with two cohort deltas) + pilot-path section. Dock-path source [`DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt`](../DJI_Cloud/DJI_CloudAPI-DockToCloud_Matrice_4D_4DT-DeviceProperties.txt) (218 lines). Pilot-path source [`DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt`](../DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt) (117 lines — **delta spec**, not full catalog). **7 M4D-only pilot-path extensions** beyond the baseline: `offline_map_enable`, `current_rth_mode`, `rth_mode`, `commander_flight_height` (rw), `commander_flight_mode` (rw), `current_commander_flight_mode` (read-back only on pilot-path), `commander_mode_lost_action` (rw). `mode_code` enum extended to value 19 `"Dock site evaluation in progress"`. No v1.11 counterpart for M4D on either path.
+- [`device-properties/m4td.md`](device-properties/m4td.md) — thermal-variant annex for M4D. Property-level identical to M4D.
+- Extended [`device-properties/README.md`](device-properties/README.md) §4.2 with a full 56-row aircraft coverage table (columns: Dock-path M3\* / Dock-path M4\* / Pilot-path M3\* / Pilot-path M4\*, rows grouped by semantic family). Added §4.3 pointer to pending 6c RC catalogs. Added §6 provenance table for 6b sources.
+- Updated 4i shells (dock-to-cloud + pilot-to-cloud `osd/`, `state/`, `property-set/`) to link real 6b docs (removed the "pending 6b" markers; corrected property-source citations). Also added a **dock-vs-pilot path clarification** to [`mqtt/pilot-to-cloud/osd/README.md`](mqtt/pilot-to-cloud/osd/README.md) — the 4i language said aircraft OSD is "gateway-agnostic" but 6b discovered that while the topic is gateway-agnostic, the *set* of properties differs meaningfully (17 dock-path-exclusive properties, 1 pilot-path-exclusive, with occasional type drift on shared properties).
+- Updated corpus [`README.md`](README.md) TOC and [`TODO.md`](TODO.md) 6b section.
+
+### Design decisions locked at 6b drafting
+
+Carried into 6c:
+
+1. **Aircraft pilot-path baseline as a single source of truth** — [`_aircraft-pilot-base.md`](device-properties/_aircraft-pilot-base.md) carries the full catalog from [`Aircraft-Properties.txt`](../DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt); per-aircraft pilot-path sections (m3d.md §B, m4d.md §B) cite the baseline and enumerate only deltas. Avoids duplicating ~250 rows across four aircraft files.
+2. **Dock-path docs inline the full catalog** — readers doing an M3D dock-path lookup should not need to cross-reference three files. The m3d.md dock-path table (§A.1 / A.2) is self-contained. m4d.md §A refers to m3d.md §A.1/A.2 for the shared shape and enumerates only the M4D-specific cohort deltas (`mode_code` value 21, `remaining_power_*` text).
+3. **Thermal variants as deltas** — m3td.md and m4td.md are small annex files. Property catalogs are identical; differences are at the payload enum level and are flagged for deeper treatment in Phase 10 device-annexes.
+4. **Camera struct enum compression** — the 60-value shutter speed enum, 32-value EV enum, 13-value ISO enum are inlined once in [`_aircraft-pilot-base.md`](device-properties/_aircraft-pilot-base.md) §1 and cited ("same 60-value enum as `wide_shutter_speed`") in the per-device dock-path tables. Keeps tables readable while preserving full grep-ability.
+5. **M4D pilot-path extract is a *delta spec***, not a full catalog — critical to flag (m4d.md §B.3). Cloud implementations that treat "absent from the Matrice4-Enterprise file" as "not published by M4D on pilot-path" will miss the baseline-inherited properties. This is DJI's own convention; we mirror it but call out the baseline-inheritance semantics clearly.
+6. **Type drift between dock-path and pilot-path** — `latitude` / `longitude` / `height` are `double` on dock-path and `float` on pilot-path; `cameras.»zoom_factor` is `float` (dock) vs `int` (pilot-base) vs `float` (M3-series v1.11 pilot). Cloud parsers should be permissive.
+
+### DJI-source inconsistencies noted during 6b
+
+Carry into Phase 9 workflow authoring; none rise to OQ level:
+
+- **`{_{type-subtype-gimbalindex}__aembLbhPpc}` garbled struct-name cell** in M4D dock-path and M4D pilot-path extracts. Source extraction artifact. Authoritative name: literal `{type-subtype-gimbalindex}`.
+- **`mode_code` enum extensions divergent across paths**:
+  - M3D dock-path: max 20 (`"POI"`).
+  - M4D dock-path: max 21 (`"during the inbound and outbound flight procedures"`).
+  - M3D pilot-path: max 18 (`"Airborne RTK fixing mode"`) — baseline.
+  - M4D pilot-path: max 19 (`"Dock site evaluation in progress"`).
+  - Cloud parsers should handle any of these; none are removed.
+- **`mode_code_reason` enum** — pilot-path baseline max 22; dock-path extends to 23 (`"Triggered by strong winds in the dock scene (return)"`).
+- **`position_state.»quality` enum** — pilot-path baseline stops at `"5":"Gear 5"`; dock-path adds `"10":"RTK fixed"`. An RTK-fixed aircraft reports `10` regardless of gateway.
+- **Label drift between dock-path and pilot-path camera enums** — `"Shutter priority exposure"` vs `"Shutter Priority"`; `"Auto(high sense)"` vs `"Auto(High Sense)"`; `"-5.0ev"` vs `"-5.0EV"`; `"Fixed"` vs `"FIXED"`; `"Ir metering off"` vs `"Temperature measurement off"`. All enum codes stable.
+- **Label drift `wind_direction` value 1**: `"True North"` (dock/pilot-baseline) vs `"North"` (M4D pilot extract).
+- **`total_flight_time` type drift**: `float` (baseline) vs `int` (M4D pilot extract).
+- **`obstacle_avoidance` accessMode drift**: `rw` (dock-path) vs `r` (pilot-path baseline).
+- **`firmware_version` pushMode drift**: `1` / state (baseline) vs `0` / osd (M4D pilot extract).
+- **`current_rth_mode` / `rth_mode` labels**: `"Intelligent altitude"` / `"Preset altitude"` (M3D dock-path) vs `"Optimal"` / `"Preset"` (M4D pilot extract). Same codes.
+- **`remaining_power_for_return_home` recommendation text** differs between M3D ("Dock 2, 25–50%") and M4D ("Dock 3, 15–50%"). Wire range identical.
+- **Pilot-path `{type-subtype-gimbalindex}` struct's nested `»payload_index` has `pushMode: 1`** while the parent struct is `pushMode: 0` OSD. Cosmetic source defect; the whole payload-indexed struct rides OSD.
+- **`latitude` / `longitude` constraint cells use float-max/min dummy values** (`3.4028235E38` / `-1.4E-45`). Actual ranges `[-90, 90]` / `[-180, 180]` — source cosmetic.
+- **`»»type` / `»»sub_type` in `battery.batteries`** have empty enum `{}` in source. Runtime-populated per battery model.
+
+No new OQ entries.
+
+### After 6b review gate — kickoff for 6c
+
+**6c sources** (enumerated during 4i and re-verified 6b):
+
+- [`DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`](../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt) (625 lines) — RC Plus 2 Enterprise primary. Much larger than RC Pro; likely includes RC-level gateway properties + relayed aircraft subset + DRC state.
+- [`DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`](../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt) (68 lines) — RC Pro Enterprise primary. Thin extract — possibly a delta spec, possibly the full RC-level gateway catalog. Confirm at 6c enumeration.
+- v1.11 canonical: [`Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md`](../Cloud-API-Doc/docs/en/60.api-reference/10.pilot-to-cloud/00.mqtt/20.rc-pro/00.properties.md) — RC Pro Enterprise pilot-path properties.
+- Out-of-scope sibling [`DJI_Cloud/DJI_CloudAPI_RC-Properties.txt`](../DJI_Cloud/DJI_CloudAPI_RC-Properties.txt) (67 lines) — plain RC, not enterprise; do not document. May have enum overlap worth cross-checking.
+
+**Expected 6c output** (~500 lines total):
+- [`device-properties/rc-plus-2.md`](device-properties/rc-plus-2.md) — RC Plus 2 Enterprise full catalog (~300 lines estimated based on source size).
+- [`device-properties/rc-pro.md`](device-properties/rc-pro.md) — RC Pro Enterprise full catalog (~100 lines).
+- Master matrix §4.3 extended with per-property RC coverage table.
+- Updated 4i pilot-to-cloud shells with RC Phase 6c links (remove the remaining "pending 6c" markers on `rc-plus-2.md` / `rc-pro.md` citations).
+
+**6c filing decisions to confirm at kickoff**:
+
+- **RC Pro Enterprise 68-line file semantics** — is it a delta spec (vs RC Plus 2) or a standalone RC Pro catalog? If delta-spec, apply same pattern as M4D pilot-path (cite RC Plus 2 as base + enumerate deltas). If standalone, treat as full catalog.
+- **RC Plus 2 vs RC Pro cohort split** — RC Plus 2 pairs with M4D (current gen), RC Pro with M3D/M3TD. At the RC property level, each RC reports its own serial's properties — they don't inherit from each other on the wire. But publication conventions may still share common structure.
+- **RC-level `{gateway_sn}` ownership** — confirmed in Phase 4h that the RC is the `{gateway_sn}` on pilot-path; paired aircraft SN is the `{device_sn}`. RC property catalog is `{gateway_sn}`-scoped properties; paired aircraft property catalog is `{device_sn}`-scoped and belongs to the aircraft doc (6b).
+
+### Known gotchas carried into 6c
+
+- **6b-to-6c cross-link**: the pilot-path aircraft docs (m3d.md §B, m4d.md §B) describe what the **aircraft** publishes when relayed by an RC. The RC docs (6c) will describe what the **RC itself** publishes on its own `{gateway_sn}` topics. Keep these clearly separate.
+- **`{gateway_sn}` in property-set** — pilot-path property-set always targets `{gateway_sn}` = RC serial, even when writing to an aircraft property. Phase 4h's pilot-to-cloud [`property-set/README.md`](mqtt/pilot-to-cloud/property-set/README.md) already captures this; 6c just confirms which RC-specific properties are writable.
+- **Out-of-scope cohort references** — RC Plus 2's enums may reference M30 / M300 / M350 RTK aircraft (out-of-scope). Preserve those rows with out-of-scope notes for enum completeness, same pattern as 6a's Dock 2 / Dock 3 cross-references.
+- **M30/M30T, M300/M350** — Per 6a decisions, keep out-of-scope devices' rows in enum tables (e.g., `compatible_device_type`) but do not document per-device.
+
+### Open questions potentially affecting 6c
+
+- [`OQ-001`](OPEN-QUESTIONS.md#oq-001--source-version-mismatch-between-cloud-api-doc-v1113-and-dji_cloud-v115) — v1.11 vs v1.15 drift. 6b had no semantic escalations; RC properties should also be mostly cosmetic given the RC feature surface is narrower than aircraft.
+- [`OQ-002`](OPEN-QUESTIONS.md#oq-002--pilot-to-cloud-osd-struct-example-appears-to-be-a-copy-paste-of-the-dock-osd-example) — pilot OSD copy-paste bug. Resolved for 6b by citing per-aircraft property files; resolve similarly for 6c by citing per-RC files.
+- [`OQ-003`](OPEN-QUESTIONS.md#oq-003--mqtt-qos-retain-and-clean-session-settings-are-not-specified-in-djis-published-documentation) — QoS / retain. Not affected by Phase 6.
+
+### Remaining Phase 6 work
+
+- **6c** — RC Plus 2 Enterprise + RC Pro Enterprise catalogs. Final Phase 6 review gate after 6c.
+
+### Remaining phases after Phase 6
+
+- Phase 7 — WPML + livestream protocols.
+- Phase 8 — HMS codes + error codes.
+- Phase 9 — Workflows.
+- Phase 10 — Device annexes + final review.
+
+---
+
 ## 2026-04-19 — handoff at Phase 6a close, ready for review gate
 
 ### State of play

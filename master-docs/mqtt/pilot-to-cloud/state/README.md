@@ -4,7 +4,7 @@ The state topic carries **on-change property push** — properties reported by t
 
 Part of the Phase 4 MQTT catalog. Shared conventions live in [`../../README.md`](../../README.md).
 
-This file is a **shell** — the actual property catalog lives in Phase 6 [`device-properties/`](../../../device-properties/) (pending).
+This file is a **shell** — the actual property catalog lives in Phase 6 [`device-properties/`](../../../device-properties/). Aircraft catalogs (landed in Phase 6b): [`m3d.md`](../../../device-properties/m3d.md), [`m3td.md`](../../../device-properties/m3td.md), [`m4d.md`](../../../device-properties/m4d.md), [`m4td.md`](../../../device-properties/m4td.md); pilot-path baseline: [`_aircraft-pilot-base.md`](../../../device-properties/_aircraft-pilot-base.md). RC catalogs pending Phase 6c.
 
 ---
 
@@ -20,12 +20,12 @@ On pilot-to-cloud, `{device_sn}` is the aircraft's serial for aircraft state pus
 
 Same set as [`../osd/`](../osd/README.md#in-scope-devices-on-the-pilot-to-cloud-path). Each property in the catalog carries a `pushMode` column; only `pushMode: 1` properties ride this topic.
 
-| Device | Property source | Phase 6 pointer (pending) |
+| Device | Property source | Phase 6 pointer |
 |---|---|---|
-| **RC Plus 2 Enterprise** | [`DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt) | `device-properties/rc-plus-2.md` |
-| **RC Pro Enterprise** | [`DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt) | `device-properties/rc-pro.md` |
-| **M3D / M3TD** | Same sources as the dock-to-cloud aircraft state shells | `device-properties/m3d.md`, `m3td.md` |
-| **M4D / M4TD** | Same sources as the dock-to-cloud aircraft state shells | `device-properties/m4d.md`, `m4td.md` |
+| **RC Plus 2 Enterprise** | [`DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Plus-2-Enterprise-Properties.txt) | [`device-properties/rc-plus-2.md`](../../../device-properties/rc-plus-2.md) *(pending 6c)* |
+| **RC Pro Enterprise** | [`DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_RC-Pro-Enterprise-Properties.txt) | [`device-properties/rc-pro.md`](../../../device-properties/rc-pro.md) *(pending 6c)* |
+| **M3D / M3TD** | [`_aircraft-pilot-base.md`](../../../device-properties/_aircraft-pilot-base.md) ← [`DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Aircraft-Properties.txt) | [`device-properties/m3d.md`](../../../device-properties/m3d.md) §B, [`m3td.md`](../../../device-properties/m3td.md) |
+| **M4D / M4TD** | [`_aircraft-pilot-base.md`](../../../device-properties/_aircraft-pilot-base.md) + M4D delta [`DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt`](../../../../DJI_Cloud/DJI_CloudAPI_Matrice4-Enterprise-Properties.txt) | [`device-properties/m4d.md`](../../../device-properties/m4d.md) §B, [`m4td.md`](../../../device-properties/m4td.md) |
 
 ## Representative envelope
 

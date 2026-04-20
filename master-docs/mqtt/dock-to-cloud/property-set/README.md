@@ -23,8 +23,8 @@ This file is a **shell** — the actual catalog of writable properties (which ke
 |---|---|---|
 | **DJI Dock 2** | `silent_mode`, `user_experience_improvement`, `air_transfer_enable` (3 total). | [`device-properties/dock2.md`](../../../device-properties/dock2.md) §3 |
 | **DJI Dock 3** | Same 3 as Dock 2. No new gateway-level writable property added in Dock 3. | [`device-properties/dock3.md`](../../../device-properties/dock3.md) §3 |
-| **Matrice 3D / 3TD** | Aircraft-side writable props reported via dock `{gateway_sn}` — pending enumeration in 6b. | `device-properties/m3d.md` *(pending 6b)* |
-| **Matrice 4D / 4TD** | Aircraft-side writable props — pending 6b. | `device-properties/m4d.md` *(pending 6b)* |
+| **Matrice 3D / 3TD** | 6 writable aircraft-side props reported via dock `{gateway_sn}`: `obstacle_avoidance` (struct), `height_limit`, `night_lights_state`, `distance_limit_status` (struct), `rth_altitude`, + the state-mode `commander_flight_height` / `commander_flight_mode` / `commander_mode_lost_action` trio, `camera_watermark_settings` (struct), and `remaining_power_for_return_home`. Plus the `thermal_*` cluster on the `{type-subtype-gimbalindex}` payload struct. | [`device-properties/m3d.md`](../../../device-properties/m3d.md) §3 |
+| **Matrice 4D / 4TD** | Same writable surface as M3D / M3TD (co-documented). | [`device-properties/m4d.md`](../../../device-properties/m4d.md) §3 |
 
 Phase 6a confirmed that Dock-level writable surface is narrower than the 4i shell's initial speculation. Other dock controls that a cloud might expect to be writable (alarm, cover, supplement light, AC mode, battery store mode, night lights, RTK calibration) are exposed as **services** under [`../services/`](../services/) (Phase 4e-1 + 4e-2), not via property-set. Phase 9 workflows surface the service-vs-property-set decision per operation.
 
